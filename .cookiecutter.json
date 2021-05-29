@@ -1,0 +1,11 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Paul Everitt",
+  "email": "pauleveritt@me.com",
+  "friendly_name": "Hopscotch",
+  "github_user": "pauleveritt",
+  "license": "MIT",
+  "package_name": "hopscotch",
+  "project_name": "hopscotch",
+  "version": "0.0.0"
+}
