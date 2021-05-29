@@ -17,7 +17,6 @@ Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
-click = "^7.0"
 
 [tool.poetry.dev-dependencies]
 nox = "^2020.12.31"
@@ -25,7 +24,6 @@ pytest = "^6.2.3"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
 mypy = "^0.812"
-typeguard = "^2.12.0"
 xdoctest = {extras = ["colors"], version = "^0.15.4"}
 sphinx = "^3.5.4"
 sphinx-autobuild = "^2021.3.14"
@@ -41,8 +39,8 @@ darglint = "^1.8.0"
 reorder-python-imports = "^2.4.0"
 pre-commit-hooks = "^3.4.0"
 sphinx-rtd-theme = "^0.5.2"
-sphinx-click = "^2.7.1"
 Pygments = "^2.8.1"
+nox-poetry = "^0.8.5"
 
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"
