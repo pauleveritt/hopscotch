@@ -9,9 +9,6 @@ homepage = "https://github.com/pauleveritt/hopscotch"
 repository = "https://github.com/pauleveritt/hopscotch"
 documentation = "https://hopscotch.readthedocs.io"
 classifiers = [
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
 ]
 
@@ -23,6 +20,7 @@ python = "^3.6.1"
 click = "^7.0"
 
 [tool.poetry.dev-dependencies]
+nox = "^2020.12.31"
 pytest = "^6.2.3"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
