@@ -15,18 +15,10 @@ jobs:
           - { python-version: 3.9, os: ubuntu-latest, session: "pre-commit" }
           - { python-version: 3.9, os: ubuntu-latest, session: "safety" }
           - { python-version: 3.9, os: ubuntu-latest, session: "mypy" }
-          - { python-version: 3.8, os: ubuntu-latest, session: "mypy" }
-          - { python-version: 3.7, os: ubuntu-latest, session: "mypy" }
-          - { python-version: 3.6, os: ubuntu-latest, session: "mypy" }
           - { python-version: 3.9, os: ubuntu-latest, session: "tests" }
-          - { python-version: 3.8, os: ubuntu-latest, session: "tests" }
-          - { python-version: 3.7, os: ubuntu-latest, session: "tests" }
-          - { python-version: 3.6, os: ubuntu-latest, session: "tests" }
           - { python-version: 3.9, os: windows-latest, session: "tests" }
           - { python-version: 3.9, os: macos-latest, session: "tests" }
-          - { python-version: 3.9, os: ubuntu-latest, session: "typeguard" }
           - { python-version: 3.9, os: ubuntu-latest, session: "xdoctest" }
-          - { python-version: 3.8, os: ubuntu-latest, session: "docs-build" }
 
     env:
       NOXSESSION: ${{ matrix.session }}
@@ -71,7 +63,7 @@ jobs:
           print("::set-output name=result::{}".format(result))
 
       - name: Restore pre-commit cache
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         if: matrix.session == 'pre-commit'
         with:
           path: ~/.cache/pre-commit
@@ -138,4 +130,4 @@ jobs:
           nox --force-color --session=coverage -- xml
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v1.3.2
+        uses: codecov/codecov-action@v1.5.0

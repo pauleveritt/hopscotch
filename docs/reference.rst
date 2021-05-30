@@ -6,8 +6,8 @@ Reference
     :backlinks: none
 
 
-hopscotch.__main__
+hopscotch.hello
 ------------------
 
-.. automodule:: hopscotch.__main__
+.. automodule:: hopscotch.hello
    :members:
