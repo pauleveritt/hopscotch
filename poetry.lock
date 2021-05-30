@@ -717,7 +717,7 @@ docutils = ">=0.11,<1.0"
 
 [[package]]
 name = "ruamel.yaml"
-version = "0.17.4"
+version = "0.17.5"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 category = "dev"
 optional = false
@@ -1006,8 +1006,8 @@ tests = ["pytest", "pytest-cov", "codecov", "scikit-build", "cmake", "ninja", "p
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9.5"
-content-hash = "6907d02d826368fa3c042dde663b30323439469bc32c626d15493ddc63e4e44a"
+python-versions = "^3.9.1"
+content-hash = "04a4ed53747f8095d00ae9b5345cb1544f60852f31d157299747afb97b3d955b"
 
 [metadata.files]
 alabaster = [
@@ -1429,8 +1429,8 @@ restructuredtext-lint = [
     {file = "restructuredtext_lint-1.3.2.tar.gz", hash = "sha256:d3b10a1fe2ecac537e51ae6d151b223b78de9fafdd50e5eb6b08c243df173c80"},
 ]
 "ruamel.yaml" = [
-    {file = "ruamel.yaml-0.17.4-py3-none-any.whl", hash = "sha256:ac79fb25f5476e8e9ed1c53b8a2286d2c3f5dde49eb37dbcee5c7eb6a8415a22"},
-    {file = "ruamel.yaml-0.17.4.tar.gz", hash = "sha256:44bc6b54fddd45e4bc0619059196679f9e8b79c027f4131bb072e6a22f4d5e28"},
+    {file = "ruamel.yaml-0.17.5-py3-none-any.whl", hash = "sha256:b41919284c5387b949c1956145917e14060a0f74f1adc9a00c6bd6194f16e615"},
+    {file = "ruamel.yaml-0.17.5.tar.gz", hash = "sha256:97f71cdda0e7d2cdeba67812a90a160b23290095a1625d8d14e831f783a7bab6"},
 ]
 "ruamel.yaml.clib" = [
     {file = "ruamel.yaml.clib-0.2.2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:28116f204103cb3a108dfd37668f20abe6e3cafd0d3fd40dba126c732457b3cc"},
