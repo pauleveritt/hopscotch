@@ -16,7 +16,7 @@ classifiers = [
 Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
 [tool.poetry.dependencies]
-python = "^3.9.5"
+python = "^3.9.1"
 
 [tool.poetry.dev-dependencies]
 nox = "^2020.12.31"
