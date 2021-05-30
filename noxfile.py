@@ -164,7 +164,7 @@ def docs_build(session: Session) -> None:
     """Build the documentation."""
     args = session.posargs or ["docs", "docs/_build"]
     session.install(".")
-    session.install("sphinx", "sphinx-rtd-theme")
+    session.install("sphinx", "furo")
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
