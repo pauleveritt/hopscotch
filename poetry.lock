@@ -472,7 +472,7 @@ python-versions = "*"
 
 [[package]]
 name = "nox"
-version = "2020.12.31"
+version = "2021.6.6"
 description = "Flexible test automation."
 category = "dev"
 optional = false
@@ -480,7 +480,8 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 argcomplete = ">=1.9.4,<2.0"
-colorlog = ">=2.6.1,<5.0.0"
+colorlog = ">=2.6.1,<7.0.0"
+packaging = ">=20.9"
 py = ">=1.4.0,<2.0.0"
 virtualenv = ">=14.0.0"
 
@@ -1008,7 +1009,7 @@ tests = ["pytest", "pytest-cov", "codecov", "scikit-build", "cmake", "ninja", "p
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9.1"
-content-hash = "a25b110e994ef4d82b7db56000fda684d717a503acfd7d3231971f7c3332ac3b"
+content-hash = "634d934a2753f7ca9bf620514d833153d08ef41367c2036cf876d7a55c8d035d"
 
 [metadata.files]
 alabaster = [
@@ -1285,8 +1286,8 @@ nodeenv = [
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
 nox = [
-    {file = "nox-2020.12.31-py3-none-any.whl", hash = "sha256:f179d6990f7a0a9cebad01b9ecea34556518b8d3340dfcafdc1d85f2c1a37ea0"},
-    {file = "nox-2020.12.31.tar.gz", hash = "sha256:58a662070767ed4786beb46ce3a789fca6f1e689ed3ac15c73c4d0094e4f9dc4"},
+    {file = "nox-2021.6.6-py3-none-any.whl", hash = "sha256:1c935868a18c6e0bea0c8d2997612dcaaf464613d3c3c7620af8ff43b14326c8"},
+    {file = "nox-2021.6.6.tar.gz", hash = "sha256:ff894d2a134b0163147b43a72d5abb4348f307f100a52665a32a98a9ab8f244a"},
 ]
 nox-poetry = [
     {file = "nox-poetry-0.8.5.tar.gz", hash = "sha256:943853dfd835de6fba1d89efdc97d901c655d7c264794f48d9d607e608e59a95"},

@@ -19,7 +19,7 @@ Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 python = "^3.9.1"
 
 [tool.poetry.dev-dependencies]
-nox = "^2020.12.31"
+nox = "^2021.6.6"
 pytest = "^6.2.3"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
