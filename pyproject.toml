@@ -39,7 +39,7 @@ darglint = "^1.8.0"
 reorder-python-imports = "^2.4.0"
 pre-commit-hooks = "^4.0.1"
 Pygments = "^2.8.1"
-nox-poetry = "^0.8.5"
+nox-poetry = "^0.8.6"
 furo = "^2021.4.11-beta.34"
 
 [tool.poetry.scripts]
