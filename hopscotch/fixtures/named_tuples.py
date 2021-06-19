@@ -12,6 +12,12 @@ class Greeting(NamedTuple):
     salutation: str = "Hello"
 
 
+class GreetingNoDefault(NamedTuple):
+    """A ``NamedTuple`` to give a greeting without a default."""
+
+    salutation: str
+
+
 class Greeter(NamedTuple):
     """A ``NamedTuple`` to engage a customer."""
 

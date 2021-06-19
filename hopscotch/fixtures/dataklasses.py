@@ -1,7 +1,6 @@
 """Example objects and services implemented as dataclasses."""
 from dataclasses import dataclass
-from typing import Annotated
-from typing import Optional
+from typing import Annotated, Optional
 
 from . import Service
 
@@ -11,6 +10,13 @@ class Greeting:
     """A dataclass to give a greeting."""
 
     salutation: str = "Hello"
+
+
+@dataclass()
+class GreetingNoDefault:
+    """A dataclass to give a greeting with no default value."""
+
+    salutation: str
 
 
 @dataclass()

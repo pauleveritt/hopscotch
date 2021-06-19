@@ -19,4 +19,4 @@ def test_caller_package() -> None:
 def test_caller_package_init() -> None:
     """Ensure the utility function returns the calling package init."""
     result = main_package()
-    assert result.__name__ == "tests.fixtures.init_caller_package"
+    assert result.__name__ == "hopscotch.fixtures.init_caller_package"

@@ -11,6 +11,15 @@ class Greeting:
     salutation: str = "Hello"
 
 
+class GreetingNonDefault:
+    """A plain-old-class to give a greeting without a default."""
+
+    salutation: str = "Hello"
+
+    def __init__(self, salutation: str):
+        self.salutation = salutation
+
+
 class GreetingService(Service):
     """A plain-old-class ``Service`` to say greeting."""
 

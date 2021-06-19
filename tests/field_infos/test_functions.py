@@ -1,4 +1,4 @@
-"""Test the field discovery functions for plain classes."""
+"""Test the field discovery functions for function targets."""
 import typing
 
 from hopscotch.field_infos import (
@@ -6,15 +6,14 @@ from hopscotch.field_infos import (
     get_non_dataclass_field_infos,
     get_operator,
 )
-from hopscotch.fixtures.plain_classes import (
+from hopscotch.fixtures.functions import (
     Greeter,
-    GreetingNonDefault,
-    GreeterAnnotated,
-    GreeterOptional,
-    GreeterService,
     Greeting,
-    GreetingService,
+    GreetingNoDefault,
+    GreeterOptional,
+    GreeterAnnotated,
 )
+
 from hopscotch.fixtures import DummyGet
 
 
@@ -24,14 +23,6 @@ def test_get_field_origin_no_generic() -> None:
     param1_annotation = th["greeting"]
     result = get_field_origin(param1_annotation)
     assert Greeting is result
-
-
-def test_get_field_origin_service_no_generic() -> None:
-    """Find correct type on a ``Service`` with *no* generic involved."""
-    th = typing.get_type_hints(GreeterService, globalns=None, localns=None)
-    param1_annotation = th["greeting"]
-    result = get_field_origin(param1_annotation)
-    assert GreetingService is result
 
 
 def test_get_field_origin_generic() -> None:
@@ -80,12 +71,11 @@ def test_get_operator_no_annotated() -> None:
 
 def test_poc_field_info_str():
     """Extract field info from a full target and check caching."""
-    field_infos = get_non_dataclass_field_infos(GreetingNonDefault)
+    field_infos = get_non_dataclass_field_infos(GreetingNoDefault)
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
     assert field_infos[0].init is True
-
 
 #
 # def test_function_field_info_children() -> None:
