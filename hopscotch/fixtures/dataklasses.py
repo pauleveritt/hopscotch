@@ -1,11 +1,13 @@
 """Example objects and services implemented as dataclasses."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Annotated
 from typing import Optional
 
-from . import DummyGet
-from . import Service
+from ..operators import Get
+from ..registry import Service, Registry
 
 
 @dataclass()
@@ -33,9 +35,9 @@ class GreetingInitFalse:
 class GreetingOperator:
     """A dataclass to give a greeting via an operator."""
 
-    salutation: Annotated[
-        str,
-        DummyGet("some_arg"),
+    greeter: Annotated[
+        Greeting,
+        Get(Greeting),
     ]
 
 
@@ -49,6 +51,24 @@ class GreetingTuple:
 @dataclass()
 class GreetingService(Service):
     """A dataclass ``Service`` to say greeting."""
+
+    salutation: str = "Hello"
+
+
+@dataclass()
+class GreetingFactory(Service):
+    """Use the ``__hopscotch_factory__`` protocol to control creation."""
+
+    salutation: str
+
+    @classmethod
+    def __hopscotch_factory__(cls, registry: Registry) -> GreetingFactory:
+        return cls(salutation="Hi From Factory")
+
+
+@dataclass()
+class GreetingImplementer(GreetingService):
+    """A dataclass that "implements" a service."""
 
     salutation: str = "Hello"
 

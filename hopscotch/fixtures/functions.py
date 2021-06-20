@@ -2,7 +2,7 @@
 from typing import Annotated
 from typing import Optional
 
-from hopscotch.fixtures import DummyGet
+from hopscotch.fixtures import DummyOperator
 
 
 def Greeting(salutation: str = "Hello") -> str:
@@ -25,7 +25,7 @@ def GreeterOptional(greeting: Optional[str]) -> Optional[str]:
     return greeting
 
 
-def GreeterAnnotated(greeting: Annotated[str, DummyGet("YOLO")]) -> str:
+def GreeterAnnotated(greeting: Annotated[str, DummyOperator("YOLO")]) -> str:
     """A function to engage a customer with an ``Annotated``."""
     return greeting
 

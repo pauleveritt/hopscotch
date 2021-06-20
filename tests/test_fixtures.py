@@ -1,10 +1,11 @@
 """Make sure the test/example/docs examples work."""
 from hopscotch.fixtures import dataklasses
-from hopscotch.fixtures import DummyGet
+from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import init_caller_package
 from hopscotch.fixtures import named_tuples
 from hopscotch.fixtures import plain_classes
+from hopscotch.registry import Registry
 
 
 def test_init_caller_package() -> None:
@@ -19,18 +20,20 @@ def test_dataklass_fixtures() -> None:
     assert greeting.salutation == "Hello"
     assert dataklasses.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert not hasattr(dataklasses.GreetingInitFalse(), "salutation")
-    assert dataklasses.GreetingOperator("Hi").salutation == "Hi"
+    assert dataklasses.GreetingOperator(greeting).greeter.salutation == "Hello"
     assert dataklasses.GreetingTuple(("Hi", "Hey")).salutation == ("Hi", "Hey")
     gs = dataklasses.GreetingService()
     assert gs.salutation == "Hello"
     assert dataklasses.Greeter(greeting=greeting).greeting.salutation == "Hello"
     assert dataklasses.GreeterService(greeting=gs).greeting.salutation == "Hello"
-    assert (
-        dataklasses.GreeterAnnotated(greeting=greeting).greeting.salutation == "Hello"
-    )
+    gs2 = dataklasses.GreeterAnnotated(greeting=greeting).greeting.salutation
+    assert gs2 == "Hello"
     children = ("a",)
     assert dataklasses.GreeterChildren(children=children).children == children
     assert dataklasses.GreeterOptional(greeting=None).greeting is None
+    gi = dataklasses.GreetingImplementer()
+    assert gi.salutation == "Hello"
+    assert isinstance(gi, dataklasses.GreetingService)
 
 
 def test_functions_fixtures() -> None:
@@ -77,5 +80,6 @@ def test_plain_classes_fixtures() -> None:
 
 def test_dummy_get() -> None:
     """Check the fake operator."""
-    dg = DummyGet(arg="Hi")
-    assert dg() == "Hi"
+    dg = DummyOperator(arg="Hi")
+    registry = Registry()
+    assert dg(registry) == "Hi"

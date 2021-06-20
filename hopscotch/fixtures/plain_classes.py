@@ -2,7 +2,7 @@
 from typing import Annotated
 from typing import Optional
 
-from . import Service
+from hopscotch.registry import Service
 
 
 class Greeting:

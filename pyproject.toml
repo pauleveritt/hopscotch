@@ -17,6 +17,7 @@ Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
 [tool.poetry.dependencies]
 python = "^3.9.1"
+venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 nox = "^2021.6.12"
@@ -51,7 +52,7 @@ source_pkgs = ["hopscotch"]
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 100
+fail_under = 90
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

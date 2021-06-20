@@ -1,4 +1,6 @@
 """Introspect target types and normalize to standard field info."""
+from __future__ import annotations
+
 import inspect
 from dataclasses import Field
 from dataclasses import fields
@@ -13,24 +15,18 @@ from typing import get_origin
 from typing import get_type_hints
 from typing import NamedTuple
 from typing import Optional
-from typing import Protocol
 from typing import Tuple
 from typing import Type
+from typing import TYPE_CHECKING
 from typing import Union
 
 from hopscotch import VDOMNode
 
+if TYPE_CHECKING:
+    from hopscotch.operators import Operator
+
 SKIPPED_FIELD_NAMES = ("__hopscotch_predicates__",)
 EMPTY = getattr(inspect, "_empty")
-
-
-class Operator(Protocol):
-    """Specify the structure of operator implementations."""
-
-    def __call__(self) -> str:
-        """Operators are callables."""
-        # TODO When the registry arrives, pass it as an arg to __call__
-        ...
 
 
 class FieldInfo(NamedTuple):
@@ -143,7 +139,9 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
         if field_name not in SKIPPED_FIELD_NAMES
     ]
 
-    setattr(target, "__hopscotch_predicates__", field_infos)
+    # TODO Bring back in some other way than mutating the class, as
+    #   the data then shows up in subclasses.
+    # setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 
 
@@ -168,6 +166,8 @@ def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]
         for param in parameters
     ]
 
+    # TODO Bring back in some other way than mutating the class, as
+    #   the data then shows up in subclasses.
     setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 

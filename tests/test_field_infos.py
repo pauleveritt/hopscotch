@@ -8,14 +8,17 @@ from hopscotch.field_infos import get_dataclass_field_infos
 from hopscotch.field_infos import get_field_origin
 from hopscotch.field_infos import get_non_dataclass_field_infos
 from hopscotch.field_infos import get_operator
-from hopscotch.field_infos import Operator
 from hopscotch.fixtures import dataklasses
-from hopscotch.fixtures import DummyGet
+from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
 from hopscotch.fixtures import plain_classes
+from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.fixtures.dataklasses import GreetingOperator
 from hopscotch.fixtures.dataklasses import GreetingTuple
+from hopscotch.operators import Get
+from hopscotch.operators import Operator
+from hopscotch.registry import Registry
 
 
 @pytest.mark.parametrize(
@@ -89,11 +92,12 @@ def test_get_field_origin_primitive_type(target: type) -> None:
 def test_dummy_get_operator() -> None:
     """See if we can get the annotation to get the operator."""
     aa = getattr(typing, "_AnnotatedAlias")
-    field_type = aa(str, (DummyGet("some_arg"),))
+    field_type = aa(str, (DummyOperator("some_arg"),))
     field_type, operator = get_operator(field_type)
     assert str is field_type
+    registry = Registry()
     if operator is not None:
-        assert "some_arg" == operator()
+        assert "some_arg" == operator(registry)
 
 
 def test_get_operator_no_annotated() -> None:
@@ -131,9 +135,12 @@ def test_target_field_info_str(
 
     # Ensure the field info is stored on the callable, then
     # try to get again.
-    assert hasattr(target, "__hopscotch_predicates__")
-    field_infos2 = get_non_dataclass_field_infos(target)
-    assert field_infos2 == field_infos
+
+    # TODO Bring back in some other way than mutating the class, as
+    #   the data then shows up in subclasses.
+    # assert hasattr(target, "__hopscotch_predicates__")
+    # field_infos2 = get_non_dataclass_field_infos(target)
+    # assert field_infos2 == field_infos
 
 
 @pytest.mark.parametrize(
@@ -178,10 +185,10 @@ def test_field_info_more_generic() -> None:
 def test_dataclass_field_info_annotation() -> None:
     """Resolve an ``Annotated`` that uses an operator."""
     field_infos = get_dataclass_field_infos(GreetingOperator)
-    assert field_infos[0].field_name == "salutation"
-    assert field_infos[0].field_type is str
+    assert field_infos[0].field_name == "greeter"
+    assert field_infos[0].field_type is Greeting
     assert field_infos[0].default_value is None
-    assert isinstance(field_infos[0].operator, DummyGet)
+    assert isinstance(field_infos[0].operator, Get)
     assert field_infos[0].has_annotated is True
     operator: Operator = field_infos[0].operator
-    assert getattr(operator, "arg") == "some_arg"
+    assert getattr(operator, "lookup_key") is Greeting
