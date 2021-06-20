@@ -4,25 +4,25 @@ from types import ModuleType
 from typing import Callable
 
 
-def caller_module(level: int = 2, sys_mod: ModuleType = sys) -> ModuleType:
-    getframe = getattr(sys_mod, "_getframe")
+def caller_module(level: int = 2) -> ModuleType:
+    """Return the module of the caller of the current scope."""
+    getframe = getattr(sys, "_getframe")
     module_globals = getframe(level).f_globals
     module_name = module_globals.get("__name__") or "__main__"
-    modules = getattr(sys_mod, "modules")
-    module: ModuleType = modules[module_name]
+    module: ModuleType = sys.modules[module_name]
     return module
 
 
 def caller_package(
-        level: int = 2,
-        cm: Callable[
-            [
-                int,
-            ],
-            ModuleType,
-        ] = caller_module,
+    level: int = 2,
+    cm: Callable[
+        [
+            int,
+        ],
+        ModuleType,
+    ] = caller_module,
 ) -> ModuleType:
-    # cm caller_module in arg list for tests
+    """Return the package for the caller of a certain scope."""
     module = cm(level + 1)
     f = getattr(module, "__file__", "")
     if ("__init__.py" in f) or ("__init__$py" in f):  # empty at >>>
