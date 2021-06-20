@@ -22,7 +22,7 @@ from hopscotch import VDOMNode
 # from viewdom.render import VDOMNode
 
 SKIPPED_FIELD_NAMES = ("__hopscotch_predicates__",)
-EMPTY = getattr(inspect, "_empty")  # noqa: B009
+EMPTY = getattr(inspect, "_empty")
 
 
 class FieldInfo(NamedTuple):
@@ -116,7 +116,7 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
 def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at dataclasses."""
     try:
-        return getattr(target, "__hopscotch_predicates__")  # noqa: B009
+        return getattr(target, "__hopscotch_predicates__")
     except AttributeError:
         pass
 
@@ -134,14 +134,14 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
         if field_name not in SKIPPED_FIELD_NAMES
     ]
 
-    setattr(target, "__hopscotch_predicates__", field_infos)  # noqa: B010
+    setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 
 
 def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at non-dataclasses."""
     try:
-        return getattr(target, "__hopscotch_predicates__")  # noqa: B009
+        return getattr(target, "__hopscotch_predicates__")
     except AttributeError:
         pass
 
@@ -158,7 +158,7 @@ def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]
         for param in parameters
     ]
 
-    setattr(target, "__hopscotch_predicates__", field_infos)  # noqa: B010
+    setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 
 

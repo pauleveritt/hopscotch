@@ -1,8 +1,9 @@
 """Example objects and services implemented as dataclasses."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Annotated, Optional
 
-from . import Service
+from . import Service, DummyGet
+from .. import VDOMNode
 
 
 @dataclass()
@@ -17,6 +18,30 @@ class GreetingNoDefault:
     """A dataclass to give a greeting with no default value."""
 
     salutation: str
+
+
+@dataclass()
+class GreetingInitFalse:
+    """A dataclass with a field that inits to false."""
+
+    salutation: str = field(init=False)
+
+
+@dataclass()
+class GreetingOperator:
+    """A dataclass to give a greeting via an operator."""
+
+    salutation: Annotated[
+        str,
+        DummyGet("some_arg"),
+    ]
+
+
+@dataclass()
+class GreetingTuple:
+    """A dataclass to give a sequence of greetings."""
+
+    salutation: tuple[str, ...]
 
 
 @dataclass()
@@ -42,17 +67,20 @@ class GreeterService(Service):
 
 @dataclass()
 class GreeterOptional:
-    """A dataclass  to engage a customer with optional greeting."""
+    """A dataclass to engage a customer with optional greeting."""
 
     greeting: Optional[Greeting]
 
 
 @dataclass()
 class GreeterAnnotated:
-    """A plain-old-class to engage a customer with an annotation."""
+    """A dataclass to engage a customer with an annotation."""
 
     greeting: Annotated[Greeting, "YOLO"]
 
-    def __init__(self, greeting: Greeting):
-        """Construct a greeter that uses Annotated."""
-        self.greeting = greeting
+
+@dataclass()
+class GreeterChildren:
+    """A dataclass that is passed a tree of VDOM nodes."""
+
+    children: tuple[VDOMNode]

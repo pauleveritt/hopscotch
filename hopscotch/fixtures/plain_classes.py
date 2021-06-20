@@ -3,6 +3,7 @@ from typing import Annotated
 from typing import Optional
 
 from . import Service
+from .. import VDOMNode
 
 
 class Greeting:
@@ -11,12 +12,13 @@ class Greeting:
     salutation: str = "Hello"
 
 
-class GreetingNonDefault:
+class GreetingNoDefault:
     """A plain-old-class to give a greeting without a default."""
 
     salutation: str = "Hello"
 
     def __init__(self, salutation: str):
+        """Store salutation on the instance."""
         self.salutation = salutation
 
 
@@ -51,7 +53,7 @@ class GreeterOptional:
 
     greeting: Optional[Greeting]
 
-    def __init__(self, greeting: Greeting):
+    def __init__(self, greeting: Optional[Greeting]):
         """Construct a greeter with an optional greeting."""
         self.greeting = greeting
 
@@ -64,3 +66,13 @@ class GreeterAnnotated:
     def __init__(self, greeting: Greeting):
         """Construct a greeter that uses Annotated."""
         self.greeting = greeting
+
+
+class GreeterChildren:
+    """A plain-old-class that is passed a tree of VDOM nodes."""
+
+    children: tuple[VDOMNode]
+
+    def __init__(self, children: tuple[VDOMNode]):
+        """Construct a greeter that has children."""
+        self.children = children

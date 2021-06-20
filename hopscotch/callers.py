@@ -6,7 +6,7 @@ from typing import Callable
 
 def caller_module(level: int = 2) -> ModuleType:
     """Return the module of the caller of the current scope."""
-    getframe = getattr(sys, "_getframe")  # noqa: B009
+    getframe = getattr(sys, "_getframe")
     module_globals = getframe(level).f_globals
     module_name = module_globals.get("__name__") or "__main__"
     module: ModuleType = sys.modules[module_name]
