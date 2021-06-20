@@ -47,7 +47,6 @@ hopscotch = "hopscotch.__main__:main"
 
 [tool.coverage.run]
 branch = true
-source = ["hopscotch"]
 
 [tool.coverage.report]
 show_missing = true

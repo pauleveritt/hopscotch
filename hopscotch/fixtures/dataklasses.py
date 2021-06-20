@@ -1,9 +1,11 @@
 """Example objects and services implemented as dataclasses."""
-from dataclasses import dataclass, field
-from typing import Annotated, Optional
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Annotated
+from typing import Optional
 
-from . import Service, DummyGet
-from .. import VDOMNode
+from . import DummyGet
+from . import Service
 
 
 @dataclass()
@@ -83,4 +85,4 @@ class GreeterAnnotated:
 class GreeterChildren:
     """A dataclass that is passed a tree of VDOM nodes."""
 
-    children: tuple[VDOMNode]
+    children: tuple[str]

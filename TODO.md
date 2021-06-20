@@ -7,3 +7,4 @@
 ## Soon
 
 - A single `__hopscotch__` field to stamp on all generated info
+- Eliminate top-level `VDOMNode` type

@@ -15,6 +15,7 @@ repos:
         name: Check Toml
         entry: check-toml
         language: system
+
         types: [toml]
       - id: check-yaml
         name: Check Yaml
