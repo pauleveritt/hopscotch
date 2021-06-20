@@ -16,5 +16,5 @@ class VDOMNode:
 
     __slots__ = ["tag", "props", "children"]
     tag: str
-    props: Mapping
+    props: Mapping[object, object]
     children: list[Union[str, VDOMNode]]

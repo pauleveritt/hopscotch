@@ -45,9 +45,12 @@ furo = "^2021.4.11-beta.34"
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"
 
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
 [tool.coverage.run]
 branch = true
-source = ["hopscotch"]
+source = ["xxxhopscotch"]
 
 [tool.coverage.report]
 show_missing = true

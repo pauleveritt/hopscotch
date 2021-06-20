@@ -3,7 +3,6 @@ from typing import Annotated
 from typing import Optional
 
 from . import Service
-from .. import VDOMNode
 
 
 class Greeting:
@@ -71,8 +70,8 @@ class GreeterAnnotated:
 class GreeterChildren:
     """A plain-old-class that is passed a tree of VDOM nodes."""
 
-    children: tuple[VDOMNode]
+    children: tuple[str]
 
-    def __init__(self, children: tuple[VDOMNode]):
+    def __init__(self, children: tuple[str]):
         """Construct a greeter that has children."""
         self.children = children

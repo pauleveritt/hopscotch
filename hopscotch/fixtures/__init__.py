@@ -1,5 +1,4 @@
 """Example objects for tests, examples, and docs."""
-
 from dataclasses import dataclass
 
 

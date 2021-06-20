@@ -2,34 +2,32 @@
 import typing
 
 import pytest
-
 from hopscotch import VDOMNode
-from hopscotch.field_infos import (
-    get_field_origin,
-    get_operator,
-    get_non_dataclass_field_infos,
-    get_dataclass_field_infos,
-)
-from hopscotch.fixtures import (
-    dataklasses,
-    functions,
-    named_tuples,
-    plain_classes,
-    DummyGet,
-)
-from hopscotch.fixtures.dataklasses import GreetingOperator, GreetingTuple
+from hopscotch.field_infos import FieldInfo
+from hopscotch.field_infos import get_dataclass_field_infos
+from hopscotch.field_infos import get_field_origin
+from hopscotch.field_infos import get_non_dataclass_field_infos
+from hopscotch.field_infos import get_operator
+from hopscotch.field_infos import Operator
+from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyGet
+from hopscotch.fixtures import functions
+from hopscotch.fixtures import named_tuples
+from hopscotch.fixtures import plain_classes
+from hopscotch.fixtures.dataklasses import GreetingOperator
+from hopscotch.fixtures.dataklasses import GreetingTuple
 
 
 @pytest.mark.parametrize(
-    'target, expected',
+    "target, expected",
     [
         (dataklasses.Greeter, dataklasses.Greeting),
-        (functions.Greeter, functions.Greeting),
+        (functions.Greeter, str),
         (named_tuples.Greeter, named_tuples.Greeting),
         (plain_classes.Greeter, plain_classes.Greeting),
-    ]
+    ],
 )
-def test_get_field_origin_no_generic(target, expected) -> None:
+def test_get_field_origin_no_generic(target: object, expected: object) -> None:
     """Find correct type with *no* generic involved."""
     th = typing.get_type_hints(target, globalns=None, localns=None)
     param1_annotation = th["greeting"]
@@ -38,15 +36,15 @@ def test_get_field_origin_no_generic(target, expected) -> None:
 
 
 @pytest.mark.parametrize(
-    'target, expected',
+    "target, expected",
     [
         (dataklasses.GreeterOptional, dataklasses.Greeting),
-        (functions.GreeterOptional, functions.Greeting),
+        (functions.GreeterOptional, str),
         (named_tuples.GreeterOptional, named_tuples.Greeting),
         (plain_classes.GreeterOptional, plain_classes.Greeting),
-    ]
+    ],
 )
-def test_get_field_origin_generic(target, expected) -> None:
+def test_get_field_origin_generic(target: object, expected: object) -> None:
     """Find correct type with a generic involved."""
     th = typing.get_type_hints(target, globalns=None, localns=None)
     param1_annotation = th["greeting"]
@@ -55,15 +53,15 @@ def test_get_field_origin_generic(target, expected) -> None:
 
 
 @pytest.mark.parametrize(
-    'target, expected',
+    "target, expected",
     [
         (dataklasses.GreeterAnnotated, dataklasses.Greeting),
-        (functions.GreeterAnnotated, functions.Greeting),
+        (functions.GreeterAnnotated, str),
         (named_tuples.GreeterAnnotated, named_tuples.Greeting),
         (plain_classes.GreeterAnnotated, plain_classes.Greeting),
-    ]
+    ],
 )
-def test_get_field_origin_annotated(target, expected) -> None:
+def test_get_field_origin_annotated(target: object, expected: object) -> None:
     """Find correct type with an ``Annotated`` involved."""
     th = typing.get_type_hints(target, globalns=None, localns=None)
     param1_annotation = th["greeting"]
@@ -72,15 +70,15 @@ def test_get_field_origin_annotated(target, expected) -> None:
 
 
 @pytest.mark.parametrize(
-    'target',
+    "target",
     [
         dataklasses.Greeting,
         functions.Greeting,
         named_tuples.Greeting,
         plain_classes.Greeting,
-    ]
+    ],
 )
-def test_get_field_origin_primitive_type(target) -> None:
+def test_get_field_origin_primitive_type(target: type) -> None:
     """Find correct type with a primitive type like ``str``."""
     th = typing.get_type_hints(target, globalns=None, localns=None)
     param1_annotation = th["salutation"]
@@ -90,10 +88,12 @@ def test_get_field_origin_primitive_type(target) -> None:
 
 def test_dummy_get_operator() -> None:
     """See if we can get the annotation to get the operator."""
-    field_type = typing._AnnotatedAlias(str, (DummyGet("some_arg"),))
+    aa = getattr(typing, "_AnnotatedAlias")
+    field_type = aa(str, (DummyGet("some_arg"),))
     field_type, operator = get_operator(field_type)
     assert str is field_type
-    assert "some_arg" == operator()
+    if operator is not None:
+        assert "some_arg" == operator()
 
 
 def test_get_operator_no_annotated() -> None:
@@ -102,22 +102,23 @@ def test_get_operator_no_annotated() -> None:
     This simulates a field like ``title: str`` with no ``Annotated`` nor
     operator.
     """
-    field_type = str
-    field_type, operator = get_operator(field_type)
+    field_type, operator = get_operator(str)
     assert str is field_type
     assert None is operator
 
 
 @pytest.mark.parametrize(
-    'target, extractor',
+    "target, extractor",
     [
         (dataklasses.GreetingNoDefault, get_dataclass_field_infos),
         (functions.GreetingNoDefault, get_non_dataclass_field_infos),
         (named_tuples.GreetingNoDefault, get_non_dataclass_field_infos),
         (plain_classes.GreetingNoDefault, get_non_dataclass_field_infos),
-    ]
+    ],
 )
-def test_target_field_info_str(target, extractor):
+def test_target_field_info_str(
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+) -> None:
     """Extract field info from a full target and check caching."""
     # Ensure this callable does not yet have the "cached" field info
     assert not hasattr(target, "__hopscotch_predicates__")
@@ -136,15 +137,17 @@ def test_target_field_info_str(target, extractor):
 
 
 @pytest.mark.parametrize(
-    'target, extractor',
+    "target, extractor",
     [
         (dataklasses.GreeterChildren, get_dataclass_field_infos),
         (functions.GreeterChildren, get_non_dataclass_field_infos),
         (named_tuples.GreeterChildren, get_non_dataclass_field_infos),
         (plain_classes.GreeterChildren, get_non_dataclass_field_infos),
-    ]
+    ],
 )
-def test_field_info_children(target, extractor) -> None:
+def test_field_info_children(
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+) -> None:
     """Look for the magic-named ``children`` argument."""
     field_infos = extractor(target)
     assert field_infos[0].field_name == "children"
@@ -180,3 +183,5 @@ def test_dataclass_field_info_annotation() -> None:
     assert field_infos[0].default_value is None
     assert isinstance(field_infos[0].operator, DummyGet)
     assert field_infos[0].has_annotated is True
+    operator: Operator = field_infos[0].operator
+    assert getattr(operator, "arg") == "some_arg"

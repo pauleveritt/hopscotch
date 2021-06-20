@@ -6,8 +6,8 @@ Reference
     :backlinks: none
 
 
-hopscotch.hello
+hopscotch.fixtures
 ------------------
 
-.. automodule:: hopscotch.hello
+.. automodule:: hopscotch.fixtures
    :members:

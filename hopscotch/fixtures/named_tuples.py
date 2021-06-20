@@ -3,9 +3,9 @@
 Note that, since ``typing.NamedTuple`` doesn't really do inheritance,
 we can't implement a ``Service`` as a ``NamedTuple``.
 """
-from typing import NamedTuple, Annotated, Optional
-
-from hopscotch import VDOMNode
+from typing import Annotated
+from typing import NamedTuple
+from typing import Optional
 
 
 class Greeting(NamedTuple):
@@ -41,4 +41,4 @@ class GreeterAnnotated(NamedTuple):
 class GreeterChildren(NamedTuple):
     """A ``NamedTuple`` that is passed a tree of VDOM nodes."""
 
-    children: tuple[VDOMNode]
+    children: tuple[str]

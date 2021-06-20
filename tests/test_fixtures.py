@@ -1,12 +1,10 @@
 """Make sure the test/example/docs examples work."""
-from hopscotch.fixtures import (
-    dataklasses,
-    functions,
-    named_tuples,
-    plain_classes,
-    DummyGet,
-    init_caller_package,
-)
+from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyGet
+from hopscotch.fixtures import functions
+from hopscotch.fixtures import init_caller_package
+from hopscotch.fixtures import named_tuples
+from hopscotch.fixtures import plain_classes
 
 
 def test_init_caller_package() -> None:
@@ -27,8 +25,11 @@ def test_dataklass_fixtures() -> None:
     assert gs.salutation == "Hello"
     assert dataklasses.Greeter(greeting=greeting).greeting.salutation == "Hello"
     assert dataklasses.GreeterService(greeting=gs).greeting.salutation == "Hello"
-    assert dataklasses.GreeterAnnotated(greeting=greeting).greeting.salutation == "Hello"
-    assert dataklasses.GreeterChildren(children=tuple()).children == tuple()
+    assert (
+        dataklasses.GreeterAnnotated(greeting=greeting).greeting.salutation == "Hello"
+    )
+    children = ("a",)
+    assert dataklasses.GreeterChildren(children=children).children == children
     assert dataklasses.GreeterOptional(greeting=None).greeting is None
 
 
@@ -40,7 +41,8 @@ def test_functions_fixtures() -> None:
     assert functions.GreetingNoDefault(salutation="Hi") == "Hi"
     assert functions.Greeter(greeting=greeting) == "Hello"
     assert functions.GreeterAnnotated(greeting=greeting) == "Hello"
-    assert functions.GreeterChildren(children=tuple()) == tuple()
+    children = ("a",)
+    assert functions.GreeterChildren(children=children) == children
     assert functions.GreeterOptional(greeting=None) is None
 
 
@@ -50,8 +52,10 @@ def test_named_tuples_fixtures() -> None:
     assert greeting.salutation == "Hello"
     assert named_tuples.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert named_tuples.Greeter(greeting=greeting).greeting.salutation == "Hello"
-    assert named_tuples.GreeterAnnotated(greeting=greeting).greeting.salutation == "Hello"
-    assert named_tuples.GreeterChildren(children=tuple()).children == tuple()
+    greeter_annotated = named_tuples.GreeterAnnotated(greeting=greeting)
+    assert greeter_annotated.greeting.salutation == "Hello"
+    children = ("a",)
+    assert named_tuples.GreeterChildren(children=children).children == children
     assert named_tuples.GreeterOptional(greeting=None).greeting is None
 
 
@@ -64,12 +68,14 @@ def test_plain_classes_fixtures() -> None:
     assert plain_classes.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert plain_classes.Greeter(greeting=greeting).greeting.salutation == "Hello"
     assert plain_classes.GreeterService(greeting=gs).greeting.salutation == "Hello"
-    assert plain_classes.GreeterAnnotated(greeting=greeting).greeting.salutation == "Hello"
-    assert plain_classes.GreeterChildren(children=tuple()).children == tuple()
+    greeter_annotated = plain_classes.GreeterAnnotated(greeting=greeting)
+    assert greeter_annotated.greeting.salutation == "Hello"
+    children = ("a",)
+    assert plain_classes.GreeterChildren(children=children).children == children
     assert plain_classes.GreeterOptional(greeting=None).greeting is None
 
 
 def test_dummy_get() -> None:
-    """Check the fake operator"""
+    """Check the fake operator."""
     dg = DummyGet(arg="Hi")
     assert dg() == "Hi"

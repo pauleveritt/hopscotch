@@ -13,16 +13,24 @@ from typing import get_origin
 from typing import get_type_hints
 from typing import NamedTuple
 from typing import Optional
+from typing import Protocol
 from typing import Tuple
 from typing import Type
 from typing import Union
 
 from hopscotch import VDOMNode
 
-# from viewdom.render import VDOMNode
-
 SKIPPED_FIELD_NAMES = ("__hopscotch_predicates__",)
 EMPTY = getattr(inspect, "_empty")
+
+
+class Operator(Protocol):
+    """Specify the structure of operator implementations."""
+
+    def __call__(self) -> str:
+        """Operators are callables."""
+        # TODO When the registry arrives, pass it as an arg to __call__
+        ...
 
 
 class FieldInfo(NamedTuple):
@@ -32,14 +40,14 @@ class FieldInfo(NamedTuple):
     field_type: Type[Any]
     default_value: Optional[Any] = None
     init: bool = True  # Dataclasses can flag init=False
-    operator: Optional[type] = None
+    operator: Optional[Operator] = None
     has_annotated: bool = False
 
 
 FieldInfos = list[FieldInfo]
 
 
-def get_field_origin(field_type: Type) -> Type:
+def get_field_origin(field_type: Type[Any]) -> Any:
     """Helper to extract generic origin e.g. Optional[Resource]."""
     origin = get_origin(field_type)
     args = get_args(field_type)
@@ -49,7 +57,7 @@ def get_field_origin(field_type: Type) -> Type:
         return field_type
 
 
-def get_operator(field_type: Type) -> Tuple[type, Optional[type]]:
+def get_operator(field_type: Type[Any]) -> Tuple[type, Optional[Operator]]:
     """If using Annotation, get the operator."""
     operator = None
     if hasattr(field_type, "__metadata__"):
@@ -58,7 +66,7 @@ def get_operator(field_type: Type) -> Tuple[type, Optional[type]]:
     return field_type, operator
 
 
-def dataclass_field_info_factory(field_type: type, field: Field) -> FieldInfo:
+def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldInfo:
     """Return field metadata for a dataclass."""
     if field.name == "children":
         # Special case: a parameter named 'children'
@@ -116,7 +124,8 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
 def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at dataclasses."""
     try:
-        return getattr(target, "__hopscotch_predicates__")
+        predicates: list[FieldInfo] = getattr(target, "__hopscotch_predicates__")
+        return predicates
     except AttributeError:
         pass
 
@@ -141,7 +150,8 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
 def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at non-dataclasses."""
     try:
-        return getattr(target, "__hopscotch_predicates__")
+        predicates: list[FieldInfo] = getattr(target, "__hopscotch_predicates__")
+        return predicates
     except AttributeError:
         pass
 
