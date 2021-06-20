@@ -19,7 +19,7 @@ Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 python = "^3.9.1"
 
 [tool.poetry.dev-dependencies]
-nox = "^2020.12.31"
+nox = "^2021.6.12"
 pytest = "^6.2.3"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
@@ -29,7 +29,7 @@ sphinx = "^3.5.4"
 sphinx-autobuild = "^2021.3.14"
 pre-commit = "^2.12.0"
 flake8 = "^3.9.0"
-black = "^21.5b2"
+black = "^21.6b0"
 flake8-bandit = "^2.1.2"
 flake8-bugbear = "^21.4.3"
 flake8-docstrings = "^1.6.0"
@@ -39,8 +39,8 @@ darglint = "^1.8.0"
 reorder-python-imports = "^2.4.0"
 pre-commit-hooks = "^4.0.1"
 Pygments = "^2.8.1"
-nox-poetry = "^0.8.5"
-furo = "^2021.4.11-beta.34"
+nox-poetry = "^0.8.6"
+furo = "^2021.6.18b36"
 
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"
