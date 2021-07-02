@@ -7,7 +7,7 @@ import pytest
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.fixtures.dataklasses import GreetingImplementer
 from hopscotch.fixtures.dataklasses import GreetingService
-from hopscotch.registry import Registry, is_service_component
+from hopscotch.registry import Registry, is_service_component, Registration
 
 
 class DummyScan:
@@ -107,7 +107,7 @@ def test_register_singleton_without_class() -> None:
 def test_register_class() -> None:
     """Register a class then ensure it is present."""
     registry = Registry()
-    registry.register_class(GreetingImplementer, servicetype=GreetingService)
+    registry.register_service(GreetingImplementer, servicetype=GreetingService)
     assert [GreetingImplementer] == registry.classes[GreetingService]
 
 
@@ -130,8 +130,8 @@ def test_get_last_class_registration() -> None:
         salutation: str = "G2"
 
     registry = Registry()
-    registry.register_class(GreetingImplementer, servicetype=GreetingService)
-    registry.register_class(GreetingImplementer2, servicetype=GreetingService)
+    registry.register_service(GreetingImplementer, servicetype=GreetingService)
+    registry.register_service(GreetingImplementer2, servicetype=GreetingService)
     result = registry.get_service(GreetingService)
     assert "G2" == result.salutation
 
@@ -144,9 +144,9 @@ def test_parent_registry() -> None:
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register_class(GreetingImplementer, servicetype=GreetingService)
+    parent_registry.register_service(GreetingImplementer, servicetype=GreetingService)
     child_registry = Registry(parent=parent_registry)
-    child_registry.register_class(GreetingImplementer2, servicetype=GreetingService)
+    child_registry.register_service(GreetingImplementer2, servicetype=GreetingService)
     result = child_registry.get_service(GreetingService)
     assert result.salutation == "G2"
 
@@ -159,8 +159,8 @@ def test_child_registry() -> None:
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register_class(GreetingImplementer, servicetype=GreetingService)
-    parent_registry.register_class(GreetingImplementer2, servicetype=GreetingService)
+    parent_registry.register_service(GreetingImplementer, servicetype=GreetingService)
+    parent_registry.register_service(GreetingImplementer2, servicetype=GreetingService)
     child_registry = Registry(parent=parent_registry)
     result = child_registry.get_service(GreetingService)
     assert "G2" == result.salutation
@@ -169,7 +169,7 @@ def test_child_registry() -> None:
 def test_get_implementations_match() -> None:
     """Find the implementations in a flat registry."""
     registry = Registry()
-    registry.register_class(Greeting)
+    registry.register_service(Greeting)
     first_result = registry.get_implementations(Greeting)[0]
     assert first_result.salutation == "Hello"
 
@@ -177,7 +177,7 @@ def test_get_implementations_match() -> None:
 def test_get_nested_implementations_match() -> None:
     """Find the implementations in a nested registry."""
     parent_registry = Registry()
-    parent_registry.register_class(Greeting)
+    parent_registry.register_service(Greeting)
     child_registry = Registry(parent=parent_registry)
     first_result = child_registry.get_implementations(Greeting)[0]
     assert first_result.salutation == "Hello"
@@ -225,11 +225,25 @@ def test_get_service_info() -> None:
     registry = Registry()
     assert GreetingService not in registry.service_infos
     # Register GreetingService and show it isn't there yet
-    registry.register_class(GreetingService)
+    registry.register_service(GreetingService)
     assert GreetingService not in registry.service_infos
     service_info = registry.get_service_info(GreetingService)
     assert GreetingService in registry.service_infos
     assert service_info.field_infos[0].field_name == "salutation"
+
+
+def test_registration_with_context() -> None:
+    """Ensure a registration can be created with a context."""
+    registration = Registration(context=Greeting)
+    assert registration.context is Greeting
+    assert registration.field_infos == []
+
+
+def test_registration_with_no_context() -> None:
+    """Ensure a registration can be created without a context."""
+    registration = Registration()
+    assert registration.context is None
+    assert registration.field_infos == []
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

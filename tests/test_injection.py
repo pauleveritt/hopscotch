@@ -21,7 +21,7 @@ def test_field_default() -> None:
 def test_service_dependency_class() -> None:
     """The target has a field to fetch from registry."""
     registry = Registry()
-    registry.register_class(GreetingService)
+    registry.register_service(GreetingService)
     result = registry.inject(GreeterService)
     assert "Hello" == result.greeting.salutation
 
@@ -45,7 +45,7 @@ def test_injection_no_registry() -> None:
 def test_service_dependency_no_default() -> None:
     """The target has str field with no default, fail with custom exception."""
     registry = Registry()
-    registry.register_class(GreetingNoDefault, servicetype=Greeting)
+    registry.register_service(GreetingNoDefault, servicetype=Greeting)
     with pytest.raises(ValueError) as exc:
         registry.inject(Greeter)
 
@@ -57,7 +57,7 @@ def test_service_dependency_no_default() -> None:
 def test_service_dependency_default() -> None:
     """The target has an str field with a default."""
     registry = Registry()
-    registry.register_class(GreetingImplementer, servicetype=GreetingService)
+    registry.register_service(GreetingImplementer, servicetype=GreetingService)
     result = registry.inject(GreeterService)
     assert "Hello" == result.greeting.salutation
 
@@ -67,7 +67,7 @@ def test_non_service_dependency() -> None:
     gs = Greeting(salutation="use singleton")
     registry = Registry()
     registry.register_singleton(gs)
-    registry.register_class(Greeter)
+    registry.register_service(Greeter)
     result = registry.get_service(Greeter)
     assert "use singleton" == result.greeting.salutation
 
@@ -102,6 +102,6 @@ def test_pass_in_props_create_service() -> None:
 def test_hopscotch_factory() -> None:
     """The service has its own factory as a class attribute."""
     r = Registry()
-    r.register_class(GreetingFactory)
+    r.register_service(GreetingFactory)
     result = r.inject(GreetingFactory)
     assert result.salutation == "Hi From Factory"

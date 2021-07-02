@@ -2,6 +2,13 @@
 
 ## Now
 
+- Generalized registration information
+  * `.classes` -> `.services`
+  * `.register_service` -> `.register_service`
+  * `Registration` named tuple -> `Registration` dataclass slots
+  * Store `Registration` with the implementation, rather than just 
+    implementation
+
 ## Next
 
 - Get context-specific registrations working and tested
@@ -9,7 +16,7 @@
 ## Soon
 
 - Bring over `injectable` decorator
-- Overhaul `register_class`
+- Overhaul `register_service`
   * Change name to `register_service`
   * Raise an exception if you try to register a non-service 
 - Overhaul `Greeting` and friends

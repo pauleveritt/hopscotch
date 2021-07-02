@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from collections import defaultdict
+from dataclasses import dataclass, field
 from importlib import import_module
 from types import ModuleType
 from typing import Any, NamedTuple, Optional, Type, TypeVar, Union
@@ -16,10 +17,15 @@ PACKAGE = Optional[Union[ModuleType, str]]
 Props = dict[str, Any]
 
 
-class ServiceInfo(NamedTuple):
-    """Collect the introspected Hopscotch info on a service target."""
-
-    field_infos: FieldInfos
+@dataclass()
+class Registration:
+    """Collect registration and introspection info of a target."""
+    slots = ('context', 'field_infos')
+    # TODO Andrey Since only services or singletons can be registered,
+    #   shouldn't this be ``Type[Service]``?
+    # implementation: Type[T]
+    context: Optional[type] = None
+    field_infos: FieldInfos = field(default_factory=list)
 
 
 class Service(metaclass=ABCMeta):
@@ -50,6 +56,8 @@ class Service(metaclass=ABCMeta):
             )
 
 
+# TODO Andrey should this be bound to ``Service``? Or maybe just use
+#   ``Type[Service]`` everywhere and eliminate this ``TypeVar``?
 T = TypeVar("T")
 
 
@@ -70,7 +78,7 @@ def inject_callable(
     kwargs = {}
 
     # If the target has a ``__hopscotch_factory__``, use that instead
-    # of automated constructions.
+    # of automated construction.
     factory = getattr(target, "__hopscotch_factory__", None)
 
     if factory is not None and registry is not None:
@@ -126,7 +134,7 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
-    service_infos: dict[Type[T], ServiceInfo]
+    service_infos: dict[Type[T], Registration]
 
     def __init__(
         self,
@@ -136,7 +144,7 @@ class Registry:
         """Construct a registry that might have a context and be nested."""
         # TODO Andrey This should be ``list[Type[T]]`` to match
         #  ``get_implementations`` return type, but when I try, I get
-        #  an unbound type problem.
+        #  an unbound type problem. Or, even better, ``Type[Service]``?
         self.classes: dict[type, list[type]] = defaultdict(list)
         self.singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
@@ -173,7 +181,7 @@ class Registry:
         """Use injection to construct and return an instance."""
         return inject_callable(cls, props=props, registry=self)
 
-    def get_service_info(self, target: Type[T]) -> ServiceInfo:
+    def get_service_info(self, target: Type[T]) -> Registration:
         """Return target's introspected service info, generating if needed.
 
         Hopscotch relies on information in the registration and in the
@@ -186,7 +194,7 @@ class Registry:
             return self.service_infos[target]
         except KeyError:
             field_infos = get_field_infos(target)
-            service_info = ServiceInfo(field_infos=field_infos)
+            service_info = Registration(field_infos=field_infos)
             self.service_infos[target] = service_info
             return service_info
 
@@ -242,7 +250,7 @@ class Registry:
             servicetype = type(instance)
         self.singletons[servicetype] = instance
 
-    def register_class(
+    def register_service(
         self,
         implementation: Type[T],
         *,
