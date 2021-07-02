@@ -8,7 +8,7 @@ import pytest
 
 from hopscotch.fixtures.dataklasses import GreetingService, GreeterService, Greeter, GreetingNoDefault, Greeting, \
     GreetingImplementer, GreetingFactory
-from hopscotch.registry import Registry
+from hopscotch.registry import Registry, inject_callable
 
 
 def test_field_default() -> None:
@@ -33,6 +33,13 @@ def test_service_dependency_singleton() -> None:
     registry.register_singleton(gs)
     result = registry.inject(GreeterService)
     assert "use singleton" == result.greeting.salutation
+
+
+def test_injection_no_registry() -> None:
+    """Simulate usage of injection rules without needing a registry."""
+    props = dict(salutation="No registry")
+    result = inject_callable(Greeting, props=props, registry=None)
+    assert "No registry" == result.salutation
 
 
 def test_service_dependency_no_default() -> None:

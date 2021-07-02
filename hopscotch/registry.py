@@ -5,19 +5,21 @@ from abc import ABCMeta
 from collections import defaultdict
 from importlib import import_module
 from types import ModuleType
-from typing import Any
-from typing import Optional
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Any, NamedTuple, Optional, Type, TypeVar, Union
 
 from venusian import Scanner
 
 from .callers import caller_package
-from .field_infos import get_field_infos
+from .field_infos import get_field_infos, FieldInfos
 
 PACKAGE = Optional[Union[ModuleType, str]]
 Props = dict[str, Any]
+
+
+class ServiceInfo(NamedTuple):
+    """Collect the introspected Hopscotch info on a service target."""
+
+    field_infos: FieldInfos
 
 
 class Service(metaclass=ABCMeta):
@@ -72,10 +74,20 @@ def inject_callable(
     factory = getattr(target, "__hopscotch_factory__", None)
 
     if factory is not None and registry is not None:
+        # TODO Allow usage without a registry
         result: T = factory(registry)
         return result
 
-    these_field_infos = get_field_infos(target)
+    # Does the registry already have field info for this target?
+    if registry is not None:
+        # Ask the registry to get the cached service info, creating
+        # it if needed
+        service_info = registry.get_service_info(target)
+        these_field_infos = service_info.field_infos
+    else:
+        # No registry, so we calculate field info every time (boo)
+        these_field_infos = get_field_infos(target)
+
     for field_info in these_field_infos:
         fn = field_info.field_name
         ft = field_info.field_type
@@ -114,6 +126,7 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
+    service_infos: dict[Type[T], ServiceInfo]
 
     def __init__(
         self,
@@ -129,6 +142,7 @@ class Registry:
         self.parent: Optional[Registry] = parent
         self.context = context
         self.scanner = Scanner(registry=self)
+        self.service_infos = {}
 
     def scan(
         self,
@@ -158,6 +172,23 @@ class Registry:
     def inject(self, cls: Type[T], props: Optional[Props] = None) -> T:
         """Use injection to construct and return an instance."""
         return inject_callable(cls, props=props, registry=self)
+
+    def get_service_info(self, target: Type[T]) -> ServiceInfo:
+        """Return target's introspected service info, generating if needed.
+
+        Hopscotch relies on information in the registration and in the
+        introspection of a target. Rather than compute this on every
+        lookup, it is done once and stored in the registry. This is done
+        lazily, though, the first time it is asked for.
+        """
+
+        try:
+            return self.service_infos[target]
+        except KeyError:
+            field_infos = get_field_infos(target)
+            service_info = ServiceInfo(field_infos=field_infos)
+            self.service_infos[target] = service_info
+            return service_info
 
     def get_implementation(self, servicetype: Type[T], props: Props) -> Type[T]:
         """Find the appropriate implementation.

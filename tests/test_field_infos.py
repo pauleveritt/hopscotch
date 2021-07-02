@@ -2,22 +2,24 @@
 import typing
 
 import pytest
+
 from hopscotch import VDOMNode
-from hopscotch.field_infos import FieldInfo
-from hopscotch.field_infos import get_dataclass_field_infos
-from hopscotch.field_infos import get_field_origin
-from hopscotch.field_infos import get_non_dataclass_field_infos
-from hopscotch.field_infos import get_operator
-from hopscotch.fixtures import dataklasses
-from hopscotch.fixtures import DummyOperator
-from hopscotch.fixtures import functions
-from hopscotch.fixtures import named_tuples
-from hopscotch.fixtures import plain_classes
-from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.fixtures.dataklasses import GreetingOperator
-from hopscotch.fixtures.dataklasses import GreetingTuple
-from hopscotch.operators import Get
-from hopscotch.operators import Operator
+from hopscotch.field_infos import (
+    FieldInfo,
+    get_dataclass_field_infos,
+    get_field_origin,
+    get_non_dataclass_field_infos,
+    get_operator,
+)
+from hopscotch.fixtures import (
+    dataklasses,
+    DummyOperator,
+    functions,
+    named_tuples,
+    plain_classes,
+)
+from hopscotch.fixtures.dataklasses import Greeting, GreetingOperator, GreetingTuple
+from hopscotch.operators import Get, Operator
 from hopscotch.registry import Registry
 
 
@@ -123,24 +125,11 @@ def test_get_operator_no_annotated() -> None:
 def test_target_field_info_str(
     target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
-    """Extract field info from a full target and check caching."""
-    # Ensure this callable does not yet have the "cached" field info
-    assert not hasattr(target, "__hopscotch_predicates__")
-
     field_infos = extractor(target)
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
     assert field_infos[0].init is True
-
-    # Ensure the field info is stored on the callable, then
-    # try to get again.
-
-    # TODO Bring back in some other way than mutating the class, as
-    #   the data then shows up in subclasses.
-    # assert hasattr(target, "__hopscotch_predicates__")
-    # field_infos2 = get_non_dataclass_field_infos(target)
-    # assert field_infos2 == field_infos
 
 
 @pytest.mark.parametrize(

@@ -139,9 +139,6 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
         if field_name not in SKIPPED_FIELD_NAMES
     ]
 
-    # TODO Bring back in some other way than mutating the class, as
-    #   the data then shows up in subclasses.
-    # setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 
 
@@ -166,9 +163,6 @@ def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]
         for param in parameters
     ]
 
-    # TODO Bring back in some other way than mutating the class, as
-    #   the data then shows up in subclasses.
-    setattr(target, "__hopscotch_predicates__", field_infos)
     return field_infos
 
 
