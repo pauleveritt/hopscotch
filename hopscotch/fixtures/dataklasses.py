@@ -1,12 +1,10 @@
 """Example objects and services implemented as dataclasses."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Annotated
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Annotated, Optional
 
-from ..operators import Get
+from ..operators import Get, Context
 from ..registry import Service, Registry
 
 
@@ -106,3 +104,31 @@ class GreeterChildren:
     """A dataclass that is passed a tree of VDOM nodes."""
 
     children: tuple[str]
+
+
+@dataclass()
+class Customer:
+    """The person to greet, stored as the registry context."""
+
+    first_name: str
+
+
+@dataclass()
+class FrenchCustomer:
+    """A different kind of person to greet, stored as the registry context."""
+
+    prenom: str
+
+
+@dataclass()
+class GreeterCustomer:
+    """A dataclass that depends on the registry context."""
+
+    customer: Annotated[Customer, Context()]
+
+
+@dataclass()
+class GreeterFrenchCustomer:
+    """A dataclass that depends on a different registry context."""
+
+    customer: Annotated[FrenchCustomer, Context()]

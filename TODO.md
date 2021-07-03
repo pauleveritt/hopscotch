@@ -2,12 +2,21 @@
 
 ## Now
 
+- Context
+  * Registry stores it
+  * Fixture that uses it
+  * Tests that check:
+    - the fixture uses the registry
+    - the fixture gets the registry context
+  * Injection will get the context
+
 - Generalized registration information
   * `.classes` -> `.services`
   * `.register_service` -> `.register_service`
   * `Registration` named tuple -> `Registration` dataclass slots
   * Store `Registration` with the implementation, rather than just 
     implementation
+  * Make it possible to inject the registry context
 
 ## Next
 

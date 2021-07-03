@@ -1,10 +1,13 @@
 """Make sure the test/example/docs examples work."""
-from hopscotch.fixtures import dataklasses
-from hopscotch.fixtures import DummyOperator
-from hopscotch.fixtures import functions
-from hopscotch.fixtures import init_caller_package
-from hopscotch.fixtures import named_tuples
-from hopscotch.fixtures import plain_classes
+
+from hopscotch.fixtures import (
+    dataklasses,
+    DummyOperator,
+    functions,
+    init_caller_package,
+    named_tuples,
+    plain_classes,
+)
 from hopscotch.registry import Registry
 
 
@@ -76,6 +79,32 @@ def test_plain_classes_fixtures() -> None:
     children = ("a",)
     assert plain_classes.GreeterChildren(children=children).children == children
     assert plain_classes.GreeterOptional(greeting=None).greeting is None
+
+
+def test_context() -> None:
+    """Ensure the ``Customer`` for ``registry.context`` can be constructed."""
+    customer = dataklasses.Customer(first_name="Mary")
+    assert customer.first_name == "Mary"
+
+
+def test_french_context() -> None:
+    """Ensure construction of ``FrenchCustomer`` for ``registry.context``."""
+    customer = dataklasses.FrenchCustomer(prenom="Marie")
+    assert customer.prenom == "Marie"
+
+
+def test_greeter_customer() -> None:
+    """Ensure construction of ``GreeterCustomer``."""
+    customer = dataklasses.Customer(first_name="Mary")
+    greeter = dataklasses.GreeterCustomer(customer=customer)
+    assert greeter.customer.first_name == "Mary"
+
+
+def test_greeter_french_customer() -> None:
+    """Ensure construction of ``GreeterFrenchCustomer``."""
+    customer = dataklasses.FrenchCustomer(prenom="Marie")
+    greeter = dataklasses.GreeterFrenchCustomer(customer=customer)
+    assert greeter.customer.prenom == "Marie"
 
 
 def test_dummy_get() -> None:
