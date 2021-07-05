@@ -21,12 +21,14 @@ Props = dict[str, Any]
 class Registration:
     """Collect registration and introspection info of a target."""
 
-    slots = ("context", "field_infos")
+    slots = ("implementation", "servicetype", "context", "field_infos", "is_singleton")
     # TODO Andrey Since only services or singletons can be registered,
     #   shouldn't this be ``Type[Service]``?
-    # implementation: Type[T]
+    implementation: type
+    servicetype: Optional[Type[T]] = None
     context: Optional[type] = None
     field_infos: FieldInfos = field(default_factory=list)
+    is_singleton: bool = False
 
 
 class Service(metaclass=ABCMeta):
@@ -141,6 +143,7 @@ class Registry:
     parent: Optional[Registry]
     scanner: Scanner
     service_infos: dict[Type[T], Registration]
+    registrations: dict[Type[T], list[Registration]]
 
     def __init__(
         self,
@@ -152,13 +155,14 @@ class Registry:
         #  ``get_implementations`` return type, but when I try, I get
         #  an unbound type problem. Or, even better, ``Type[Service]``?
         self.classes: dict[type, list[type]] = defaultdict(list)
+        self.service_infos = {}
+        self.registrations = defaultdict(list)
         # TODO Andrey Same thing here, not sure this is the correct
         #  type hint.
         self.singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
         self.context = context
         self.scanner = Scanner(registry=self)
-        self.service_infos = {}
 
     def scan(
         self,
@@ -202,7 +206,10 @@ class Registry:
             return self.service_infos[target]
         except KeyError:
             field_infos = get_field_infos(target)
-            service_info = Registration(field_infos=field_infos)
+            service_info = Registration(
+                implementation=target,
+                field_infos=field_infos,
+            )
             self.service_infos[target] = service_info
             return service_info
 
@@ -226,19 +233,54 @@ class Registry:
 
         return klass
 
-    def get_service(self, servicetype: Type[T], **kwargs: Props) -> T:
+    def get_service(
+            self,
+            servicetype: Type[T],
+            context: Optional[Any] = None,
+            **kwargs: Props,
+    ) -> T:
         """Find an appropriate service class and construct an implementation.
 
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
+        registrations = self.registrations[servicetype]
 
-        # NEXT HERE: Get the registration information, then filter for
-        #   registration.context == registry.context. First for singletons.
-        try:
-            return self.singletons[servicetype]  # type: ignore
-        except KeyError:
-            pass
+        # Use the passed-in context class if provided, otherwise, the
+        # the registry's context (if provided.)
+        context_class: Optional[Any] = None
+        if context:
+            context_class = context.__class__
+        elif self.context:
+            context_class = self.context.__class__
+
+        # SINGLETONS: But *only* if this call passed in no props.
+        if not kwargs:
+            precedences: list[Optional[Registration]] = [None, None, None]
+            singletons = [s for s in registrations if s.is_singleton]
+            for registration in singletons:
+                # If context_class is None, then the only match will be a
+                # singleton registered for None
+                singleton_context = registration.context
+                if context_class is None:
+                    if singleton_context is None:
+                        # Low precedence
+                        precedences[2] = registration
+                    else:
+                        continue
+                if singleton_context is context_class:
+                    # Highest precedence, this singleton was registered for
+                    # the same class
+                    precedences[0] = registration
+                elif singleton_context and issubclass(context_class, singleton_context):
+                    # Second highest precedence,
+                    precedences[1] = registration
+                elif singleton_context is None:
+                    precedences[2] = registration
+            # Return best-matching singleton, if found
+            for precedence in precedences:
+                if precedence is not None:
+                    return precedence.implementation
 
         klass = self.get_implementation(servicetype, kwargs)
         instance = self.inject(klass, props=kwargs)
@@ -249,14 +291,20 @@ class Registry:
         instance: T,
         *,
         servicetype: Optional[Type[T]] = None,
-        # TODO Implement context-specific registrations
         context: Optional[Any] = None,
     ) -> None:
         """Register an instance as the lookup value for a type."""
-        # TODO: context isn't used
+        registration = Registration(
+            implementation=instance,
+            context=context,
+            servicetype=servicetype,
+            is_singleton=True,
+        )
         if servicetype is None:
             servicetype = type(instance)
         self.singletons[servicetype] = instance
+
+        self.registrations[servicetype].append(registration)
 
     # TODO Andrey if we make ``servicetype`` required, can we then "enforce" that
     #   the implementation "is a kind of" the servicetype? And thus, bring back

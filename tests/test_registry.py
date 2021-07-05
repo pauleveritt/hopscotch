@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 
-from hopscotch.fixtures.dataklasses import Greeting, Customer
+from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreetingImplementer
 from hopscotch.fixtures.dataklasses import GreetingService
 from hopscotch.registry import Registry, is_service_component, Registration
@@ -29,55 +29,202 @@ def test_construction() -> None:
     assert {} == registry.service_infos
 
 
+def test_singleton_registry_context_none() -> None:
+    """When registry context is none, get correct singletons."""
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+
+    # ### A bunch of single-registration cases, no precedence involved
+    # Singleton with context=None
+    r = Registry(context=None)
+    r.register_singleton(greeting)
+    assert r.get_service(Greeting).salutation == "no context"
+    # Singleton with context=Customer
+    r = Registry(context=None)
+    r.register_singleton(customer_greeting, context=Customer)
+    with pytest.raises(LookupError):
+        r.get_service(Greeting)
+
+
+def test_singleton_registry_context_customer() -> None:
+    """When registry context is ``Customer``, get correct singletons."""
+
+    @dataclass()
+    class NonCustomer:
+        salutation: str = "Not a Customer"
+
+    customer = Customer(first_name="customer")
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+    french_greeting = Greeting(salutation="french customer")
+    non_customer_greeting = Greeting(salutation="non customer")
+
+    # ### A bunch of single-registration cases, no precedence involved
+    # singleton.context=None
+    r = Registry(context=customer)
+    r.register_singleton(greeting)
+    assert r.get_service(Greeting).salutation == "no context"
+
+    # singleton.context=Customer means match
+    r = Registry(context=customer)
+    r.register_singleton(customer_greeting, context=Customer)
+    assert r.get_service(Greeting).salutation == "customer"
+
+    # singleton.context=FrenchCustomer means *no* match, too specific
+    r = Registry(context=customer)
+    r.register_singleton(french_greeting, context=FrenchCustomer)
+    with pytest.raises(LookupError):
+        r.get_service(Greeting)
+
+    # singleton.context=NonCustomer means *no* match, not same type.
+    r = Registry(context=customer)
+    r.register_singleton(non_customer_greeting, context=NonCustomer)
+    with pytest.raises(LookupError):
+        r.get_service(Greeting)
+
+
+def test_singleton_registry_context_french_customer() -> None:
+    """When registry context is ``FrenchCustomer``, get correct singletons."""
+
+    @dataclass()
+    class NonCustomer:
+        salutation: str = "Not a Customer"
+
+    french_customer = FrenchCustomer(first_name="french customer")
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+    french_greeting = Greeting(salutation="french customer")
+    non_customer_greeting = Greeting(salutation="non customer")
+
+    # ### A bunch of single-registration cases, no precedence involved
+    # singleton.context=None
+    r = Registry(context=french_customer)
+    r.register_singleton(greeting)
+    assert r.get_service(Greeting).salutation == "no context"
+
+    # singleton.context=Customer means match
+    r = Registry(context=french_customer)
+    r.register_singleton(customer_greeting, context=Customer)
+    assert r.get_service(Greeting).salutation == "customer"
+
+    # singleton.context=FrenchCustomer matches
+    r = Registry(context=french_customer)
+    r.register_singleton(french_greeting, context=FrenchCustomer)
+    assert r.get_service(Greeting).salutation == "french customer"
+
+    # singleton.context=NonCustomer means *no* match, not same type.
+    r = Registry(context=french_customer)
+    r.register_singleton(non_customer_greeting, context=NonCustomer)
+    with pytest.raises(LookupError):
+        r.get_service(Greeting)
+
+
+def test_singleton_registry_context_french_multiple() -> None:
+    """Registry context is ``FrenchCustomer``, get singletons from multiple."""
+
+    @dataclass()
+    class NonCustomer:
+        salutation: str = "Not a Customer"
+
+    customer = Customer(first_name="customer")
+    french_customer = FrenchCustomer(first_name="french customer")
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+    french_greeting = Greeting(salutation="french customer")
+    non_customer_greeting = Greeting(salutation="non customer")
+
+    # ### A bunch of multiple-registration cases, no precedence involved
+    # No context on registrations, choose last one.
+    r = Registry(context=french_customer)
+    r.register_singleton(greeting)
+    r.register_singleton(Greeting(salutation="second"))
+    assert r.get_service(Greeting).salutation == "second"
+
+    # Matching the exact class is highest precedence
+    r = Registry(context=french_customer)
+    r.register_singleton(greeting)
+    r.register_singleton(french_greeting, context=FrenchCustomer)
+    r.register_singleton(customer_greeting, context=Customer)
+    assert r.get_service(Greeting).salutation == "french customer"
+
+    # Matching the exact class is highest precedence, registration order
+    # doesn't matter
+    r = Registry(context=french_customer)
+    r.register_singleton(french_greeting, context=FrenchCustomer)
+    r.register_singleton(greeting)
+    r.register_singleton(customer_greeting, context=Customer)
+    assert r.get_service(Greeting).salutation == "french customer"
+
+    # Matching a subclass is highest precedence
+    r = Registry(context=french_customer)
+    r.register_singleton(greeting)
+    r.register_singleton(customer_greeting, context=Customer)
+    assert r.get_service(Greeting).salutation == "customer"
+
+    # Matching the class is higher precedence, registration order
+    # doesn't matter.
+    r = Registry(context=french_customer)
+    r.register_singleton(customer_greeting, context=Customer)
+    r.register_singleton(greeting)
+    assert r.get_service(Greeting).salutation == "customer"
+
+    # Adding in a type that doesn't subclass, doesn't matter.
+    r = Registry(context=french_customer)
+    r.register_singleton(customer_greeting, context=Customer)
+    r.register_singleton(non_customer_greeting, context=NonCustomer)
+    r.register_singleton(greeting)
+    assert r.get_service(Greeting).salutation == "customer"
+
+
 def test_get_singleton() -> None:
     """Return a singleton that has no service it is registered against."""
     registry = Registry()
-    di = Greeting()
-    registry.register_singleton(di)
+    greeting = Greeting()
+    registry.register_singleton(greeting)
     result = registry.get_service(Greeting)
-    assert di is result
+    assert greeting is result
 
 
 def test_get_singleton_service() -> None:
     """Return a singleton that is registered against a service."""
     registry = Registry()
-    di = GreetingImplementer()
-    registry.register_singleton(di, servicetype=GreetingService)
+    greeting = GreetingImplementer()
+    registry.register_singleton(greeting, servicetype=GreetingService)
     result = registry.get_service(GreetingService)
-    assert di.salutation == result.salutation
+    assert greeting.salutation == result.salutation
 
 
 def test_get_singleton_service_subclass() -> None:
     """Return a singleton that subclasses a service."""
     registry = Registry()
-    di = GreetingImplementer()
-    registry.register_singleton(di, servicetype=GreetingService)
+    greeting = GreetingImplementer()
+    registry.register_singleton(greeting, servicetype=GreetingService)
     result = registry.get_service(GreetingService)
-    assert di is result
+    assert greeting is result
 
 
 def test_get_services_found_class() -> None:
     """Construct an instance from a matching class."""
     registry = Registry()
-    di = GreetingImplementer()
+    greeting = GreetingImplementer()
 
     # Let's override the registry method with a dummy
     def fake_instantiate_class(cls: object, props: object) -> object:
-        return di
+        return greeting
 
     setattr(registry, "instantiate_service", fake_instantiate_class)
     registry.classes[GreetingService] = [
         GreetingImplementer,
     ]
     result = registry.get_service(GreetingService)
-    assert di == result
+    assert greeting == result
 
 
 def test_get_services_match_in_parent() -> None:
     """No local match but is found in parent."""
     parent_registry = Registry()
-    di = GreetingImplementer()
-    setattr(parent_registry, "instantiate_service", lambda x: di)
+    greeting = GreetingImplementer()
+    setattr(parent_registry, "instantiate_service", lambda x: greeting)
     parent_registry.classes[GreetingService] = [
         GreetingImplementer,
     ]
@@ -85,23 +232,27 @@ def test_get_services_match_in_parent() -> None:
     # Make a child registry which has nothing registered
     child_registry = Registry(parent=parent_registry)
     result = child_registry.get_service(GreetingService)
-    assert di == result
+    assert greeting == result
 
 
 def test_register_singleton_with_class() -> None:
     """Register a singleton with the longer format."""
     registry = Registry()
-    di = GreetingImplementer()
-    registry.register_singleton(di)
-    assert di == registry.singletons[GreetingImplementer]
+    greeting = Greeting()
+    registry.register_singleton(greeting)
+    assert greeting == registry.singletons[Greeting]
+    registration = registry.registrations[Greeting][0]
+    assert registration.is_singleton
+    assert registration.implementation == greeting
+    assert registration.servicetype is None
 
 
 def test_register_singleton_without_class() -> None:
     """Register a singleton with the shorter format."""
     registry = Registry()
-    di = GreetingImplementer()
-    registry.register_singleton(di)
-    assert di == registry.singletons[GreetingImplementer]
+    greeting = GreetingImplementer()
+    registry.register_singleton(greeting)
+    assert greeting == registry.singletons[GreetingImplementer]
 
 
 def test_register_class() -> None:
@@ -234,14 +385,44 @@ def test_get_service_info() -> None:
 
 def test_registration_with_context() -> None:
     """Ensure a registration can be created with a context."""
-    registration = Registration(context=Greeting)
+    registration = Registration(
+        implementation=Greeting,
+        context=Greeting,
+    )
+    assert registration.implementation is Greeting
+    assert registration.servicetype is None
+    assert registration.context is Greeting
+    assert registration.field_infos == []
+    assert not registration.is_singleton
+
+
+def test_registration_with_servicetype() -> None:
+    """Ensure a registration can be created with a servicetype."""
+    registration = Registration(
+        implementation=GreetingImplementer,
+        servicetype=GreetingService,
+        context=Greeting,
+    )
+    assert registration.implementation is GreetingImplementer
+    assert registration.servicetype is GreetingService
     assert registration.context is Greeting
     assert registration.field_infos == []
 
 
+def test_registration_singleton() -> None:
+    """Ensure a singleton registration."""
+    registration = Registration(
+        implementation=Greeting,
+        is_singleton=True,
+    )
+    assert registration.is_singleton
+
+
 def test_registration_with_no_context() -> None:
     """Ensure a registration can be created without a context."""
-    registration = Registration()
+    registration = Registration(implementation=Greeting)
+    assert registration.implementation is Greeting
+    assert registration.servicetype is None
     assert registration.context is None
     assert registration.field_infos == []
 
@@ -251,7 +432,6 @@ def test_context_registration_no_context() -> None:
     registry = Registry()
     registry.register_service(GreetingService, context=Customer)
     registry.get_service(GreetingService)
-
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

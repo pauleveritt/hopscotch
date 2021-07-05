@@ -89,8 +89,8 @@ def test_context() -> None:
 
 def test_french_context() -> None:
     """Ensure construction of ``FrenchCustomer`` for ``registry.context``."""
-    customer = dataklasses.FrenchCustomer(prenom="Marie")
-    assert customer.prenom == "Marie"
+    customer = dataklasses.FrenchCustomer(first_name="Marie")
+    assert customer.first_name == "Marie"
 
 
 def test_greeter_customer() -> None:
@@ -102,9 +102,9 @@ def test_greeter_customer() -> None:
 
 def test_greeter_french_customer() -> None:
     """Ensure construction of ``GreeterFrenchCustomer``."""
-    customer = dataklasses.FrenchCustomer(prenom="Marie")
+    customer = dataklasses.FrenchCustomer(first_name="Marie")
     greeter = dataklasses.GreeterFrenchCustomer(customer=customer)
-    assert greeter.customer.prenom == "Marie"
+    assert greeter.customer.first_name == "Marie"
 
 
 def test_dummy_get() -> None:

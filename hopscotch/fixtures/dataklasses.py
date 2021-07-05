@@ -121,10 +121,10 @@ class Customer:
 
 
 @dataclass()
-class FrenchCustomer:
+class FrenchCustomer(Customer):
     """A different kind of person to greet, stored as the registry context."""
 
-    prenom: str
+    first_name: str
 
 
 @dataclass()
