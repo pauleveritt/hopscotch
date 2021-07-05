@@ -34,7 +34,6 @@ def test_singleton_registry_context_none() -> None:
     greeting = Greeting(salutation="no context")
     customer_greeting = Greeting(salutation="customer")
 
-    # ### A bunch of single-registration cases, no precedence involved
     # Singleton with context=None
     r = Registry(context=None)
     r.register_singleton(greeting)
@@ -84,7 +83,7 @@ def test_singleton_registry_context_customer() -> None:
 
 
 def test_singleton_registry_context_french_customer() -> None:
-    """When registry context is ``FrenchCustomer``, get correct singletons."""
+    """When registry context is ``FrenchCustomer``, get correct xxx_singletons."""
 
     @dataclass()
     class NonCustomer:
@@ -120,7 +119,7 @@ def test_singleton_registry_context_french_customer() -> None:
 
 
 def test_singleton_registry_context_french_multiple() -> None:
-    """Registry context is ``FrenchCustomer``, get singletons from multiple."""
+    """Registry context is ``FrenchCustomer``, get xxx_singletons from multiple."""
 
     @dataclass()
     class NonCustomer:
@@ -207,15 +206,7 @@ def test_get_services_found_class() -> None:
     """Construct an instance from a matching class."""
     registry = Registry()
     greeting = GreetingImplementer()
-
-    # Let's override the registry method with a dummy
-    def fake_instantiate_class(cls: object, props: object) -> object:
-        return greeting
-
-    setattr(registry, "instantiate_service", fake_instantiate_class)
-    registry.classes[GreetingService] = [
-        GreetingImplementer,
-    ]
+    registry.register_service(GreetingImplementer, servicetype=GreetingService)
     result = registry.get_service(GreetingService)
     assert greeting == result
 
@@ -224,10 +215,7 @@ def test_get_services_match_in_parent() -> None:
     """No local match but is found in parent."""
     parent_registry = Registry()
     greeting = GreetingImplementer()
-    setattr(parent_registry, "instantiate_service", lambda x: greeting)
-    parent_registry.classes[GreetingService] = [
-        GreetingImplementer,
-    ]
+    parent_registry.register_service(GreetingImplementer, servicetype=GreetingService)
 
     # Make a child registry which has nothing registered
     child_registry = Registry(parent=parent_registry)
@@ -240,8 +228,8 @@ def test_register_singleton_with_class() -> None:
     registry = Registry()
     greeting = Greeting()
     registry.register_singleton(greeting)
-    assert greeting == registry.singletons[Greeting]
-    registration = registry.registrations[Greeting][0]
+    assert greeting == registry.xxx_singletons[Greeting]
+    registration = registry.singletons[Greeting][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
     assert registration.servicetype is None
@@ -252,7 +240,7 @@ def test_register_singleton_without_class() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register_singleton(greeting)
-    assert greeting == registry.singletons[GreetingImplementer]
+    assert greeting == registry.xxx_singletons[GreetingImplementer]
 
 
 def test_register_class() -> None:
@@ -263,7 +251,7 @@ def test_register_class() -> None:
 
 
 def test_get_last_singleton_registration() -> None:
-    """Register multiple singletons, last one wins."""
+    """Register multiple xxx_singletons, last one wins."""
     g1 = Greeting(salutation="G1")
     g2 = Greeting(salutation="G2")
     registry = Registry()
@@ -431,7 +419,8 @@ def test_context_registration_no_context() -> None:
     """A registration for a context in a registry with none."""
     registry = Registry()
     registry.register_service(GreetingService, context=Customer)
-    registry.get_service(GreetingService)
+    with pytest.raises(LookupError):
+        registry.get_service(GreetingService)
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

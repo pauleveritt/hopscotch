@@ -22,9 +22,9 @@ class Registration:
     """Collect registration and introspection info of a target."""
 
     slots = ("implementation", "servicetype", "context", "field_infos", "is_singleton")
-    # TODO Andrey Since only services or singletons can be registered,
+    # TODO Andrey Since only services or xxx_singletons can be registered,
     #   shouldn't this be ``Type[Service]``?
-    implementation: type
+    implementation: Union[Type[T], T]
     servicetype: Optional[Type[T]] = None
     context: Optional[type] = None
     field_infos: FieldInfos = field(default_factory=list)
@@ -36,10 +36,10 @@ class Service(metaclass=ABCMeta):
 
     @classmethod
     def select(
-        cls: Type[T],
-        registry: Registry,
-        props: Optional[Props],
-        context: Optional[Any] = None,
+            cls: Type[T],
+            registry: Registry,
+            props: Optional[Props],
+            context: Optional[Any] = None,
     ) -> Type[T]:
         """Default implementation selects based on context registration."""
         context_class = context.__class__
@@ -73,9 +73,9 @@ def is_service_component(callable_: Any) -> bool:
 
 
 def inject_callable(
-    target: Type[T],
-    props: Optional[Props] = None,
-    registry: Optional[Registry] = None,
+        target: Type[T],
+        props: Optional[Props] = None,
+        registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
     kwargs = {}
@@ -113,8 +113,8 @@ def inject_callable(
             #   the next 3 statements.
             # This field uses Annotated[SomeType, SomeOperator]
             field_value = operator(registry)
-        elif registry and ft in registry.singletons:
-            field_value = registry.singletons[ft]
+        elif registry and ft in registry.xxx_singletons:
+            field_value = registry.xxx_singletons[ft]
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
@@ -143,12 +143,13 @@ class Registry:
     parent: Optional[Registry]
     scanner: Scanner
     service_infos: dict[Type[T], Registration]
-    registrations: dict[Type[T], list[Registration]]
+    services: dict[Type[T], list[Registration]]
+    singletons: dict[Type[T], list[Registration]]
 
     def __init__(
-        self,
-        parent: Optional[Registry] = None,
-        context: Optional[Any] = None,
+            self,
+            parent: Optional[Registry] = None,
+            context: Optional[Any] = None,
     ):
         """Construct a registry that might have a context and be nested."""
         # TODO Andrey This should be ``list[Type[T]]`` to match
@@ -156,17 +157,18 @@ class Registry:
         #  an unbound type problem. Or, even better, ``Type[Service]``?
         self.classes: dict[type, list[type]] = defaultdict(list)
         self.service_infos = {}
-        self.registrations = defaultdict(list)
+        self.services = defaultdict(list)
+        self.singletons = defaultdict(list)
         # TODO Andrey Same thing here, not sure this is the correct
         #  type hint.
-        self.singletons: dict[type, object] = {}
+        self.xxx_singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
         self.context = context
         self.scanner = Scanner(registry=self)
 
     def scan(
-        self,
-        pkg: PACKAGE = None,
+            self,
+            pkg: PACKAGE = None,
     ) -> None:
         """Look for decorators that need to be registered."""
         if pkg is None:
@@ -213,26 +215,6 @@ class Registry:
             self.service_infos[target] = service_info
             return service_info
 
-    def get_implementation(self, servicetype: Type[T], props: Props) -> Type[T]:
-        """Find the appropriate implementation.
-
-        We use ``get_implementations`` to find the class. This method
-        then finds the appropriate instance, constructing it if needed.
-        """
-        # Get the class. If this is a service, let it do the selecting.
-        if issubclass(servicetype, Service):
-            klass: Type[T] = servicetype.select(
-                self, props=props, context=self.context
-            )  # type: ignore
-        else:
-            # This is the simple case. It won't have predicates or
-            # any other stuff for *location*. But it might still have
-            # field injection and caching.
-            klasses = self.get_implementations(servicetype)
-            klass = klasses[0]
-
-        return klass
-
     def get_service(
             self,
             servicetype: Type[T],
@@ -244,7 +226,6 @@ class Registry:
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
-        registrations = self.registrations[servicetype]
 
         # Use the passed-in context class if provided, otherwise, the
         # the registry's context (if provided.)
@@ -255,10 +236,9 @@ class Registry:
             context_class = self.context.__class__
 
         # SINGLETONS: But *only* if this call passed in no props.
-        if not kwargs:
+        if not kwargs and self.singletons:
             precedences: list[Optional[Registration]] = [None, None, None]
-            singletons = [s for s in registrations if s.is_singleton]
-            for registration in singletons:
+            for registration in self.singletons[servicetype]:
                 # If context_class is None, then the only match will be a
                 # singleton registered for None
                 singleton_context = registration.context
@@ -272,26 +252,67 @@ class Registry:
                     # Highest precedence, this singleton was registered for
                     # the same class
                     precedences[0] = registration
-                elif singleton_context and issubclass(context_class, singleton_context):
+                    continue
+                if singleton_context and issubclass(context_class, singleton_context):
                     # Second highest precedence,
                     precedences[1] = registration
-                elif singleton_context is None:
+                    continue
+                if singleton_context is None:
                     precedences[2] = registration
+                    continue
             # Return best-matching singleton, if found
             for precedence in precedences:
                 if precedence is not None:
                     return precedence.implementation
 
-        klass = self.get_implementation(servicetype, kwargs)
-        instance = self.inject(klass, props=kwargs)
-        return instance
+        # SERVICES: Similar logic, but give ``select`` a chance to
+        # narrow *after* the generic narrowing for context.
+        precedences: list[Optional[Registration]] = [None, None, None]
+        for registration in self.services[servicetype]:
+            service_context = registration.context
+            if context_class is None:
+                if service_context is None:
+                    # Low precedence
+                    precedences[2] = registration
+                else:
+                    continue
+            if service_context is context_class:
+                # Highest precedence, this service was registered for
+                # the same class
+                precedences[0] = registration
+                continue
+            if service_context and issubclass(context_class, service_context):
+                # Second highest precedence,
+                precedences[1] = registration
+                continue
+            if service_context is None:
+                precedences[2] = registration
+                continue
+
+        # Return best-matching singleton, if found
+        for precedence in precedences:
+            if precedence is not None:
+                # TODO Somewhere in here, let ``Service.select`` get involved
+                #   to narrow the candidates, instead of just taking the first
+                #   one, which is a mistake anyway.
+                klass = precedence.implementation
+                instance = self.inject(klass, props=kwargs)
+                return instance
+
+        # Try with the parents
+        if self.parent is not None:
+            return self.parent.get_service(servicetype, context, **kwargs)
+
+        # If we get to here, we didn't find anything, raise an error
+        msg = f"No service '{servicetype.__name__}' in registry"
+        raise LookupError(msg)
 
     def register_singleton(
-        self,
-        instance: T,
-        *,
-        servicetype: Optional[Type[T]] = None,
-        context: Optional[Any] = None,
+            self,
+            instance: T,
+            *,
+            servicetype: Optional[Type[T]] = None,
+            context: Optional[Any] = None,
     ) -> None:
         """Register an instance as the lookup value for a type."""
         registration = Registration(
@@ -302,27 +323,33 @@ class Registry:
         )
         if servicetype is None:
             servicetype = type(instance)
-        self.singletons[servicetype] = instance
+        self.xxx_singletons[servicetype] = instance
 
-        self.registrations[servicetype].append(registration)
+        self.singletons[servicetype].append(registration)
 
     # TODO Andrey if we make ``servicetype`` required, can we then "enforce" that
     #   the implementation "is a kind of" the servicetype? And thus, bring back
     #   registering non-Service?
     def register_service(
-        self,
-        implementation: Type[T],
-        *,
-        servicetype: Optional[Type[T]] = None,
-        context: Optional[Any] = None,
+            self,
+            implementation: Type[T],
+            *,
+            servicetype: Optional[Type[T]] = None,
+            context: Optional[Any] = None,
     ) -> None:
         """Use a LIFO list for all the possible implementations.
 
         Note that the implementation must be a subclass of the servicetype.
         """
+        registration = Registration(
+            implementation=implementation,
+            context=context,
+            servicetype=servicetype,
+        )
+
         if servicetype is None:
             servicetype = implementation
-
+        self.services[servicetype].append(registration)
         # We store the registry_context registration info on the implementation
         # apart from "predicates", as it is built-in
         # setattr(implementation, "__hopscotch_context__", context)
