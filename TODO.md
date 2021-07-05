@@ -2,9 +2,12 @@
 
 ## Now
 
+- Clean up
+  * Inline any functions that are only called in one place
+  * Check the code path execution to get to the various places
+  * Do the field_info on registration
+  
 - Context
-  * Registry stores it
-  * Fixture that uses it
   * Tests that check:
     - the fixture uses the registry
     - the fixture gets the registry context
@@ -17,6 +20,8 @@
   * Store `Registration` with the implementation, rather than just 
     implementation
   * Make it possible to inject the registry context
+  * Logic (not in select, as it is first class) that gets based on context
+  * Docs
 
 ## Next
 
@@ -45,3 +50,4 @@
 - `Context` operator should use a `get_context` method on the registry
   that recurses through parent registries, looking for `context`. Currently
   just uses the current registry. Context might be higher up.
+- Registries have props that can be more easily injected than singletons

@@ -107,6 +107,13 @@ class GreeterChildren:
 
 
 @dataclass()
+class GreeterRegistry:
+    """A dataclass that depends on the registry."""
+
+    registry: Registry
+
+
+@dataclass()
 class Customer:
     """The person to greet, stored as the registry context."""
 

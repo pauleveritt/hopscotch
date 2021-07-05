@@ -6,8 +6,18 @@ registry.
 """
 import pytest
 
-from hopscotch.fixtures.dataklasses import GreetingService, GreeterService, Greeter, GreetingNoDefault, Greeting, \
-    GreetingImplementer, GreetingFactory
+from hopscotch.fixtures.dataklasses import (
+    GreetingService,
+    GreeterService,
+    Greeter,
+    GreetingNoDefault,
+    Greeting,
+    GreetingImplementer,
+    GreetingFactory,
+    GreeterRegistry,
+    GreeterCustomer,
+    Customer,
+)
 from hopscotch.registry import Registry, inject_callable
 
 
@@ -50,7 +60,7 @@ def test_service_dependency_no_default() -> None:
         registry.inject(Greeter)
 
     target = "hopscotch.fixtures.dataklasses.Greeting"
-    expected = f"Cannot inject <class '{target}'> on "'Greeter.greeting'
+    expected = f"Cannot inject <class '{target}'> on " "Greeter.greeting"
     assert exc.value.args[0] == expected
 
 
@@ -73,7 +83,7 @@ def test_non_service_dependency() -> None:
 
 
 def test_service_dependency_nested_registry() -> None:
-    """ Nested registry, can service get singleton from right level? """
+    """Nested registry, can service get singleton from right level?"""
 
     gs_child = GreetingService(salutation="use child")
     gs_parent = GreetingService(salutation="use parent")
@@ -97,6 +107,23 @@ def test_pass_in_props_create_service() -> None:
     props = dict(salutation="use prop")
     result = registry.inject(Greeting, props=props)
     assert result.salutation == "use prop"
+
+
+def test_inject_registry() -> None:
+    """Target wants the registry and will later get what it needs."""
+    registry = Registry()
+    registry.register_service(GreeterRegistry)
+    result = registry.inject(GreeterRegistry)
+    assert registry == result.registry
+
+
+def test_inject_context() -> None:
+    """Target wants the registry context."""
+    customer = Customer(first_name="Mary")
+    registry = Registry(context=customer)
+    registry.register_service(GreeterCustomer)
+    result = registry.inject(GreeterCustomer)
+    assert customer == result.customer
 
 
 def test_hopscotch_factory() -> None:

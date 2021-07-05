@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from importlib import import_module
 from types import ModuleType
-from typing import Any, NamedTuple, Optional, Type, TypeVar, Union
+from typing import Any, Optional, Type, TypeVar, Union
 
 from venusian import Scanner
 
@@ -20,7 +20,8 @@ Props = dict[str, Any]
 @dataclass()
 class Registration:
     """Collect registration and introspection info of a target."""
-    slots = ('context', 'field_infos')
+
+    slots = ("context", "field_infos")
     # TODO Andrey Since only services or singletons can be registered,
     #   shouldn't this be ``Type[Service]``?
     # implementation: Type[T]
@@ -90,6 +91,8 @@ def inject_callable(
     if registry is not None:
         # Ask the registry to get the cached service info, creating
         # it if needed
+        # TODO Paul When move to registry.registrations is complete,
+        #   remove this and the method.
         service_info = registry.get_service_info(target)
         these_field_infos = service_info.field_infos
     else:
@@ -110,6 +113,9 @@ def inject_callable(
             field_value = operator(registry)
         elif registry and ft in registry.singletons:
             field_value = registry.singletons[ft]
+        elif registry and ft is Registry:
+            # Special rule: if you ask for the registry, you'll get it
+            field_value = registry
         elif registry and is_service_component(ft):
             # TODO This implies that we can only inject something if it
             #  is a subclass of ``Service`` or a singleton. Make sure to
@@ -146,6 +152,8 @@ class Registry:
         #  ``get_implementations`` return type, but when I try, I get
         #  an unbound type problem. Or, even better, ``Type[Service]``?
         self.classes: dict[type, list[type]] = defaultdict(list)
+        # TODO Andrey Same thing here, not sure this is the correct
+        #  type hint.
         self.singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
         self.context = context
@@ -224,10 +232,10 @@ class Registry:
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
+
+        # NEXT HERE: Get the registration information, then filter for
+        #   registration.context == registry.context. First for singletons.
         try:
-            # If this servicetype is in singletons, use it.
-            # TODO Andrey need to adjust the type annotation on
-            #  self.singletons
             return self.singletons[servicetype]  # type: ignore
         except KeyError:
             pass
@@ -250,6 +258,9 @@ class Registry:
             servicetype = type(instance)
         self.singletons[servicetype] = instance
 
+    # TODO Andrey if we make ``servicetype`` required, can we then "enforce" that
+    #   the implementation "is a kind of" the servicetype? And thus, bring back
+    #   registering non-Service?
     def register_service(
         self,
         implementation: Type[T],

@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 
-from hopscotch.fixtures.dataklasses import Greeting
+from hopscotch.fixtures.dataklasses import Greeting, Customer
 from hopscotch.fixtures.dataklasses import GreetingImplementer
 from hopscotch.fixtures.dataklasses import GreetingService
 from hopscotch.registry import Registry, is_service_component, Registration
@@ -244,6 +244,14 @@ def test_registration_with_no_context() -> None:
     registration = Registration()
     assert registration.context is None
     assert registration.field_infos == []
+
+
+def test_context_registration_no_context() -> None:
+    """A registration for a context in a registry with none."""
+    registry = Registry()
+    registry.register_service(GreetingService, context=Customer)
+    registry.get_service(GreetingService)
+
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():
