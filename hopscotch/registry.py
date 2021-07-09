@@ -22,8 +22,6 @@ class Registration:
     """Collect registration and introspection info of a target."""
 
     slots = ("implementation", "servicetype", "context", "field_infos", "is_singleton")
-    # TODO Andrey Since only services or xxx_singletons can be registered,
-    #   shouldn't this be ``Type[Service]``?
     implementation: Union[Type[T], T]
     servicetype: Optional[Type[T]] = None
     context: Optional[type] = None
@@ -59,8 +57,6 @@ class Service(metaclass=ABCMeta):
             )
 
 
-# TODO Andrey should this be bound to ``Service``? Or maybe just use
-#   ``Type[Service]`` everywhere and eliminate this ``TypeVar``?
 T = TypeVar("T")
 
 
@@ -142,25 +138,20 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
-    service_infos: dict[Type[T], Registration]
-    services: dict[Type[T], list[Registration]]
-    singletons: dict[Type[T], list[Registration]]
+    service_infos: dict[type, Registration]
+    services: dict[type, list[Registration]]
+    singletons: dict[type, list[Registration]]
 
     def __init__(
             self,
             parent: Optional[Registry] = None,
             context: Optional[Any] = None,
-    ):
+    ) -> None:
         """Construct a registry that might have a context and be nested."""
-        # TODO Andrey This should be ``list[Type[T]]`` to match
-        #  ``get_implementations`` return type, but when I try, I get
-        #  an unbound type problem. Or, even better, ``Type[Service]``?
         self.classes: dict[type, list[type]] = defaultdict(list)
         self.service_infos = {}
         self.services = defaultdict(list)
         self.singletons = defaultdict(list)
-        # TODO Andrey Same thing here, not sure this is the correct
-        #  type hint.
         self.xxx_singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
         self.context = context
@@ -327,9 +318,6 @@ class Registry:
 
         self.singletons[servicetype].append(registration)
 
-    # TODO Andrey if we make ``servicetype`` required, can we then "enforce" that
-    #   the implementation "is a kind of" the servicetype? And thus, bring back
-    #   registering non-Service?
     def register_service(
             self,
             implementation: Type[T],
