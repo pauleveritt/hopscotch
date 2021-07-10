@@ -2,10 +2,24 @@
 
 ## Now
 
+
+- Clean up fixtures to reflect (a) subclassing and (b) de-service-ification
+
+- Ensure mypy and friends are happy
+
+- Service types have a `select` which helps narrow
+
+- Remove `Service`
+
+- Make `get_service` check for looking up `str` or stuff in the standard library
+  
 - Clean up
   * Inline any functions that are only called in one place
   * Check the code path execution to get to the various places
   * Do the field_info on registration
+  * Ensure the last registration is the one returned
+  * inject_callable should already have the field_infos, don't do 
+    the work in there to find the implementation
   
 - Context
   * Tests that check:
@@ -42,7 +56,12 @@
 - Return this repo to a `src` layout and get coverage working again in GHA
 - Write example of a `select` that uses predicates
   * Convert `context` to be part of predicates
-  
+- Use custom dataclass fields instead of `Annotated`
+- Bring over predicates
+- Hierarchical cache service
+  * Including simple persistent based on shelve
+  * Get the context and predicate into into a hashable "arguments"
+
 ## Eventually
 
 - Sybil for docs
