@@ -47,11 +47,13 @@ def is_service_component(callable_: Any) -> bool:
 
 
 def inject_callable(
-        target: Type[T],
+        registration: Registration,
         props: Optional[Props] = None,
         registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
+
+    target = registration.implementation
     kwargs = {}
 
     # If the target has a ``__hopscotch_factory__``, use that instead
@@ -69,8 +71,7 @@ def inject_callable(
         # it if needed
         # TODO Paul When move to registry.registrations is complete,
         #   remove this and the method.
-        service_info = registry.get_service_info(target)
-        these_field_infos = service_info.field_infos
+        these_field_infos = registration.field_infos
     else:
         # No registry, so we calculate field info every time (boo)
         these_field_infos = get_field_infos(target)
@@ -89,6 +90,7 @@ def inject_callable(
             field_value = operator(registry)
         elif registry and ft in registry.singletons:
             # TODO What's up with the need to manually say `Registration`?
+            # TODO Later, just remove this...the tree can get the singleton.
             v: Registration = registry.singletons[ft][-1]
             field_value = v.implementation
         elif registry and ft is Registry:
@@ -103,7 +105,7 @@ def inject_callable(
             field_value = field_info.default_value
         else:
             ql = target.__qualname__
-            msg = f"Cannot inject {ft} on {ql}.{fn}"
+            msg = f"Cannot inject '{ft.__name__}' on '{ql}.{fn}'"
             raise ValueError(msg)
 
         kwargs[fn] = field_value
@@ -118,7 +120,6 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
-    service_infos: dict[type, Registration]
     services: dict[type, list[Registration]]
     singletons: dict[type, list[Registration]]
 
@@ -129,7 +130,6 @@ class Registry:
     ) -> None:
         """Construct a registry that might have a context and be nested."""
         self.classes: dict[type, list[type]] = defaultdict(list)
-        self.service_infos = {}
         self.services = defaultdict(list)
         self.singletons = defaultdict(list)
         self.parent: Optional[Registry] = parent
@@ -161,29 +161,9 @@ class Registry:
 
         return classes
 
-    def inject(self, cls: Type[T], props: Optional[Props] = None) -> T:
+    def inject(self, registration: Registration, props: Optional[Props] = None) -> T:
         """Use injection to construct and return an instance."""
-        return inject_callable(cls, props=props, registry=self)
-
-    def get_service_info(self, target: Type[T]) -> Registration:
-        """Return target's introspected service info, generating if needed.
-
-        Hopscotch relies on information in the registration and in the
-        introspection of a target. Rather than compute this on every
-        lookup, it is done once and stored in the registry. This is done
-        lazily, though, the first time it is asked for.
-        """
-
-        try:
-            return self.service_infos[target]
-        except KeyError:
-            field_infos = get_field_infos(target)
-            service_info = Registration(
-                implementation=target,
-                field_infos=field_infos,
-            )
-            self.service_infos[target] = service_info
-            return service_info
+        return inject_callable(registration, props=props, registry=self)
 
     def get_service(
             self,
@@ -231,9 +211,9 @@ class Registry:
                     precedences[2] = registration
                     continue
             # Return best-matching singleton, if found
-            for precedence in precedences:
-                if precedence is not None:
-                    return precedence.implementation
+            for registration in precedences:
+                if registration is not None:
+                    return registration.implementation
 
         # SERVICES: Similar logic, but give ``select`` a chance to
         # narrow *after* the generic narrowing for context.
@@ -260,13 +240,12 @@ class Registry:
                 continue
 
         # Return best-matching singleton, if found
-        for precedence in precedences:
-            if precedence is not None:
+        for registration in precedences:
+            if registration is not None:
                 # TODO Somewhere in here, let ``Service.select`` get involved
                 #   to narrow the candidates, instead of just taking the first
                 #   one, which is a mistake anyway.
-                klass = precedence.implementation
-                instance = self.inject(klass, props=kwargs)
+                instance = self.inject(registration, props=kwargs)
                 return instance
 
         # Try with the parents
@@ -307,9 +286,11 @@ class Registry:
 
         Note that the implementation must be a subclass of the servicetype.
         """
+        field_infos = get_field_infos(implementation)
         registration = Registration(
             implementation=implementation,
             context=context,
+            field_infos=field_infos,
             servicetype=servicetype,
         )
 

@@ -26,7 +26,6 @@ def test_construction() -> None:
     """Ensure the registry is setup correctly."""
     registry = Registry()
     assert {} == registry.classes
-    assert {} == registry.service_infos
 
 
 def test_singleton_registry_context_none() -> None:
@@ -355,18 +354,27 @@ def test_is_not_service_component() -> None:
     """Check if the helper returns false for a non-class."""
     assert not is_service_component(999)
 
-
-def test_get_service_info() -> None:
-    """Get the cached value of service info, starting at first time."""
-
-    registry = Registry()
-    assert GreetingService not in registry.service_infos
-    # Register GreetingService and show it isn't there yet
-    registry.register_service(GreetingService)
-    assert GreetingService not in registry.service_infos
-    service_info = registry.get_service_info(GreetingService)
-    assert GreetingService in registry.service_infos
-    assert service_info.field_infos[0].field_name == "salutation"
+# TODO Make sure the policies tested here reflect in refactoring
+# def test_get_service_info() -> None:
+#     """Get the cached value of service info, starting at first time."""
+#
+#     registry = Registry()
+#     assert GreetingService not in registry.service_infos
+#     # Register GreetingService and show it isn't there yet
+#     registry.register_service(GreetingService)
+#     assert GreetingService not in registry.service_infos
+#     service_info = registry.get_service_info(GreetingService)
+#     assert GreetingService in registry.service_infos
+#     assert service_info.field_infos[0].field_name == "salutation"
+#
+#
+# def test_get_service_info_with_servicetype() -> None:
+#     """Get the cached value of service info for a servicetype."""
+#
+#     registry = Registry()
+#     registry.register_service(GreetingImplementer, servicetype=GreetingService)
+#     service_info = registry.get_service_info(GreetingService)
+#     assert service_info.implementation is GreetingImplementer
 
 
 def test_registration_with_context() -> None:
