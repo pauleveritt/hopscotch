@@ -36,12 +36,12 @@ def test_singleton_registry_context_none() -> None:
     # Singleton with context=None
     r = Registry(context=None)
     r.register(greeting)
-    assert r.get_service(Greeting).salutation == "no context"
+    assert r.get(Greeting).salutation == "no context"
     # Singleton with context=Customer
     r = Registry(context=None)
     r.register(customer_greeting, context=Customer)
     with pytest.raises(LookupError):
-        r.get_service(Greeting)
+        r.get(Greeting)
 
 
 def test_singleton_registry_context_customer() -> None:
@@ -61,24 +61,24 @@ def test_singleton_registry_context_customer() -> None:
     # singleton.context=None
     r = Registry(context=customer)
     r.register(greeting)
-    assert r.get_service(Greeting).salutation == "no context"
+    assert r.get(Greeting).salutation == "no context"
 
     # singleton.context=Customer means match
     r = Registry(context=customer)
     r.register(customer_greeting, context=Customer)
-    assert r.get_service(Greeting).salutation == "customer"
+    assert r.get(Greeting).salutation == "customer"
 
     # singleton.context=FrenchCustomer means *no* match, too specific
     r = Registry(context=customer)
     r.register(french_greeting, context=FrenchCustomer)
     with pytest.raises(LookupError):
-        r.get_service(Greeting)
+        r.get(Greeting)
 
     # singleton.context=NonCustomer means *no* match, not same type.
     r = Registry(context=customer)
     r.register(non_customer_greeting, context=NonCustomer)
     with pytest.raises(LookupError):
-        r.get_service(Greeting)
+        r.get(Greeting)
 
 
 def test_singleton_registry_context_french_customer() -> None:
@@ -98,23 +98,23 @@ def test_singleton_registry_context_french_customer() -> None:
     # singleton.context=None
     r = Registry(context=french_customer)
     r.register(greeting)
-    assert r.get_service(Greeting).salutation == "no context"
+    assert r.get(Greeting).salutation == "no context"
 
     # singleton.context=Customer means match
     r = Registry(context=french_customer)
     r.register(customer_greeting, context=Customer)
-    assert r.get_service(Greeting).salutation == "customer"
+    assert r.get(Greeting).salutation == "customer"
 
     # singleton.context=FrenchCustomer matches
     r = Registry(context=french_customer)
     r.register(french_greeting, context=FrenchCustomer)
-    assert r.get_service(Greeting).salutation == "french customer"
+    assert r.get(Greeting).salutation == "french customer"
 
     # singleton.context=NonCustomer means *no* match, not same type.
     r = Registry(context=french_customer)
     r.register(non_customer_greeting, context=NonCustomer)
     with pytest.raises(LookupError):
-        r.get_service(Greeting)
+        r.get(Greeting)
 
 
 def test_singleton_registry_context_french_multiple() -> None:
@@ -136,14 +136,14 @@ def test_singleton_registry_context_french_multiple() -> None:
     r = Registry(context=french_customer)
     r.register(greeting)
     r.register(Greeting(salutation="second"))
-    assert r.get_service(Greeting).salutation == "second"
+    assert r.get(Greeting).salutation == "second"
 
     # Matching the exact class is highest precedence
     r = Registry(context=french_customer)
     r.register(greeting)
     r.register(french_greeting, context=FrenchCustomer)
     r.register(customer_greeting, context=Customer)
-    assert r.get_service(Greeting).salutation == "french customer"
+    assert r.get(Greeting).salutation == "french customer"
 
     # Matching the exact class is highest precedence, registration order
     # doesn't matter
@@ -151,27 +151,27 @@ def test_singleton_registry_context_french_multiple() -> None:
     r.register(french_greeting, context=FrenchCustomer)
     r.register(greeting)
     r.register(customer_greeting, context=Customer)
-    assert r.get_service(Greeting).salutation == "french customer"
+    assert r.get(Greeting).salutation == "french customer"
 
     # Matching a subclass is highest precedence
     r = Registry(context=french_customer)
     r.register(greeting)
     r.register(customer_greeting, context=Customer)
-    assert r.get_service(Greeting).salutation == "customer"
+    assert r.get(Greeting).salutation == "customer"
 
     # Matching the class is higher precedence, registration order
     # doesn't matter.
     r = Registry(context=french_customer)
     r.register(customer_greeting, context=Customer)
     r.register(greeting)
-    assert r.get_service(Greeting).salutation == "customer"
+    assert r.get(Greeting).salutation == "customer"
 
     # Adding in a type that doesn't subclass, doesn't matter.
     r = Registry(context=french_customer)
     r.register(customer_greeting, context=Customer)
     r.register(non_customer_greeting, context=NonCustomer)
     r.register(greeting)
-    assert r.get_service(Greeting).salutation == "customer"
+    assert r.get(Greeting).salutation == "customer"
 
 
 def test_get_singleton() -> None:
@@ -179,7 +179,7 @@ def test_get_singleton() -> None:
     registry = Registry()
     greeting = Greeting()
     registry.register(greeting)
-    result = registry.get_service(Greeting)
+    result = registry.get(Greeting)
     assert greeting is result
 
 
@@ -188,7 +188,7 @@ def test_get_singleton_service() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register(greeting, servicetype=GreetingService)
-    result = registry.get_service(GreetingService)
+    result = registry.get(GreetingService)
     assert greeting.salutation == result.salutation
 
 
@@ -197,7 +197,7 @@ def test_get_singleton_service_subclass() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register(greeting, servicetype=GreetingService)
-    result = registry.get_service(GreetingService)
+    result = registry.get(GreetingService)
     assert greeting is result
 
 
@@ -206,7 +206,7 @@ def test_get_services_found_class() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register(GreetingImplementer, servicetype=GreetingService)
-    result = registry.get_service(GreetingService)
+    result = registry.get(GreetingService)
     assert greeting == result
 
 
@@ -218,7 +218,7 @@ def test_get_services_match_in_parent() -> None:
 
     # Make a child registry which has nothing registered
     child_registry = Registry(parent=parent_registry)
-    result = child_registry.get_service(GreetingService)
+    result = child_registry.get(GreetingService)
     assert greeting == result
 
 
@@ -254,7 +254,7 @@ def test_get_last_singleton_registration() -> None:
     registry = Registry()
     registry.register(g1)
     registry.register(g2)
-    result = registry.get_service(Greeting)
+    result = registry.get(Greeting)
     assert "G2" == result.salutation
 
 
@@ -268,7 +268,7 @@ def test_get_last_class_registration() -> None:
     registry = Registry()
     registry.register(GreetingImplementer, servicetype=GreetingService)
     registry.register(GreetingImplementer2, servicetype=GreetingService)
-    result = registry.get_service(GreetingService)
+    result = registry.get(GreetingService)
     assert "G2" == result.salutation
 
 
@@ -283,7 +283,7 @@ def test_parent_registry() -> None:
     parent_registry.register(GreetingImplementer, servicetype=GreetingService)
     child_registry = Registry(parent=parent_registry)
     child_registry.register(GreetingImplementer2, servicetype=GreetingService)
-    result = child_registry.get_service(GreetingService)
+    result = child_registry.get(GreetingService)
     assert result.salutation == "G2"
 
 
@@ -298,7 +298,7 @@ def test_child_registry() -> None:
     parent_registry.register(GreetingImplementer, servicetype=GreetingService)
     parent_registry.register(GreetingImplementer2, servicetype=GreetingService)
     child_registry = Registry(parent=parent_registry)
-    result = child_registry.get_service(GreetingService)
+    result = child_registry.get(GreetingService)
     assert "G2" == result.salutation
 
 
@@ -426,7 +426,7 @@ def test_context_registration_no_context() -> None:
     registry = Registry()
     registry.register(GreetingService, context=Customer)
     with pytest.raises(LookupError):
-        registry.get_service(GreetingService)
+        registry.get(GreetingService)
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

@@ -104,9 +104,9 @@ def inject_callable(
             field_value = registry
         elif registry and is_service_component(ft):
             # TODO Replace is_service_component check with something in
-            #   `get_service` which bails in a friendly way when you
+            #   `get` which bails in a friendly way when you
             #   try to look up `str` or a class in the standard lib.
-            field_value = registry.get_service(ft)
+            field_value = registry.get(ft)
         elif field_info.default_value is not None:
             field_value = field_info.default_value
         else:
@@ -125,7 +125,7 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
-    services: dict[type, list[Registration]]
+    registrations: dict[type, list[Registration]]
     singletons: dict[type, list[Registration]]
 
     def __init__(
@@ -135,7 +135,7 @@ class Registry:
     ) -> None:
         """Construct a registry that might have a context and be nested."""
         self.classes: dict[type, list[type]] = defaultdict(list)
-        self.services = defaultdict(list)
+        self.registrations = defaultdict(list)
         self.singletons = defaultdict(list)
         self.parent: Optional[Registry] = parent
         self.context = context
@@ -170,7 +170,7 @@ class Registry:
         """Use injection to construct and return an instance."""
         return inject_callable(registration, props=props, registry=self)
 
-    def get_service(
+    def get(
             self,
             servicetype: Type[T],
             context: Optional[Any] = None,
@@ -223,7 +223,7 @@ class Registry:
         # SERVICES: Similar logic, but give ``select`` a chance to
         # narrow *after* the generic narrowing for context.
         precedences: list[Optional[Registration]] = [None, None, None]
-        for registration in self.services[servicetype]:
+        for registration in self.registrations[servicetype]:
             service_context = registration.context
             if context_class is None:
                 if service_context is None:
@@ -255,7 +255,7 @@ class Registry:
 
         # Try with the parents
         if self.parent is not None:
-            return self.parent.get_service(servicetype, context, **kwargs)
+            return self.parent.get(servicetype, context, **kwargs)
 
         # If we get to here, we didn't find anything, raise an error
         msg = f"No service '{servicetype.__name__}' in registry"
@@ -284,13 +284,9 @@ class Registry:
             st = type(implementation) if is_singleton else implementation
         else:
             st = servicetype
-        self.services[st].append(registration)
+        self.registrations[st].append(registration)
 
         if is_singleton:
             self.singletons[st].append(registration)
         else:
             self.classes[st].insert(0, implementation)
-        # We store the registry_context registration info on the implementation
-        # apart from "predicates", as it is built-in
-        # setattr(implementation, "__hopscotch_context__", context)
-
