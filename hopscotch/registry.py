@@ -28,6 +28,11 @@ class Registration:
     field_infos: FieldInfos = field(default_factory=list)
     is_singleton: bool = False
 
+    def __post_init__(self) -> None:
+        """Extract and assign the field infos if not singleton."""
+        if not self.is_singleton:
+            self.field_infos = get_field_infos(self.implementation)
+
 
 class Service(metaclass=ABCMeta):
     """Type-oriented base class that supports looking up implementations."""
@@ -286,11 +291,9 @@ class Registry:
 
         Note that the implementation must be a subclass of the servicetype.
         """
-        field_infos = get_field_infos(implementation)
         registration = Registration(
             implementation=implementation,
             context=context,
-            field_infos=field_infos,
             servicetype=servicetype,
         )
 

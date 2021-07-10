@@ -24,10 +24,7 @@ from hopscotch.registry import Registry, inject_callable, Registration
 
 def test_field_default() -> None:
     """The target a field with a default."""
-    registration = Registration(
-        implementation=GreetingService,
-        field_infos=get_field_infos(GreetingService)
-    )
+    registration = Registration(GreetingService)
     result = inject_callable(registration)
     assert result.salutation == "Hello"
 
@@ -37,10 +34,7 @@ def test_service_dependency_class() -> None:
     registry = Registry()
     registry.register_service(GreetingService)
 
-    registration = Registration(
-        implementation=GreeterService,
-        field_infos=get_field_infos(GreeterService),
-    )
+    registration = Registration(GreeterService)
     result = registry.inject(registration)
     assert "Hello" == result.greeting.salutation
 
@@ -48,20 +42,14 @@ def test_service_dependency_class() -> None:
 def test_injection_no_registry() -> None:
     """Simulate usage of injection rules without needing a registry."""
     props = dict(salutation="No registry")
-    registration = Registration(
-        implementation=Greeting,
-        field_infos=get_field_infos(Greeting),
-    )
+    registration = Registration(Greeting)
     result = inject_callable(registration, props=props)
     assert "No registry" == result.salutation
 
 
 def test_service_dependency_no_default() -> None:
     """The target has str field with no default, fail with custom exception."""
-    registration = Registration(
-        implementation=GreetingNoDefault,
-        field_infos=get_field_infos(GreetingNoDefault),
-    )
+    registration = Registration(GreetingNoDefault)
     with pytest.raises(ValueError) as exc:
         inject_callable(registration)
 
@@ -71,10 +59,7 @@ def test_service_dependency_no_default() -> None:
 
 def test_service_dependency_default() -> None:
     """The target has an str field with a default."""
-    registration = Registration(
-        implementation=GreetingImplementer,
-        field_infos=get_field_infos(GreetingImplementer),
-    )
+    registration = Registration(GreetingImplementer)
     result = inject_callable(registration)
     assert "Hello" == result.salutation
 
@@ -84,10 +69,7 @@ def test_non_service_dependency() -> None:
     gs = Greeting(salutation="use singleton")
     registry = Registry()
     registry.register_singleton(gs)
-    registration = Registration(
-        implementation=Greeter,
-        field_infos=get_field_infos(Greeter),
-    )
+    registration = Registration(Greeter)
     result = inject_callable(registration, registry=registry)
     assert "use singleton" == result.greeting.salutation
 
@@ -107,10 +89,7 @@ def test_service_dependency_nested_registry() -> None:
     child_registry.register_singleton(gs_child)
 
     # Get something registered with parent, dependency local
-    registration = Registration(
-        implementation=GreeterService,
-        field_infos=get_field_infos(GreeterService),
-    )
+    registration = Registration(GreeterService)
     result = child_registry.inject(registration)
     assert "use child" == result.greeting.salutation
 
@@ -118,10 +97,7 @@ def test_service_dependency_nested_registry() -> None:
 def test_pass_in_props_create_service() -> None:
     """Instead of injecting a field, get it from passed-in 'props'."""
     props = dict(salutation="use prop")
-    registration = Registration(
-        implementation=Greeting,
-        field_infos=get_field_infos(Greeting),
-    )
+    registration = Registration(Greeting)
     result = inject_callable(registration, props=props)
     assert result.salutation == "use prop"
 
@@ -129,10 +105,7 @@ def test_pass_in_props_create_service() -> None:
 def test_inject_registry() -> None:
     """Target wants the registry and will later get what it needs."""
     registry = Registry()
-    registration = Registration(
-        implementation=GreeterRegistry,
-        field_infos=get_field_infos(GreeterRegistry),
-    )
+    registration = Registration(GreeterRegistry)
     result = inject_callable(registration, registry=registry)
     assert registry == result.registry
 
@@ -141,10 +114,7 @@ def test_inject_context() -> None:
     """Target wants the registry context."""
     customer = Customer(first_name="Mary")
     registry = Registry(context=customer)
-    registration = Registration(
-        implementation=GreeterCustomer,
-        field_infos=get_field_infos(GreeterCustomer)
-    )
+    registration = Registration(GreeterCustomer)
     registry.register_service(GreeterCustomer)
     result = inject_callable(registration, registry=registry)
     assert customer == result.customer
@@ -152,10 +122,7 @@ def test_inject_context() -> None:
 
 def test_hopscotch_factory() -> None:
     """The service has its own factory as a class attribute."""
-    registraton = Registration(
-        implementation=GreetingFactory,
-        field_infos=get_field_infos(GreetingFactory),
-    )
+    registraton = Registration(GreetingFactory)
     registry = Registry()
     registry.register_service(GreetingFactory)
     result = inject_callable(registraton, registry=registry)

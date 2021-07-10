@@ -386,7 +386,7 @@ def test_registration_with_context() -> None:
     assert registration.implementation is Greeting
     assert registration.servicetype is None
     assert registration.context is Greeting
-    assert registration.field_infos == []
+    assert len(registration.field_infos) == 1
     assert not registration.is_singleton
 
 
@@ -400,7 +400,7 @@ def test_registration_with_servicetype() -> None:
     assert registration.implementation is GreetingImplementer
     assert registration.servicetype is GreetingService
     assert registration.context is Greeting
-    assert registration.field_infos == []
+    assert len(registration.field_infos) == 1
 
 
 def test_registration_singleton() -> None:
@@ -418,7 +418,7 @@ def test_registration_with_no_context() -> None:
     assert registration.implementation is Greeting
     assert registration.servicetype is None
     assert registration.context is None
-    assert registration.field_infos == []
+    assert len(registration.field_infos) == 1
 
 
 def test_context_registration_no_context() -> None:
