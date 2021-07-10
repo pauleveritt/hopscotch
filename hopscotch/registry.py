@@ -32,29 +32,7 @@ class Registration:
 class Service(metaclass=ABCMeta):
     """Type-oriented base class that supports looking up implementations."""
 
-    @classmethod
-    def select(
-            cls: Type[T],
-            registry: Registry,
-            props: Optional[Props],
-            context: Optional[Any] = None,
-    ) -> Type[T]:
-        """Default implementation selects based on context registration."""
-        context_class = context.__class__
-        try:
-            return next(
-                klass
-                for klass in registry.get_implementations(cls)
-                if getattr(klass, "__hopscotch_context__", None) is context_class
-            )
-        except StopIteration:
-            # We couldn't find one matching this context, get the first
-            # one for context=None.
-            return next(
-                klass
-                for klass in registry.get_implementations(cls)
-                if getattr(klass, "__hopscotch_context__", None) is None
-            )
+    pass
 
 
 T = TypeVar("T")
@@ -109,15 +87,17 @@ def inject_callable(
             #   the next 3 statements.
             # This field uses Annotated[SomeType, SomeOperator]
             field_value = operator(registry)
-        elif registry and ft in registry.xxx_singletons:
-            field_value = registry.xxx_singletons[ft]
+        elif registry and ft in registry.singletons:
+            # TODO What's up with the need to manually say `Registration`?
+            v: Registration = registry.singletons[ft][-1]
+            field_value = v.implementation
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
         elif registry and is_service_component(ft):
-            # TODO This implies that we can only inject something if it
-            #  is a subclass of ``Service`` or a singleton. Make sure to
-            #  state this in documentation.
+            # TODO Replace is_service_component check with something in
+            #   `get_service` which bails in a friendly way when you
+            #   try to look up `str` or a class in the standard lib.
             field_value = registry.get_service(ft)
         elif field_info.default_value is not None:
             field_value = field_info.default_value
@@ -152,7 +132,6 @@ class Registry:
         self.service_infos = {}
         self.services = defaultdict(list)
         self.singletons = defaultdict(list)
-        self.xxx_singletons: dict[type, object] = {}
         self.parent: Optional[Registry] = parent
         self.context = context
         self.scanner = Scanner(registry=self)
@@ -314,7 +293,6 @@ class Registry:
         )
         if servicetype is None:
             servicetype = type(instance)
-        self.xxx_singletons[servicetype] = instance
 
         self.singletons[servicetype].append(registration)
 

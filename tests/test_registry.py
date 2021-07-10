@@ -83,7 +83,7 @@ def test_singleton_registry_context_customer() -> None:
 
 
 def test_singleton_registry_context_french_customer() -> None:
-    """When registry context is ``FrenchCustomer``, get correct xxx_singletons."""
+    """When registry context is ``FrenchCustomer``, get correct singletons."""
 
     @dataclass()
     class NonCustomer:
@@ -119,7 +119,7 @@ def test_singleton_registry_context_french_customer() -> None:
 
 
 def test_singleton_registry_context_french_multiple() -> None:
-    """Registry context is ``FrenchCustomer``, get xxx_singletons from multiple."""
+    """Registry context is ``FrenchCustomer``, get singletons from multiple."""
 
     @dataclass()
     class NonCustomer:
@@ -228,7 +228,6 @@ def test_register_singleton_with_class() -> None:
     registry = Registry()
     greeting = Greeting()
     registry.register_singleton(greeting)
-    assert greeting == registry.xxx_singletons[Greeting]
     registration = registry.singletons[Greeting][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
@@ -240,7 +239,6 @@ def test_register_singleton_without_class() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register_singleton(greeting)
-    assert greeting == registry.xxx_singletons[GreetingImplementer]
 
 
 def test_register_class() -> None:
@@ -251,7 +249,7 @@ def test_register_class() -> None:
 
 
 def test_get_last_singleton_registration() -> None:
-    """Register multiple xxx_singletons, last one wins."""
+    """Register multiple singletons, last one wins."""
     g1 = Greeting(salutation="G1")
     g2 = Greeting(salutation="G2")
     registry = Registry()
