@@ -32,7 +32,7 @@ def test_field_default() -> None:
 def test_service_dependency_class() -> None:
     """The target has a field dependency to fetch from registry."""
     registry = Registry()
-    registry.register_service(GreetingService)
+    registry.register(GreetingService)
 
     registration = Registration(GreeterService)
     result = registry.inject(registration)
@@ -68,7 +68,7 @@ def test_non_service_dependency() -> None:
     """The target has a non-service field to fetch from registry."""
     gs = Greeting(salutation="use singleton")
     registry = Registry()
-    registry.register_singleton(gs)
+    registry.register(gs)
     registration = Registration(Greeter)
     result = inject_callable(registration, registry=registry)
     assert "use singleton" == result.greeting.salutation
@@ -82,11 +82,11 @@ def test_service_dependency_nested_registry() -> None:
 
     # Site registry
     parent_registry = Registry()
-    parent_registry.register_singleton(gs_parent)
+    parent_registry.register(gs_parent)
 
     # Per-request registry with a specific singleton
     child_registry = Registry(parent=parent_registry)
-    child_registry.register_singleton(gs_child)
+    child_registry.register(gs_child)
 
     # Get something registered with parent, dependency local
     registration = Registration(GreeterService)
@@ -115,7 +115,7 @@ def test_inject_context() -> None:
     customer = Customer(first_name="Mary")
     registry = Registry(context=customer)
     registration = Registration(GreeterCustomer)
-    registry.register_service(GreeterCustomer)
+    registry.register(GreeterCustomer)
     result = inject_callable(registration, registry=registry)
     assert customer == result.customer
 
@@ -124,6 +124,6 @@ def test_hopscotch_factory() -> None:
     """The service has its own factory as a class attribute."""
     registraton = Registration(GreetingFactory)
     registry = Registry()
-    registry.register_service(GreetingFactory)
+    registry.register(GreetingFactory)
     result = inject_callable(registraton, registry=registry)
     assert result.salutation == "Hi From Factory"

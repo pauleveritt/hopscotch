@@ -5,6 +5,7 @@ from abc import ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass, field
 from importlib import import_module
+from inspect import isclass
 from types import ModuleType
 from typing import Any, Optional, Type, TypeVar, Union
 
@@ -121,7 +122,6 @@ def inject_callable(
 
 class Registry:
     """Type-oriented registry with special features."""
-
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
@@ -261,28 +261,9 @@ class Registry:
         msg = f"No service '{servicetype.__name__}' in registry"
         raise LookupError(msg)
 
-    def register_singleton(
+    def register(
             self,
-            instance: T,
-            *,
-            servicetype: Optional[Type[T]] = None,
-            context: Optional[Any] = None,
-    ) -> None:
-        """Register an instance as the lookup value for a type."""
-        registration = Registration(
-            implementation=instance,
-            context=context,
-            servicetype=servicetype,
-            is_singleton=True,
-        )
-        if servicetype is None:
-            servicetype = type(instance)
-
-        self.singletons[servicetype].append(registration)
-
-    def register_service(
-            self,
-            implementation: Type[T],
+            implementation: Union[T, Type[T]],
             *,
             servicetype: Optional[Type[T]] = None,
             context: Optional[Any] = None,
@@ -291,17 +272,25 @@ class Registry:
 
         Note that the implementation must be a subclass of the servicetype.
         """
+        is_singleton = not isclass(implementation)
         registration = Registration(
             implementation=implementation,
             context=context,
             servicetype=servicetype,
+            is_singleton=is_singleton,
         )
 
         if servicetype is None:
-            servicetype = implementation
-        self.services[servicetype].append(registration)
+            st = type(implementation) if is_singleton else implementation
+        else:
+            st = servicetype
+        self.services[st].append(registration)
+
+        if is_singleton:
+            self.singletons[st].append(registration)
+        else:
+            self.classes[st].insert(0, implementation)
         # We store the registry_context registration info on the implementation
         # apart from "predicates", as it is built-in
         # setattr(implementation, "__hopscotch_context__", context)
 
-        self.classes[servicetype].insert(0, implementation)

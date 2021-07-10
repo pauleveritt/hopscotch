@@ -33,8 +33,8 @@ def test_operators_get_simple_type() -> None:
 
     registry = Registry()
     greeting = GreetingService()
-    registry.register_singleton(greeting)
-    registry.register_service(DummyGreeter)
+    registry.register(greeting)
+    registry.register(DummyGreeter)
     # Now ask the registry to construct this
     dummy_greeter = registry.get_service(DummyGreeter)
     assert isinstance(dummy_greeter.dummy_greeting, GreetingService)
@@ -49,8 +49,8 @@ def test_operators_get_attr() -> None:
 
     registry = Registry()
     greeting = Greeting()
-    registry.register_singleton(greeting)
-    registry.register_service(DummyGreeter)
+    registry.register(greeting)
+    registry.register(DummyGreeter)
     # Now ask the registry to construct this
     dummy_greeter = registry.get_service(DummyGreeter)
     assert "Hello" == dummy_greeter.dummy_salutation
@@ -95,7 +95,7 @@ def test_operators_context() -> None:
 
     context1 = Context1()
     registry = Registry(context=context1)
-    registry.register_service(DummyHeading)
+    registry.register(DummyHeading)
     result = registry.get_service(DummyHeading)
     assert result.context1 == context1
 
@@ -116,7 +116,7 @@ def test_operators_context_attr() -> None:
 
     context1 = Context1()
     registry = Registry(context=context1)
-    registry.register_service(DummyHeading)
+    registry.register(DummyHeading)
     result = registry.get_service(DummyHeading)
     assert result.context_title == context1.title
 
