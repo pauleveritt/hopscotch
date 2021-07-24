@@ -248,7 +248,9 @@ def test_register_class() -> None:
     """Register a class then ensure it is present."""
     registry = Registry()
     registry.register(GreetingImplementer, servicetype=GreetingService)
-    assert [GreetingImplementer] == registry.classes[GreetingService]
+    registrations = registry.registrations[GreetingService]["classes"][None]
+    registration = registrations[0]
+    assert GreetingImplementer is registration.implementation
     gs = registry.registrations[GreetingService]
     first = gs['classes'][None][0]
     assert first.implementation is GreetingImplementer
@@ -261,7 +263,10 @@ def test_register_class_with_context() -> None:
     registry = Registry()
     registry.register(GreetingImplementer,
                       servicetype=GreetingService, context=FrenchCustomer)
-    assert [GreetingImplementer] == registry.classes[GreetingService]
+    classes = registry.registrations[GreetingService]["classes"]
+    registrations = classes[FrenchCustomer]
+    registration = registrations[0]
+    assert GreetingImplementer == registration.implementation
     gs = registry.registrations[GreetingService]
     assert gs['classes'][None] == []
     first = gs['classes'][FrenchCustomer][0]
@@ -325,40 +330,6 @@ def test_child_registry() -> None:
     assert "G2" == result.salutation
 
 
-def test_get_implementations_match() -> None:
-    """Find the implementations in a flat registry."""
-    registry = Registry()
-    registry.register(Greeting)
-    first_result = registry.get_implementations(Greeting)[0]
-    assert first_result.salutation == "Hello"
-
-
-def test_get_nested_implementations_match() -> None:
-    """Find the implementations in a nested registry."""
-    parent_registry = Registry()
-    parent_registry.register(Greeting)
-    child_registry = Registry(parent=parent_registry)
-    first_result = child_registry.get_implementations(Greeting)[0]
-    assert first_result.salutation == "Hello"
-
-
-def test_get_implementations_no_match() -> None:
-    """No match should result in ``LookupError``."""
-    registry = Registry()
-    with pytest.raises(LookupError) as exc:
-        registry.get_implementations(Greeting)
-    assert "No service 'Greeting' in registry" == exc.value.args[0]
-
-
-def test_get_nested_implementations_no_match() -> None:
-    """No match should result in ``LookupError``."""
-    parent_registry = Registry()
-    child_registry = Registry(parent=parent_registry)
-    with pytest.raises(LookupError) as exc:
-        child_registry.get_implementations(Greeting)
-    assert "No service 'Greeting' in registry" == exc.value.args[0]
-
-
 def test_injector_registry_scan_caller() -> None:
     """Pretend to scan and see if called_with is set correctly."""
     registry = Registry()
@@ -366,29 +337,6 @@ def test_injector_registry_scan_caller() -> None:
     registry.scanner.scan = ds
     registry.scan()
     assert "tests" == ds.called_with.__name__  # type: ignore
-
-
-# TODO Make sure the policies tested here reflect in refactoring
-# def test_get_service_info() -> None:
-#     """Get the cached value of service info, starting at first time."""
-#
-#     registry = Registry()
-#     assert GreetingService not in registry.service_infos
-#     # Register GreetingService and show it isn't there yet
-#     registry.register_service(GreetingService)
-#     assert GreetingService not in registry.service_infos
-#     service_info = registry.get_service_info(GreetingService)
-#     assert GreetingService in registry.service_infos
-#     assert service_info.field_infos[0].field_name == "salutation"
-#
-#
-# def test_get_service_info_with_servicetype() -> None:
-#     """Get the cached value of service info for a servicetype."""
-#
-#     registry = Registry()
-#     registry.register_service(GreetingImplementer, servicetype=GreetingService)
-#     service_info = registry.get_service_info(GreetingService)
-#     assert service_info.implementation is GreetingImplementer
 
 
 def test_registration_with_context() -> None:

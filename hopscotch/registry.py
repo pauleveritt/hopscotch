@@ -171,18 +171,6 @@ class Registry:
             pkg = import_module(pkg)
         self.scanner.scan(pkg)
 
-    def get_implementations(self, servicetype: Type[T]) -> list[Type[T]]:
-        """Walk the registry hierarchy to find one with registered implementations."""
-        classes = self.classes.get(servicetype)
-        if classes is None:
-            if self.parent is not None:
-                return self.parent.get_implementations(servicetype)
-            else:
-                msg = f"No service '{servicetype.__name__}' in registry"
-                raise LookupError(msg)
-
-        return classes
-
     def inject(self, registration: Registration, props: Optional[Props] = None) -> T:
         """Use injection to construct and return an instance."""
         return inject_callable(registration, props=props, registry=self)
@@ -228,8 +216,7 @@ class Registry:
             medium=list(),
             low=list(),
         )
-        for this_context, tr in registrations.items():
-            these_registrations = list(reversed(tr))
+        for this_context, these_registrations in registrations.items():
             if this_context is None and context_class is None:
                 # This is the most basic case, test it first to bail out quickly.
                 precedences2['low'] = these_registrations
@@ -259,70 +246,6 @@ class Registry:
         msg = f"No service '{servicetype.__name__}' in registry"
         raise LookupError(msg)
 
-        # SINGLETONS: But *only* if this call passed in no props.
-        # if not kwargs and singletons:
-        #     precedences = [None, None, None]
-        #     for registration in singletons:
-        #         # If context_class is None, then the only match will be a
-        #         # singleton registered for None
-        #         singleton_context = registration.context
-        #         if context_class is None:
-        #             if singleton_context is None:
-        #                 # Low precedence
-        #                 precedences[2] = registration
-        #             else:
-        #                 continue
-        #         if singleton_context is context_class:
-        #             # Highest precedence, this singleton was registered for
-        #             # the same class
-        #             precedences[0] = registration
-        #             continue
-        #         if singleton_context and issubclass(context_class, singleton_context):
-        #             # Second highest precedence,
-        #             precedences[1] = registration
-        #             continue
-        #         if singleton_context is None:
-        #             precedences[2] = registration
-        #             continue
-        #     # Return best-matching singleton, if found
-        #     for registration in precedences:
-        #         if registration is not None:
-        #             return registration.implementation
-        #
-        # # SERVICES: Similar logic, but give ``select`` a chance to
-        # # narrow *after* the generic narrowing for context.
-        # precedences: list[Optional[Registration]] = [None, None, None]
-        # for registration in self.registrations[servicetype]:
-        #     service_context = registration.context
-        #     if context_class is None:
-        #         if service_context is None:
-        #             # Low precedence
-        #             precedences[2] = registration
-        #         else:
-        #             continue
-        #     if service_context is context_class:
-        #         # Highest precedence, this service was registered for
-        #         # the same class
-        #         precedences[0] = registration
-        #         continue
-        #     if service_context and issubclass(context_class, service_context):
-        #         # Second highest precedence,
-        #         precedences[1] = registration
-        #         continue
-        #     if service_context is None:
-        #         precedences[2] = registration
-        #         continue
-        #
-        # # Return best-matching singleton, if found
-        # for registration in precedences:
-        #     if registration is not None:
-        #         # TODO Somewhere in here, let ``Service.select`` get involved
-        #         #   to narrow the candidates, instead of just taking the first
-        #         #   one, which is a mistake anyway.
-        #         instance = self.inject(registration, props=kwargs)
-        #         return instance
-        #
-
     def register(
             self,
             implementation: Union[T, Type[T]],
@@ -351,7 +274,4 @@ class Registry:
         # Put this in the correct place of the registrations tree,
         # creating tree nodes as needed.
         s_or_c = 'singletons' if is_singleton else 'classes'
-        self.registrations[st][s_or_c][context].append(registration)
-
-        if not is_singleton:
-            self.classes[st].insert(0, implementation)
+        self.registrations[st][s_or_c][context].insert(0, registration)
