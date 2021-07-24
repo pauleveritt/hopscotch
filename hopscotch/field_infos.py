@@ -25,7 +25,6 @@ from hopscotch import VDOMNode
 if TYPE_CHECKING:
     from hopscotch.operators import Operator
 
-SKIPPED_FIELD_NAMES = ("__hopscotch_predicates__",)
 EMPTY = getattr(inspect, "_empty")
 
 
@@ -119,12 +118,6 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
 
 def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at dataclasses."""
-    try:
-        predicates: list[FieldInfo] = getattr(target, "__hopscotch_predicates__")
-        return predicates
-    except AttributeError:
-        pass
-
     type_hints = get_type_hints(
         target, include_extras=True, globalns=None, localns=None
     )
@@ -136,7 +129,6 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
             fields_mapping[field_name],
         )
         for field_name in type_hints
-        if field_name not in SKIPPED_FIELD_NAMES
     ]
 
     return field_infos
@@ -144,12 +136,6 @@ def get_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
 
 def get_non_dataclass_field_infos(target: Callable[..., Any]) -> list[FieldInfo]:
     """Entry point to all sniffing at non-dataclasses."""
-    try:
-        predicates: list[FieldInfo] = getattr(target, "__hopscotch_predicates__")
-        return predicates
-    except AttributeError:
-        pass
-
     type_hints = get_type_hints(
         target, include_extras=True, globalns=None, localns=None
     )

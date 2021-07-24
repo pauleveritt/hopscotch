@@ -125,6 +125,7 @@ def test_get_operator_no_annotated() -> None:
 def test_target_field_info_str(
     target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
+    """Variations of field_info extraction."""
     field_infos = extractor(target)
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str

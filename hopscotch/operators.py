@@ -40,7 +40,7 @@ class Get:
             msg = f"Cannot use a string '{lk}' as container lookup value"
             raise ValueError(msg)
 
-        result_value = registry.get_service(self.lookup_key)
+        result_value = registry.get(self.lookup_key)
 
         # Are we plucking an attr?
         if self.attr is not None:
