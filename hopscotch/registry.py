@@ -95,15 +95,15 @@ def inject_callable(
             #   the next 3 statements.
             # This field uses Annotated[SomeType, SomeOperator]
             field_value = operator(registry)
-        elif registry and ft in registry.singletons:
-            # TODO What's up with the need to manually say `Registration`?
-            # TODO Later, just remove this...the tree can get the singleton.
-            v: Registration = registry.singletons[ft][-1]
-            field_value = v.implementation
+        # elif registry and ft in registry.singletons:
+        #     # TODO What's up with the need to manually say `Registration`?
+        #     # TODO Later, just remove this...the tree can get the singleton.
+        #     v: Registration = registry.singletons[ft][-1]
+        #     field_value = v.implementation
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
-        elif registry and type(ft).__module__ != "builtins":
+        elif registry and ft.__module__ != "builtins":
             # Avoid trying to inject str, meaning, only inject
             # user-defined classes
             field_value = registry.get(ft)
@@ -122,7 +122,6 @@ def inject_callable(
 
 def make_singletons_classes():
     """Factory for defaultdict to initialize second level of tree"""
-    singletons = defaultdict(list)
     return dict(
         singletons=defaultdict(list),
         classes=defaultdict(list),
@@ -146,7 +145,6 @@ class Registry:
     scanner: Scanner
     # TODO Improve typing, including literal
     registrations: Registrations
-    singletons: dict[type, list[Registration]]
 
     def __init__(
             self,
@@ -156,7 +154,6 @@ class Registry:
         """Construct a registry that might have a context and be nested."""
         self.classes: dict[type, list[type]] = defaultdict(list)
         self.registrations = defaultdict(make_singletons_classes)
-        self.singletons = defaultdict(list)
         self.parent: Optional[Registry] = parent
         self.context = context
         self.scanner = Scanner(registry=self)
@@ -355,9 +352,6 @@ class Registry:
         # creating tree nodes as needed.
         s_or_c = 'singletons' if is_singleton else 'classes'
         self.registrations[st][s_or_c][context].append(registration)
-        # self.registrations[st].append(registration)
 
-        if is_singleton:
-            self.singletons[st].append(registration)
-        else:
+        if not is_singleton:
             self.classes[st].insert(0, implementation)

@@ -226,7 +226,8 @@ def test_register_service_with_class() -> None:
     registry = Registry()
     greeting = Greeting()
     registry.register(greeting)
-    registration = registry.singletons[Greeting][0]
+    greetings = registry.registrations[Greeting]
+    registration = greetings['singletons'][None][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
     assert registration.servicetype is None
