@@ -124,7 +124,6 @@ def test_singleton_registry_context_french_multiple() -> None:
     class NonCustomer:
         salutation: str = "Not a Customer"
 
-    customer = Customer(first_name="customer")
     french_customer = FrenchCustomer(first_name="french customer")
     greeting = Greeting(salutation="no context")
     customer_greeting = Greeting(salutation="customer")
@@ -238,6 +237,10 @@ def test_register_service_without_class() -> None:
     registry = Registry()
     greeting = GreetingImplementer()
     registry.register(greeting)
+    gi = registry.registrations[GreetingImplementer]
+    first = gi['singletons'][None][0]
+    assert first.implementation == greeting
+    assert first.is_singleton
 
 
 def test_register_class() -> None:
@@ -245,6 +248,25 @@ def test_register_class() -> None:
     registry = Registry()
     registry.register(GreetingImplementer, servicetype=GreetingService)
     assert [GreetingImplementer] == registry.classes[GreetingService]
+    gs = registry.registrations[GreetingService]
+    first = gs['classes'][None][0]
+    assert first.implementation is GreetingImplementer
+    assert first.servicetype is GreetingService
+    assert not first.is_singleton
+
+
+def test_register_class_with_context() -> None:
+    """Register a class for a context then ensure it is present."""
+    registry = Registry()
+    registry.register(GreetingImplementer,
+                      servicetype=GreetingService, context=FrenchCustomer)
+    assert [GreetingImplementer] == registry.classes[GreetingService]
+    gs = registry.registrations[GreetingService]
+    assert gs['classes'][None] == []
+    first = gs['classes'][FrenchCustomer][0]
+    assert first.implementation is GreetingImplementer
+    assert first.servicetype is GreetingService
+    assert not first.is_singleton
 
 
 def test_get_last_singleton_registration() -> None:
@@ -354,6 +376,7 @@ def test_is_not_service_component() -> None:
     """Check if the helper returns false for a non-class."""
     assert not is_service_component(999)
 
+
 # TODO Make sure the policies tested here reflect in refactoring
 # def test_get_service_info() -> None:
 #     """Get the cached value of service info, starting at first time."""
@@ -446,3 +469,4 @@ def test_context_registration_no_context() -> None:
 #     registry.scanner.scan = ds
 #     registry.scan("examples.d_decorators")
 #     assert "examples.d_decorators" == ds.called_with.__name__  # type: ignore
+
