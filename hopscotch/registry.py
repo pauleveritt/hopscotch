@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from importlib import import_module
 from inspect import isclass
 from types import ModuleType
-from typing import Any, Optional, Type, TypeVar, Union, TypedDict
+from typing import Any, Optional, Type, TypeVar, Union, TypedDict, Callable
 
 from venusian import Scanner
 
@@ -19,22 +19,13 @@ Props = dict[str, Any]
 
 
 @dataclass()
-class TreeNode:
-    """A servicetype with registered singletons and classes."""
-
-    servicetype: type
-    singletons: list[type] = field(default=list)
-    classes: list[type] = field(default=list)
-
-
-@dataclass()
 class Registration:
     """Collect registration and introspection info of a target."""
 
     slots = ("implementation", "servicetype", "context", "field_infos", "is_singleton")
-    implementation: Union[Type[T], T]
-    servicetype: Optional[Type[T]] = None
-    context: Optional[type] = None
+    implementation: Union[Callable[..., object], object]
+    servicetype: Optional[Callable[..., object]] = None
+    context: Optional[Callable[..., object]] = None
     field_infos: FieldInfos = field(default_factory=list)
     is_singleton: bool = False
 
@@ -59,7 +50,6 @@ def inject_callable(
         registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
-
     target = registration.implementation
     kwargs = {}
 
@@ -101,7 +91,7 @@ def inject_callable(
         elif field_info.default_value is not None:
             field_value = field_info.default_value
         else:
-            ql = target.__qualname__
+            ql = target.__qualname__  # type: ignore
             msg = f"Cannot inject '{ft.__name__}' on '{ql}.{fn}'"
             raise ValueError(msg)
 
@@ -113,12 +103,13 @@ def inject_callable(
 
 class KindGroups(TypedDict):
     """Constrain the keys to just singleton and classes."""
+
     singletons: dict[Union[type, Type[None]], list[Registration]]
     classes: dict[Union[type, Type[None]], list[Registration]]
 
 
 def make_singletons_classes() -> KindGroups:
-    """Factory for defaultdict to initialize second level of tree"""
+    """Factory for defaultdict to initialize second level of tree."""
     kind_groups: KindGroups = dict(
         singletons=defaultdict(list),
         classes=defaultdict(list),
@@ -131,6 +122,7 @@ Registrations = dict[type, KindGroups]
 
 class Registry:
     """Type-oriented registry with special features."""
+
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
@@ -176,7 +168,6 @@ class Registry:
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
-
         # Use the passed-in context class if provided, otherwise, the
         # the registry's context (if provided.)
         context_class: Optional[Any] = None
@@ -185,18 +176,13 @@ class Registry:
         elif self.context:
             context_class = self.context.__class__
 
-        # Look registrations for servicetypes that are an exact match
-        # (higher precedence) vs. subclass (lower precedence) vs.
-        # no match.
-        matching_servicetypes: dict[str, dict]
-
         st_registrations = self.registrations[servicetype]
         if kwargs:
             # If props are passed in, we can't use singletons. So if
             # kwargs are None, add in singletons.
-            registrations = st_registrations['classes']
+            registrations = st_registrations["classes"]
         else:
-            registrations = st_registrations['singletons'] | st_registrations['classes']
+            registrations = st_registrations["singletons"] | st_registrations["classes"]
 
         # We will put possible matches into three piles: high/medium/low
         # precedence. Each pile is an ordered list based on registration
@@ -209,23 +195,26 @@ class Registry:
         for this_context, these_registrations in registrations.items():
             if this_context is None and context_class is None:
                 # This is the most basic case, test it first to bail out quickly.
-                precedences2['low'] = these_registrations
+                precedences2["low"] = these_registrations
             elif this_context is context_class:
-                precedences2['high'] = these_registrations
+                precedences2["high"] = these_registrations
             elif this_context is None:
-                precedences2['low'] = these_registrations
+                precedences2["low"] = these_registrations
             elif context_class is not None and issubclass(context_class, this_context):
-                precedences2['medium'] = these_registrations
+                precedences2["medium"] = these_registrations
             # Otherwise, filter it out and do nothing
 
         # Now filter by predicates
-        matches = precedences2['high'] + precedences2['medium'] + precedences2['low']
+        matches = precedences2["high"] + precedences2["medium"] + precedences2["low"]
         for match in matches:
             if match.is_singleton:
-                return match.implementation
+                # TODO Now that ``.get()`` makes promises about typing, it makes
+                #    registering a singleton for a "kind" a good bit harder.
+                #    We'll just shut this up for now.
+                return match.implementation  # type: ignore
             else:
                 # Need to construct it
-                instance = self.inject(match, props=kwargs)
+                instance: T = self.inject(match, props=kwargs)
                 return instance
 
         # # Try with the parents
@@ -263,5 +252,6 @@ class Registry:
 
         # Put this in the correct place of the registrations tree,
         # creating tree nodes as needed.
-        s_or_c = 'singletons' if is_singleton else 'classes'
-        self.registrations[st][s_or_c][context].insert(0, registration)
+        s_or_c = "singletons" if is_singleton else "classes"
+        registrations = self.registrations[st][s_or_c]  # type: ignore
+        registrations[context].insert(0, registration)

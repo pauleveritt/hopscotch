@@ -6,7 +6,6 @@ registry.
 """
 import pytest
 
-from hopscotch.field_infos import get_field_infos
 from hopscotch.fixtures.dataklasses import (
     GreetingService,
     GreeterService,
@@ -53,7 +52,7 @@ def test_service_dependency_no_default() -> None:
     with pytest.raises(ValueError) as exc:
         inject_callable(registration)
 
-    expected = f"Cannot inject 'str' on 'GreetingNoDefault.salutation'"
+    expected = "Cannot inject 'str' on 'GreetingNoDefault.salutation'"
     assert exc.value.args[0] == expected
 
 
@@ -76,7 +75,6 @@ def test_non_service_dependency() -> None:
 
 def test_service_dependency_nested_registry() -> None:
     """Nested registry, can service get singleton from right level?"""
-
     gs_child = GreetingService(salutation="use child")
     gs_parent = GreetingService(salutation="use parent")
 

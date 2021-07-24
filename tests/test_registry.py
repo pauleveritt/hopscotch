@@ -227,7 +227,7 @@ def test_register_service_with_class() -> None:
     greeting = Greeting()
     registry.register(greeting)
     greetings = registry.registrations[Greeting]
-    registration = greetings['singletons'][None][0]
+    registration = greetings["singletons"][None][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
     assert registration.servicetype is None
@@ -239,7 +239,7 @@ def test_register_service_without_class() -> None:
     greeting = GreetingImplementer()
     registry.register(greeting)
     gi = registry.registrations[GreetingImplementer]
-    first = gi['singletons'][None][0]
+    first = gi["singletons"][None][0]
     assert first.implementation == greeting
     assert first.is_singleton
 
@@ -252,7 +252,7 @@ def test_register_class() -> None:
     registration = registrations[0]
     assert GreetingImplementer is registration.implementation
     gs = registry.registrations[GreetingService]
-    first = gs['classes'][None][0]
+    first = gs["classes"][None][0]
     assert first.implementation is GreetingImplementer
     assert first.servicetype is GreetingService
     assert not first.is_singleton
@@ -261,15 +261,16 @@ def test_register_class() -> None:
 def test_register_class_with_context() -> None:
     """Register a class for a context then ensure it is present."""
     registry = Registry()
-    registry.register(GreetingImplementer,
-                      servicetype=GreetingService, context=FrenchCustomer)
+    registry.register(
+        GreetingImplementer, servicetype=GreetingService, context=FrenchCustomer
+    )
     classes = registry.registrations[GreetingService]["classes"]
     registrations = classes[FrenchCustomer]
     registration = registrations[0]
     assert GreetingImplementer == registration.implementation
     gs = registry.registrations[GreetingService]
-    assert gs['classes'][None] == []
-    first = gs['classes'][FrenchCustomer][0]
+    assert gs["classes"][None] == []
+    first = gs["classes"][FrenchCustomer][0]
     assert first.implementation is GreetingImplementer
     assert first.servicetype is GreetingService
     assert not first.is_singleton
@@ -389,6 +390,7 @@ def test_context_registration_no_context() -> None:
     registry.register(GreetingService, context=Customer)
     with pytest.raises(LookupError):
         registry.get(GreetingService)
+
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

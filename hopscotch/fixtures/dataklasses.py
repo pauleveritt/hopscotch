@@ -61,6 +61,7 @@ class GreetingFactory(Service):
 
     @classmethod
     def __hopscotch_factory__(cls, registry: Registry) -> GreetingFactory:
+        """Manually construct this instance, instead of injection."""
         return cls(salutation="Hi From Factory")
 
 
