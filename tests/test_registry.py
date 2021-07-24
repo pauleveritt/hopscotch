@@ -22,12 +22,6 @@ class DummyScan:
         self.called_with = pkg
 
 
-def test_construction() -> None:
-    """Ensure the registry is setup correctly."""
-    registry = Registry()
-    assert {} == registry.classes
-
-
 def test_singleton_registry_context_none() -> None:
     """When registry context is none, get correct singletons."""
     greeting = Greeting(salutation="no context")
@@ -390,7 +384,6 @@ def test_context_registration_no_context() -> None:
     registry.register(GreetingService, context=Customer)
     with pytest.raises(LookupError):
         registry.get(GreetingService)
-
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

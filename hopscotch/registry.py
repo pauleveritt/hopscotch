@@ -134,7 +134,6 @@ class Registry:
             context: Optional[Any] = None,
     ) -> None:
         """Construct a registry that might have a context and be nested."""
-        self.classes: dict[type, list[type]] = defaultdict(list)
         self.registrations = defaultdict(make_singletons_classes)
         self.parent: Optional[Registry] = parent
         self.context = context
