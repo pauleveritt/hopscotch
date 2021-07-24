@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from importlib import import_module
 from inspect import isclass
 from types import ModuleType
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, Type, TypeVar, Union, TypedDict
 
 from venusian import Scanner
 
@@ -74,10 +74,6 @@ def inject_callable(
 
     # Does the registry already have field info for this target?
     if registry is not None:
-        # Ask the registry to get the cached service info, creating
-        # it if needed
-        # TODO Paul When move to registry.registrations is complete,
-        #   remove this and the method.
         these_field_infos = registration.field_infos
     else:
         # No registry, so we calculate field info every time (boo)
@@ -95,11 +91,6 @@ def inject_callable(
             #   the next 3 statements.
             # This field uses Annotated[SomeType, SomeOperator]
             field_value = operator(registry)
-        # elif registry and ft in registry.singletons:
-        #     # TODO What's up with the need to manually say `Registration`?
-        #     # TODO Later, just remove this...the tree can get the singleton.
-        #     v: Registration = registry.singletons[ft][-1]
-        #     field_value = v.implementation
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
@@ -120,22 +111,22 @@ def inject_callable(
     return target(**kwargs)  # type: ignore
 
 
-def make_singletons_classes():
+class KindGroups(TypedDict):
+    """Constrain the keys to just singleton and classes."""
+    singletons: dict[Union[type, Type[None]], list[Registration]]
+    classes: dict[Union[type, Type[None]], list[Registration]]
+
+
+def make_singletons_classes() -> KindGroups:
     """Factory for defaultdict to initialize second level of tree"""
-    return dict(
+    kind_groups: KindGroups = dict(
         singletons=defaultdict(list),
         classes=defaultdict(list),
     )
+    return kind_groups
 
 
-Registrations = dict[
-    type, dict[
-        str, dict[
-            Union[type, Type[None]],
-            list[Registration]
-        ]
-    ]
-]
+Registrations = dict[type, KindGroups]
 
 
 class Registry:
@@ -143,7 +134,6 @@ class Registry:
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner
-    # TODO Improve typing, including literal
     registrations: Registrations
 
     def __init__(
