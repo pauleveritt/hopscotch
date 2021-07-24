@@ -7,7 +7,7 @@ import pytest
 from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreetingImplementer
 from hopscotch.fixtures.dataklasses import GreetingService
-from hopscotch.registry import Registry, is_service_component, Registration
+from hopscotch.registry import Registry, Registration
 
 
 class DummyScan:
@@ -367,16 +367,6 @@ def test_injector_registry_scan_caller() -> None:
     assert "tests" == ds.called_with.__name__  # type: ignore
 
 
-def test_is_service_component() -> None:
-    """Check if the helper does return true for a subclass."""
-    assert is_service_component(GreetingService)
-
-
-def test_is_not_service_component() -> None:
-    """Check if the helper returns false for a non-class."""
-    assert not is_service_component(999)
-
-
 # TODO Make sure the policies tested here reflect in refactoring
 # def test_get_service_info() -> None:
 #     """Get the cached value of service info, starting at first time."""
@@ -469,4 +459,3 @@ def test_context_registration_no_context() -> None:
 #     registry.scanner.scan = ds
 #     registry.scan("examples.d_decorators")
 #     assert "examples.d_decorators" == ds.called_with.__name__  # type: ignore
-

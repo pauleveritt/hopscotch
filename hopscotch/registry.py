@@ -53,14 +53,6 @@ class Service(metaclass=ABCMeta):
 T = TypeVar("T")
 
 
-def is_service_component(callable_: Any) -> bool:
-    """Simplify checking if something is a 'service'."""
-    try:
-        return issubclass(callable_, Service)
-    except TypeError:
-        return False
-
-
 def inject_callable(
         registration: Registration,
         props: Optional[Props] = None,
@@ -111,10 +103,9 @@ def inject_callable(
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
-        elif registry and is_service_component(ft):
-            # TODO Replace is_service_component check with something in
-            #   `get` which bails in a friendly way when you
-            #   try to look up `str` or a class in the standard lib.
+        elif registry and type(ft).__module__ != "builtins":
+            # Avoid trying to inject str, meaning, only inject
+            # user-defined classes
             field_value = registry.get(ft)
         elif field_info.default_value is not None:
             field_value = field_info.default_value
