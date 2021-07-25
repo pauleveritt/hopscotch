@@ -131,6 +131,7 @@ def test_target_field_info_str(
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
     assert field_infos[0].init is True
+    assert field_infos[0].has_annotated is False
 
 
 @pytest.mark.parametrize(
@@ -161,6 +162,7 @@ def test_dataclass_field_info_init_false() -> None:
     assert field_infos[0].default_value is None
     assert field_infos[0].init is False
     assert field_infos[0].has_annotated is False
+    assert field_infos[0].is_builtin is True
 
 
 def test_field_info_more_generic() -> None:
@@ -170,6 +172,7 @@ def test_field_info_more_generic() -> None:
     assert "GenericAlias" in str(type(field_infos[0].field_type))
     assert field_infos[0].default_value is None
     assert field_infos[0].init is True
+    assert field_infos[0].is_builtin is True
 
 
 def test_dataclass_field_info_annotation() -> None:
@@ -178,6 +181,7 @@ def test_dataclass_field_info_annotation() -> None:
     assert field_infos[0].field_name == "greeter"
     assert field_infos[0].field_type is Greeting
     assert field_infos[0].default_value is None
+    assert field_infos[0].is_builtin is False
     assert isinstance(field_infos[0].operator, Get)
     assert field_infos[0].has_annotated is True
     operator: Operator = field_infos[0].operator

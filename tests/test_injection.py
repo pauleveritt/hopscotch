@@ -48,9 +48,6 @@ def test_dependency_namedtuple() -> None:
     directly rather than going to find it.
     """
     from hopscotch.fixtures.named_tuples import Greeter as NTGreeter
-    # registry = Registry()
-    #
-    # registry.register(NTGreeter)
 
     registration = Registration(NTGreeter)
     result = inject_callable(registration)

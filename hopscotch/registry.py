@@ -65,6 +65,7 @@ def inject_callable(
     for field_info in these_field_infos:
         fn = field_info.field_name
         ft = field_info.field_type
+        is_builtin = field_info.is_builtin
         operator = field_info.operator
         if props and fn in props:
             # Props have highest precedence
@@ -77,7 +78,7 @@ def inject_callable(
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
-        elif ft.__module__ != "builtins":
+        elif not is_builtin:
             # Avoid trying to inject str, meaning, only inject
             # user-defined classes
             # TODO If ``ft`` is a function or NamedTuple, it kind of breaks

@@ -2,6 +2,7 @@
 
 ## Now
 
+- Calculate up front whether a field type is a builtin
 ## Next
 
 - Make it possible to inject the context without the registry
