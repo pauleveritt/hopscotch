@@ -77,10 +77,24 @@ def inject_callable(
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
-        elif registry and ft.__module__ != "builtins":
+        elif ft.__module__ != "builtins":
             # Avoid trying to inject str, meaning, only inject
             # user-defined classes
-            field_value = registry.get(ft)
+            # TODO If ``ft`` is a function or NamedTuple, it kind of breaks
+            #   the type-oriented contract for ``get``. But the following
+            #   might still work.  Not sure the right solution.
+            if registry:
+                field_value = registry.get(ft)
+            else:
+                # Treat this as a symbol that can be injected without
+                # a lookup, such as a function, NamedTuple, etc.
+                # TODO Would be great to avoid computing this each time
+                registration = Registration(
+                    context=None,  # TODO Bring this back w/ context injection
+                    implementation=ft,
+                    is_singleton=False,  # TODO They might be in registry
+                )
+                field_value = inject_callable(registration, props=props)
         elif field_info.default_value is not None:
             field_value = field_info.default_value
         else:

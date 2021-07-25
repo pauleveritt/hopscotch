@@ -27,13 +27,33 @@ def test_field_default() -> None:
     assert result.salutation == "Hello"
 
 
-def test_service_dependency_class() -> None:
+def test_dependency_class() -> None:
     """The target has a field dependency to fetch from registry."""
     registry = Registry()
     registry.register(Greeting)
 
     registration = Registration(GreeterService)
     result = registry.inject(registration)
+    assert "Hello" == result.greeting.salutation
+
+
+def test_dependency_namedtuple() -> None:
+    """Inject a non-type that isn't registered.
+
+    We use ``registry.get`` to get an implementation that is a type of
+    the thing we are looking up. Things like ``NamedTuple`` and
+    functions can't be subclasses.
+
+    They can still be used by the injector, just by grabbing the symbol
+    directly rather than going to find it.
+    """
+    from hopscotch.fixtures.named_tuples import Greeter as NTGreeter
+    # registry = Registry()
+    #
+    # registry.register(NTGreeter)
+
+    registration = Registration(NTGreeter)
+    result = inject_callable(registration)
     assert "Hello" == result.greeting.salutation
 
 
@@ -45,7 +65,7 @@ def test_injection_no_registry() -> None:
     assert "No registry" == result.salutation
 
 
-def test_service_dependency_no_default() -> None:
+def test_dependency_no_default() -> None:
     """The target has str field with no default, fail with custom exception."""
     registration = Registration(GreetingNoDefault)
     with pytest.raises(ValueError) as exc:
@@ -55,15 +75,15 @@ def test_service_dependency_no_default() -> None:
     assert exc.value.args[0] == expected
 
 
-def test_service_dependency_default() -> None:
+def test_dependency_default() -> None:
     """The target has an str field with a default."""
     registration = Registration(AnotherGreeting)
     result = inject_callable(registration)
     assert "Another Hello" == result.salutation
 
 
-def test_non_service_dependency() -> None:
-    """The target has a non-service field to fetch from registry."""
+def test_non_dependency() -> None:
+    """The target has a dependent field to fetch from registry."""
     gs = Greeting(salutation="use singleton")
     registry = Registry()
     registry.register(gs)
@@ -72,8 +92,8 @@ def test_non_service_dependency() -> None:
     assert "use singleton" == result.greeting.salutation
 
 
-def test_service_dependency_nested_registry() -> None:
-    """Nested registry, can service get singleton from right level?"""
+def test_dependency_nested_registry() -> None:
+    """Nested registry, can injector get singleton from right level?"""
     gs_child = Greeting(salutation="use child")
     gs_parent = Greeting(salutation="use parent")
 
@@ -91,7 +111,7 @@ def test_service_dependency_nested_registry() -> None:
     assert "use child" == result.greeting.salutation
 
 
-def test_pass_in_props_create_service() -> None:
+def test_pass_in_props_create_dependency() -> None:
     """Instead of injecting a field, get it from passed-in 'props'."""
     props = dict(salutation="use prop")
     registration = Registration(Greeting)
@@ -118,7 +138,7 @@ def test_inject_context() -> None:
 
 
 def test_hopscotch_factory() -> None:
-    """The service has its own factory as a class attribute."""
+    """The dependency has its own factory as a class attribute."""
     registraton = Registration(GreetingFactory)
     registry = Registry()
     registry.register(GreetingFactory)

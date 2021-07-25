@@ -2,12 +2,9 @@
 
 ## Now
 
-- Overhaul `Greeting` and friends
-  * Emphasis on the service versions in naming
-  * Provide some alternate implementations
-
 ## Next
 
+- Make it possible to inject the context without the registry
 - Use custom dataclass fields instead of `Annotated`
 - Bring over `injectable` decorator
 
