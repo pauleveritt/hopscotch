@@ -2,8 +2,6 @@
 from typing import Annotated
 from typing import Optional
 
-from hopscotch.registry import Service
-
 
 class Greeting:
     """A plain-old-class to give a greeting."""
@@ -21,7 +19,7 @@ class GreetingNoDefault:
         self.salutation = salutation
 
 
-class GreetingService(Service):
+class GreetingService:
     """A plain-old-class ``Service`` to say greeting."""
 
     salutation: str = "Hello"
@@ -37,7 +35,7 @@ class Greeter:
         self.greeting = greeting
 
 
-class GreeterService(Service):
+class GreeterService:
     """A plain-old-class ``Service`` to engage a customer."""
 
     greeting: GreetingService

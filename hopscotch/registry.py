@@ -1,7 +1,6 @@
 """Type-oriented registry that start simple and finishes powerful."""
 from __future__ import annotations
 
-from abc import ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass, field
 from importlib import import_module
@@ -33,12 +32,6 @@ class Registration:
         """Extract and assign the field infos if not singleton."""
         if not self.is_singleton:
             self.field_infos = get_field_infos(self.implementation)
-
-
-class Service(metaclass=ABCMeta):
-    """Type-oriented base class that supports looking up implementations."""
-
-    pass
 
 
 T = TypeVar("T")

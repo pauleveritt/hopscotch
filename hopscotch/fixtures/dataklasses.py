@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Annotated, Optional
 
 from ..operators import Get, Context
-from ..registry import Service, Registry
+from ..registry import Registry
 
 
 @dataclass()
@@ -47,14 +47,14 @@ class GreetingTuple:
 
 
 @dataclass()
-class GreetingService(Service):
+class GreetingService:
     """A dataclass ``Service`` to say greeting."""
 
     salutation: str = "Hello"
 
 
 @dataclass()
-class GreetingFactory(Service):
+class GreetingFactory:
     """Use the ``__hopscotch_factory__`` protocol to control creation."""
 
     salutation: str
@@ -80,7 +80,7 @@ class Greeter:
 
 
 @dataclass()
-class GreeterService(Service):
+class GreeterService:
     """A dataclass ``Service`` to engage a customer."""
 
     greeting: GreetingService
