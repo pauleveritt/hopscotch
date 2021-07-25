@@ -4,8 +4,8 @@ from typing import Optional
 
 import pytest
 
-from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer
 from hopscotch.fixtures.dataklasses import AnotherGreeting
+from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer, GreeterFirstName, GreeterFrenchCustomer
 from hopscotch.registry import Registry, Registration
 
 
@@ -108,6 +108,21 @@ def test_singleton_registry_context_french_customer() -> None:
     r.register(non_customer_greeting, context=NonCustomer)
     with pytest.raises(LookupError):
         r.get(Greeting)
+
+
+def test_field_operator_get_attr() -> None:
+    """Use a field operator version of ``Get`` for the attribute."""
+    r = Registry()
+    r.register(Customer(first_name="Field"))
+    r.register(GreeterFirstName)
+    assert r.get(GreeterFirstName).customer_name == "Field"
+
+
+def test_field_operator_context() -> None:
+    """Use a field operator version of ``Context`` for the field."""
+    r = Registry(context=FrenchCustomer(first_name="Marie"))
+    r.register(GreeterFrenchCustomer)
+    assert r.get(GreeterFrenchCustomer).customer.first_name == "Marie"
 
 
 def test_singleton_registry_context_french_multiple() -> None:

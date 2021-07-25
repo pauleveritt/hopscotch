@@ -73,7 +73,15 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
 
     # Using Annotation[] ??
     has_annotated = hasattr(field_type, "__metadata__")
-    field_type, operator = get_operator(field_type)
+    if has_annotated:
+        field_type, operator = get_operator(field_type)
+    else:
+        # Field operators stash their info in field.metadata
+        if "injected" in field.metadata:
+            injected = field.metadata["injected"]
+            operator = injected["operator"]
+        else:
+            operator = None
 
     # Default values
     default_value = None if field.default is MISSING else field.default

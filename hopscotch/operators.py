@@ -4,7 +4,7 @@ Operators allow a field to ask for some work to be done during injection.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, Field, field
 from typing import Any
 from typing import Optional
 from typing import Protocol
@@ -22,6 +22,30 @@ class Operator(Protocol):
         ...
 
 
+def make_field_operator(operator_class: Any) -> Any:
+    def _inner(*args, **kwargs) -> Field:
+        # Some of the kwargs are for generic field keyword
+        # arguments, such as ``init=False``. But some should be
+        # sent to the operator. Put them in two piles.
+        operator_kwargs = {}
+        for kwarg_key, kwarg_value in list(kwargs.items()):
+            if kwarg_key not in Field.__slots__:
+                operator_kwargs[kwarg_key] = kwarg_value
+                del kwargs[kwarg_key]
+
+        # We can now construct the operator
+        operator = operator_class(*args, **operator_kwargs)
+        if "metadata" not in kwargs:
+            kwargs["metadata"] = {}
+
+        # Use dataclass field metadata support to smuggle our injector
+        # information through to the other side.
+        kwargs["metadata"]["injected"] = dict(operator=operator)
+        return field(**kwargs)
+
+    return _inner
+
+
 @dataclass(frozen=True)
 class Get:
     """Lookup a service and optionally pluck an attr."""
@@ -30,8 +54,8 @@ class Get:
     attr: Optional[str] = None
 
     def __call__(
-        self,
-        registry: Registry,
+            self,
+            registry: Registry,
     ) -> object:
         """Use registry to find lookup key and optionally pluck attr."""
         # Can't lookup a string, ever, so bail on this with an error.
@@ -49,6 +73,9 @@ class Get:
         return result_value
 
 
+get = make_field_operator(Get)
+
+
 @dataclass(frozen=True)
 class Context:
     """Grab the current container context and optionally pluck an attr."""
@@ -56,8 +83,8 @@ class Context:
     attr: Optional[str] = None
 
     def __call__(
-        self,
-        registry: Registry,
+            self,
+            registry: Registry,
     ) -> object:
         """Use registry to grab the context and optionally pluck an attr."""
         value = registry.context
@@ -69,3 +96,6 @@ class Context:
             value = getattr(value, self.attr)
 
         return value
+
+
+context = make_field_operator(Context)

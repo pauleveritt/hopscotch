@@ -18,7 +18,13 @@ from hopscotch.fixtures import (
     named_tuples,
     plain_classes,
 )
-from hopscotch.fixtures.dataklasses import Greeting, GreetingOperator, GreetingTuple
+from hopscotch.fixtures.dataklasses import (
+    Greeting,
+    GreetingOperator,
+    GreetingTuple,
+    GreeterFirstName,
+    Customer,
+)
 from hopscotch.operators import Get, Operator
 from hopscotch.registry import Registry
 
@@ -123,7 +129,7 @@ def test_get_operator_no_annotated() -> None:
     ],
 )
 def test_target_field_info_str(
-    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+        target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Variations of field_info extraction."""
     field_infos = extractor(target)
@@ -144,7 +150,7 @@ def test_target_field_info_str(
     ],
 )
 def test_field_info_children(
-    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+        target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Look for the magic-named ``children`` argument."""
     field_infos = extractor(target)
@@ -186,3 +192,13 @@ def test_dataclass_field_info_annotation() -> None:
     assert field_infos[0].has_annotated is True
     operator: Operator = field_infos[0].operator
     assert getattr(operator, "lookup_key") is Greeting
+
+
+def test_dataclass_field_operator() -> None:
+    """Field operators should result in same field info as annotated."""
+    field_infos = get_dataclass_field_infos(GreeterFirstName)
+    customer_name = field_infos[0]
+    operator = customer_name.operator
+    assert isinstance(operator, Get)
+    assert operator.lookup_key == Customer
+    assert operator.attr == "first_name"

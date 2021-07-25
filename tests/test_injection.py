@@ -4,6 +4,7 @@ The ``inject_callable`` callable is used in both the registry and
 components. Thus it needs to support use both with and without a
 registry.
 """
+
 import pytest
 
 from hopscotch.fixtures.dataklasses import (

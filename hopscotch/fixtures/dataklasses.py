@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Annotated, Optional
 
-from ..operators import Get, Context
+from ..operators import Get, Context, context, get
 from ..registry import Registry
 
 
@@ -132,4 +132,11 @@ class GreeterCustomer:
 class GreeterFrenchCustomer:
     """A dataclass that depends on a different registry context."""
 
-    customer: Annotated[FrenchCustomer, Context()]
+    customer: FrenchCustomer = context()
+
+
+@dataclass()
+class GreeterFirstName:
+    """A dataclass that gets an attribute off a dependency."""
+
+    customer_name: str = get(Customer, attr="first_name")
