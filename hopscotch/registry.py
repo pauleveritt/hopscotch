@@ -8,7 +8,7 @@ from inspect import isclass
 from types import ModuleType
 from typing import Any, Optional, Type, TypeVar, Union, TypedDict, Callable
 
-from venusian import Scanner
+from venusian import Scanner, attach
 
 from .callers import caller_package
 from .field_infos import get_field_infos, FieldInfos
@@ -262,3 +262,32 @@ class Registry:
         s_or_c = "singletons" if is_singleton else "classes"
         registrations = self.registrations[st][s_or_c]  # type: ignore
         registrations[context].insert(0, registration)
+
+
+class injectable:  # noqa
+    """``venusian`` decorator to register an injectable factory ."""
+    servicetype = None  # Give subclasses a chance to give default, e.g. view
+
+    def __init__(
+            self,
+            servicetype: type = None,
+            *,
+            context: Optional[Type] = None,
+            singleton: bool = False,
+    ):
+        if servicetype is not None:
+            self.servicetype = servicetype
+        self.context = context
+
+    def __call__(self, wrapped):
+        def callback(scanner: Scanner, name: str, cls):
+            servicetype = self.servicetype if self.servicetype else cls
+            registry = getattr(scanner, "registry")
+            registry.register(
+                implementation=cls,
+                servicetype=servicetype,
+                context=self.context,
+            )
+
+        attach(wrapped, callback)
+        return wrapped

@@ -5,9 +5,10 @@ from dataclasses import dataclass, field
 from typing import Annotated, Optional
 
 from ..operators import Get, Context, context, get
-from ..registry import Registry
+from ..registry import Registry, injectable
 
 
+@injectable()
 @dataclass()
 class Greeting:
     """A dataclass to give a greeting."""
@@ -65,6 +66,7 @@ class GreetingFactory:
         return cls(salutation="Hi From Factory")
 
 
+@injectable()
 @dataclass()
 class Greeter:
     """A dataclass to engage a customer."""
@@ -121,6 +123,7 @@ class FrenchCustomer(Customer):
     first_name: str
 
 
+@injectable()
 @dataclass()
 class GreeterCustomer:
     """A dataclass that depends on the registry context."""
@@ -128,6 +131,7 @@ class GreeterCustomer:
     customer: Annotated[Customer, Context()]
 
 
+@injectable(context=FrenchCustomer)
 @dataclass()
 class GreeterFrenchCustomer:
     """A dataclass that depends on a different registry context."""

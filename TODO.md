@@ -4,8 +4,6 @@
 
 ## Next
 
-- Use custom dataclass fields instead of `Annotated`
-- Bring over `injectable` decorator
 
 ## Soon
 
