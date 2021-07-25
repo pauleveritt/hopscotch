@@ -6,7 +6,6 @@ import pytest
 
 from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreetingImplementer
-from hopscotch.fixtures.dataklasses import GreetingService
 from hopscotch.registry import Registry, Registration
 
 
@@ -180,8 +179,8 @@ def test_get_singleton_service() -> None:
     """Return a singleton that is registered against a service."""
     registry = Registry()
     greeting = GreetingImplementer()
-    registry.register(greeting, servicetype=GreetingService)
-    result = registry.get(GreetingService)
+    registry.register(greeting, servicetype=Greeting)
+    result = registry.get(Greeting)
     assert greeting.salutation == result.salutation
 
 
@@ -189,8 +188,8 @@ def test_get_singleton_service_subclass() -> None:
     """Return a singleton that subclasses a service."""
     registry = Registry()
     greeting = GreetingImplementer()
-    registry.register(greeting, servicetype=GreetingService)
-    result = registry.get(GreetingService)
+    registry.register(greeting, servicetype=Greeting)
+    result = registry.get(Greeting)
     assert greeting is result
 
 
@@ -198,8 +197,8 @@ def test_get_services_found_class() -> None:
     """Construct an instance from a matching class."""
     registry = Registry()
     greeting = GreetingImplementer()
-    registry.register(GreetingImplementer, servicetype=GreetingService)
-    result = registry.get(GreetingService)
+    registry.register(GreetingImplementer, servicetype=Greeting)
+    result = registry.get(Greeting)
     assert greeting == result
 
 
@@ -207,11 +206,11 @@ def test_get_services_match_in_parent() -> None:
     """No local match but is found in parent."""
     parent_registry = Registry()
     greeting = GreetingImplementer()
-    parent_registry.register(GreetingImplementer, servicetype=GreetingService)
+    parent_registry.register(GreetingImplementer, servicetype=Greeting)
 
     # Make a child registry which has nothing registered
     child_registry = Registry(parent=parent_registry)
-    result = child_registry.get(GreetingService)
+    result = child_registry.get(Greeting)
     assert greeting == result
 
 
@@ -241,14 +240,14 @@ def test_register_service_without_class() -> None:
 def test_register_class() -> None:
     """Register a class then ensure it is present."""
     registry = Registry()
-    registry.register(GreetingImplementer, servicetype=GreetingService)
-    registrations = registry.registrations[GreetingService]["classes"][None]
+    registry.register(GreetingImplementer, servicetype=Greeting)
+    registrations = registry.registrations[Greeting]["classes"][None]
     registration = registrations[0]
     assert GreetingImplementer is registration.implementation
-    gs = registry.registrations[GreetingService]
+    gs = registry.registrations[Greeting]
     first = gs["classes"][None][0]
     assert first.implementation is GreetingImplementer
-    assert first.servicetype is GreetingService
+    assert first.servicetype is Greeting
     assert not first.is_singleton
 
 
@@ -256,17 +255,17 @@ def test_register_class_with_context() -> None:
     """Register a class for a context then ensure it is present."""
     registry = Registry()
     registry.register(
-        GreetingImplementer, servicetype=GreetingService, context=FrenchCustomer
+        GreetingImplementer, servicetype=Greeting, context=FrenchCustomer
     )
-    classes = registry.registrations[GreetingService]["classes"]
+    classes = registry.registrations[Greeting]["classes"]
     registrations = classes[FrenchCustomer]
     registration = registrations[0]
     assert GreetingImplementer == registration.implementation
-    gs = registry.registrations[GreetingService]
+    gs = registry.registrations[Greeting]
     assert gs["classes"][None] == []
     first = gs["classes"][FrenchCustomer][0]
     assert first.implementation is GreetingImplementer
-    assert first.servicetype is GreetingService
+    assert first.servicetype is Greeting
     assert not first.is_singleton
 
 
@@ -285,13 +284,13 @@ def test_get_last_class_registration() -> None:
     """Register multiple classes, last one wins."""
 
     @dataclass()
-    class GreetingImplementer2(GreetingService):
+    class GreetingImplementer2(Greeting):
         salutation: str = "G2"
 
     registry = Registry()
-    registry.register(GreetingImplementer, servicetype=GreetingService)
-    registry.register(GreetingImplementer2, servicetype=GreetingService)
-    result = registry.get(GreetingService)
+    registry.register(GreetingImplementer, servicetype=Greeting)
+    registry.register(GreetingImplementer2, servicetype=Greeting)
+    result = registry.get(Greeting)
     assert "G2" == result.salutation
 
 
@@ -299,14 +298,14 @@ def test_parent_registry() -> None:
     """Match a registry in the parent registry."""
 
     @dataclass()
-    class GreetingImplementer2(GreetingService):
+    class GreetingImplementer2(Greeting):
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register(GreetingImplementer, servicetype=GreetingService)
+    parent_registry.register(GreetingImplementer, servicetype=Greeting)
     child_registry = Registry(parent=parent_registry)
-    child_registry.register(GreetingImplementer2, servicetype=GreetingService)
-    result = child_registry.get(GreetingService)
+    child_registry.register(GreetingImplementer2, servicetype=Greeting)
+    result = child_registry.get(Greeting)
     assert result.salutation == "G2"
 
 
@@ -314,14 +313,14 @@ def test_child_registry() -> None:
     """Match a registry in the child registry."""
 
     @dataclass()
-    class GreetingImplementer2(GreetingService):
+    class GreetingImplementer2(Greeting):
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register(GreetingImplementer, servicetype=GreetingService)
-    parent_registry.register(GreetingImplementer2, servicetype=GreetingService)
+    parent_registry.register(GreetingImplementer, servicetype=Greeting)
+    parent_registry.register(GreetingImplementer2, servicetype=Greeting)
     child_registry = Registry(parent=parent_registry)
-    result = child_registry.get(GreetingService)
+    result = child_registry.get(Greeting)
     assert "G2" == result.salutation
 
 
@@ -351,11 +350,11 @@ def test_registration_with_servicetype() -> None:
     """Ensure a registration can be created with a servicetype."""
     registration = Registration(
         implementation=GreetingImplementer,
-        servicetype=GreetingService,
+        servicetype=Greeting,
         context=Greeting,
     )
     assert registration.implementation is GreetingImplementer
-    assert registration.servicetype is GreetingService
+    assert registration.servicetype is Greeting
     assert registration.context is Greeting
     assert len(registration.field_infos) == 1
 
@@ -381,9 +380,9 @@ def test_registration_with_no_context() -> None:
 def test_context_registration_no_context() -> None:
     """A registration for a context in a registry with none."""
     registry = Registry()
-    registry.register(GreetingService, context=Customer)
+    registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
-        registry.get(GreetingService)
+        registry.get(Greeting)
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

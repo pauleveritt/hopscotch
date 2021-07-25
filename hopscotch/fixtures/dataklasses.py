@@ -46,12 +46,6 @@ class GreetingTuple:
     salutation: tuple[str, ...]
 
 
-@dataclass()
-class GreetingService:
-    """A dataclass ``Service`` to say greeting."""
-
-    salutation: str = "Hello"
-
 
 @dataclass()
 class GreetingFactory:
@@ -66,7 +60,7 @@ class GreetingFactory:
 
 
 @dataclass()
-class GreetingImplementer(GreetingService):
+class GreetingImplementer(Greeting):
     """A dataclass that "implements" a service."""
 
     salutation: str = "Hello"
@@ -83,7 +77,7 @@ class Greeter:
 class GreeterService:
     """A dataclass ``Service`` to engage a customer."""
 
-    greeting: GreetingService
+    greeting: Greeting
 
 
 @dataclass()

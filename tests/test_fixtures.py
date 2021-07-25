@@ -25,7 +25,7 @@ def test_dataklass_fixtures() -> None:
     assert not hasattr(dataklasses.GreetingInitFalse(), "salutation")
     assert dataklasses.GreetingOperator(greeting).greeter.salutation == "Hello"
     assert dataklasses.GreetingTuple(("Hi", "Hey")).salutation == ("Hi", "Hey")
-    gs = dataklasses.GreetingService()
+    gs = dataklasses.Greeting()
     assert gs.salutation == "Hello"
     assert dataklasses.Greeter(greeting=greeting).greeting.salutation == "Hello"
     assert dataklasses.GreeterService(greeting=gs).greeting.salutation == "Hello"
@@ -36,7 +36,7 @@ def test_dataklass_fixtures() -> None:
     assert dataklasses.GreeterOptional(greeting=None).greeting is None
     gi = dataklasses.GreetingImplementer()
     assert gi.salutation == "Hello"
-    assert isinstance(gi, dataklasses.GreetingService)
+    assert isinstance(gi, dataklasses.Greeting)
 
 
 def test_functions_fixtures() -> None:
@@ -69,11 +69,9 @@ def test_plain_classes_fixtures() -> None:
     """Check the plain-old-classes examples."""
     greeting = plain_classes.Greeting()
     assert greeting.salutation == "Hello"
-    gs = plain_classes.GreetingService()
-    assert gs.salutation == "Hello"
     assert plain_classes.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert plain_classes.Greeter(greeting=greeting).greeting.salutation == "Hello"
-    assert plain_classes.GreeterService(greeting=gs).greeting.salutation == "Hello"
+    assert plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
     greeter_annotated = plain_classes.GreeterAnnotated(greeting=greeting)
     assert greeter_annotated.greeting.salutation == "Hello"
     children = ("a",)

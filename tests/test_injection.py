@@ -7,7 +7,6 @@ registry.
 import pytest
 
 from hopscotch.fixtures.dataklasses import (
-    GreetingService,
     GreeterService,
     Greeter,
     GreetingNoDefault,
@@ -23,7 +22,7 @@ from hopscotch.registry import Registry, inject_callable, Registration
 
 def test_field_default() -> None:
     """The target a field with a default."""
-    registration = Registration(GreetingService)
+    registration = Registration(Greeting)
     result = inject_callable(registration)
     assert result.salutation == "Hello"
 
@@ -31,7 +30,7 @@ def test_field_default() -> None:
 def test_service_dependency_class() -> None:
     """The target has a field dependency to fetch from registry."""
     registry = Registry()
-    registry.register(GreetingService)
+    registry.register(Greeting)
 
     registration = Registration(GreeterService)
     result = registry.inject(registration)
@@ -75,8 +74,8 @@ def test_non_service_dependency() -> None:
 
 def test_service_dependency_nested_registry() -> None:
     """Nested registry, can service get singleton from right level?"""
-    gs_child = GreetingService(salutation="use child")
-    gs_parent = GreetingService(salutation="use parent")
+    gs_child = Greeting(salutation="use child")
+    gs_parent = Greeting(salutation="use parent")
 
     # Site registry
     parent_registry = Registry()

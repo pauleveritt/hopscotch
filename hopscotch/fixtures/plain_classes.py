@@ -19,12 +19,6 @@ class GreetingNoDefault:
         self.salutation = salutation
 
 
-class GreetingService:
-    """A plain-old-class ``Service`` to say greeting."""
-
-    salutation: str = "Hello"
-
-
 class Greeter:
     """A plain-old-class to engage a customer."""
 
@@ -38,9 +32,9 @@ class Greeter:
 class GreeterService:
     """A plain-old-class ``Service`` to engage a customer."""
 
-    greeting: GreetingService
+    greeting: Greeting
 
-    def __init__(self, greeting: GreetingService):
+    def __init__(self, greeting: Greeting):
         """Construct a greeter that is a service."""
         self.greeting = greeting
 

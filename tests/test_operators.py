@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Annotated
 
 import pytest
+
 from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.fixtures.dataklasses import GreetingService
 from hopscotch.operators import Context
 from hopscotch.operators import Get
 from hopscotch.registry import Registry
@@ -29,15 +29,15 @@ def test_operators_get_simple_type() -> None:
 
     @dataclass()
     class DummyGreeter:
-        dummy_greeting: Annotated[Greeting, Get(GreetingService)]
+        dummy_greeting: Annotated[Greeting, Get(Greeting)]
 
     registry = Registry()
-    greeting = GreetingService()
+    greeting = Greeting()
     registry.register(greeting)
     registry.register(DummyGreeter)
     # Now ask the registry to construct this
     dummy_greeter = registry.get(DummyGreeter)
-    assert isinstance(dummy_greeter.dummy_greeting, GreetingService)
+    assert isinstance(dummy_greeter.dummy_greeting, Greeting)
 
 
 def test_operators_get_attr() -> None:
