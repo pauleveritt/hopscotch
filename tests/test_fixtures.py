@@ -34,8 +34,8 @@ def test_dataklass_fixtures() -> None:
     children = ("a",)
     assert dataklasses.GreeterChildren(children=children).children == children
     assert dataklasses.GreeterOptional(greeting=None).greeting is None
-    gi = dataklasses.GreetingImplementer()
-    assert gi.salutation == "Hello"
+    gi = dataklasses.AnotherGreeting()
+    assert gi.salutation == "Another Hello"
     assert isinstance(gi, dataklasses.Greeting)
 
 

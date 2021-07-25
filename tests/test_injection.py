@@ -11,7 +11,7 @@ from hopscotch.fixtures.dataklasses import (
     Greeter,
     GreetingNoDefault,
     Greeting,
-    GreetingImplementer,
+    AnotherGreeting,
     GreetingFactory,
     GreeterRegistry,
     GreeterCustomer,
@@ -57,9 +57,9 @@ def test_service_dependency_no_default() -> None:
 
 def test_service_dependency_default() -> None:
     """The target has an str field with a default."""
-    registration = Registration(GreetingImplementer)
+    registration = Registration(AnotherGreeting)
     result = inject_callable(registration)
-    assert "Hello" == result.salutation
+    assert "Another Hello" == result.salutation
 
 
 def test_non_service_dependency() -> None:

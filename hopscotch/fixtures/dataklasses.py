@@ -16,6 +16,13 @@ class Greeting:
 
 
 @dataclass()
+class AnotherGreeting(Greeting):
+    """A replacement alternative for the default ``Greeting``."""
+
+    salutation: str = "Another Hello"
+
+
+@dataclass()
 class GreetingNoDefault:
     """A dataclass to give a greeting with no default value."""
 
@@ -46,7 +53,6 @@ class GreetingTuple:
     salutation: tuple[str, ...]
 
 
-
 @dataclass()
 class GreetingFactory:
     """Use the ``__hopscotch_factory__`` protocol to control creation."""
@@ -57,13 +63,6 @@ class GreetingFactory:
     def __hopscotch_factory__(cls, registry: Registry) -> GreetingFactory:
         """Manually construct this instance, instead of injection."""
         return cls(salutation="Hi From Factory")
-
-
-@dataclass()
-class GreetingImplementer(Greeting):
-    """A dataclass that "implements" a service."""
-
-    salutation: str = "Hello"
 
 
 @dataclass()
