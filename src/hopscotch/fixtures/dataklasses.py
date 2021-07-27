@@ -1,11 +1,17 @@
 """Example objects and services implemented as dataclasses."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Annotated, Optional
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Annotated
+from typing import Optional
 
-from ..operators import Get, Context, context, get
-from ..registry import Registry, injectable
+from ..operators import Context
+from ..operators import context
+from ..operators import Get
+from ..operators import get
+from ..registry import injectable
+from ..registry import Registry
 
 
 @injectable()

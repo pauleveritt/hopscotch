@@ -1,16 +1,15 @@
-"""
-
-Test usage of wired and components via decorators instead of
-imperative.
+"""Test usage of injectables via decorators instead of imperative.
 
 More cumbersome (due to scanner) to copy around so placed into a
 single test.
-
 """
 import pytest
-
 from hopscotch.fixtures import dataklasses
-from hopscotch.fixtures.dataklasses import Greeter, Customer, GreeterCustomer, FrenchCustomer, GreeterFrenchCustomer
+from hopscotch.fixtures.dataklasses import Customer
+from hopscotch.fixtures.dataklasses import FrenchCustomer
+from hopscotch.fixtures.dataklasses import Greeter
+from hopscotch.fixtures.dataklasses import GreeterCustomer
+from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.registry import Registry
 
 

@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from typing import Annotated
 
 import pytest
-
 from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.operators import Context, make_field_operator
+from hopscotch.operators import Context
 from hopscotch.operators import Get
+from hopscotch.operators import make_field_operator
 from hopscotch.registry import Registry
 
 
@@ -130,17 +130,13 @@ def test_operators_operators_value_none() -> None:
     assert exc.value.args[0] == expected
 
 
-class BogusResource:
-    pass
-
-
 def test_make_field_operator() -> None:
     """Turn an operator into a dataclass field."""
     get = make_field_operator(Get)
     get_field = get(Greeting, attr="salutation", metadata=dict(flag=9))
     metadata = get_field.metadata
     assert metadata["flag"] == 9
-    injected = metadata['injected']
-    operator: Get = injected['operator']
+    injected = metadata["injected"]
+    operator: Get = injected["operator"]
     assert operator.lookup_key == Greeting
     assert operator.attr == "salutation"

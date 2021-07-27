@@ -2,16 +2,25 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from importlib import import_module
 from inspect import isclass
 from types import ModuleType
-from typing import Any, Optional, Type, TypeVar, Union, TypedDict, Callable
+from typing import Any
+from typing import Callable
+from typing import Optional
+from typing import Type
+from typing import TypedDict
+from typing import TypeVar
+from typing import Union
 
-from venusian import Scanner, attach
+from venusian import attach
+from venusian import Scanner
 
 from .callers import caller_package
-from .field_infos import get_field_infos, FieldInfos
+from .field_infos import FieldInfos
+from .field_infos import get_field_infos
 
 PACKAGE = Optional[Union[ModuleType, str]]
 Props = dict[str, Any]
@@ -38,9 +47,9 @@ T = TypeVar("T")
 
 
 def inject_callable(
-        registration: Registration,
-        props: Optional[Props] = None,
-        registry: Optional[Registry] = None,
+    registration: Registration,
+    props: Optional[Props] = None,
+    registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
     target = registration.implementation
@@ -137,9 +146,9 @@ class Registry:
     registrations: Registrations
 
     def __init__(
-            self,
-            parent: Optional[Registry] = None,
-            context: Optional[Any] = None,
+        self,
+        parent: Optional[Registry] = None,
+        context: Optional[Any] = None,
     ) -> None:
         """Construct a registry that might have a context and be nested."""
         self.registrations = defaultdict(make_singletons_classes)
@@ -148,8 +157,8 @@ class Registry:
         self.scanner = Scanner(registry=self)
 
     def scan(
-            self,
-            pkg: PACKAGE = None,
+        self,
+        pkg: PACKAGE = None,
     ) -> None:
         """Look for decorators that need to be registered."""
         if pkg is None:
@@ -164,11 +173,11 @@ class Registry:
         """Use injection to construct and return an instance."""
         return inject_callable(registration, props=props, registry=self)
 
-    def get(
-            self,
-            servicetype: Type[T],
-            context: Optional[Any] = None,
-            **kwargs: Props,
+    def get(  # noqa: C901
+        self,
+        servicetype: Type[T],
+        context: Optional[Any] = None,
+        **kwargs: Props,
     ) -> T:
         """Find an appropriate service class and construct an implementation.
 
@@ -233,11 +242,11 @@ class Registry:
         raise LookupError(msg)
 
     def register(
-            self,
-            implementation: Union[T, Type[T]],
-            *,
-            servicetype: Optional[Type[T]] = None,
-            context: Optional[Any] = None,
+        self,
+        implementation: Union[T, Type[T]],
+        *,
+        servicetype: Optional[Type[T]] = None,
+        context: Optional[Any] = None,
     ) -> None:
         """Use a LIFO list for all the possible implementations.
 
@@ -266,21 +275,25 @@ class Registry:
 
 class injectable:  # noqa
     """``venusian`` decorator to register an injectable factory ."""
+
     servicetype = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
-            self,
-            servicetype: type = None,
-            *,
-            context: Optional[Type] = None,
-            singleton: bool = False,
+        self,
+        servicetype: Optional[Type[T]] = None,
+        *,
+        context: Optional[Optional[Any]] = None,
     ):
+        """Construct decorator that can register later with registry."""
         if servicetype is not None:
             self.servicetype = servicetype
         self.context = context
 
-    def __call__(self, wrapped):
-        def callback(scanner: Scanner, name: str, cls):
+    def __call__(self, wrapped: object) -> object:
+        """Execute the decorator during venusian scan phase."""
+
+        def callback(scanner: Scanner, name: str, cls: object) -> None:
+            """Perform the work of actually putting in registry."""
             servicetype = self.servicetype if self.servicetype else cls
             registry = getattr(scanner, "registry")
             registry.register(

@@ -1,13 +1,10 @@
 """Make sure the test/example/docs examples work."""
-
-from hopscotch.fixtures import (
-    dataklasses,
-    DummyOperator,
-    functions,
-    init_caller_package,
-    named_tuples,
-    plain_classes,
-)
+from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyOperator
+from hopscotch.fixtures import functions
+from hopscotch.fixtures import init_caller_package
+from hopscotch.fixtures import named_tuples
+from hopscotch.fixtures import plain_classes
 from hopscotch.registry import Registry
 
 
@@ -71,7 +68,9 @@ def test_plain_classes_fixtures() -> None:
     assert greeting.salutation == "Hello"
     assert plain_classes.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert plain_classes.Greeter(greeting=greeting).greeting.salutation == "Hello"
-    assert plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
+    assert (
+        plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
+    )
     greeter_annotated = plain_classes.GreeterAnnotated(greeting=greeting)
     assert greeter_annotated.greeting.salutation == "Hello"
     children = ("a",)

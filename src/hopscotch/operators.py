@@ -4,7 +4,9 @@ Operators allow a field to ask for some work to be done during injection.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, Field, field
+from dataclasses import dataclass
+from dataclasses import Field
+from dataclasses import field
 from typing import Any
 from typing import Optional
 from typing import Protocol
@@ -23,7 +25,9 @@ class Operator(Protocol):
 
 
 def make_field_operator(operator_class: Any) -> Any:
-    def _inner(*args, **kwargs) -> Field:
+    """Helper to convert an Operator into a dataclass field."""
+
+    def _inner(*args, **kwargs) -> Field:  # type: ignore
         # Some of the kwargs are for generic field keyword
         # arguments, such as ``init=False``. But some should be
         # sent to the operator. Put them in two piles.
@@ -41,7 +45,7 @@ def make_field_operator(operator_class: Any) -> Any:
         # Use dataclass field metadata support to smuggle our injector
         # information through to the other side.
         kwargs["metadata"]["injected"] = dict(operator=operator)
-        return field(**kwargs)
+        return field(**kwargs)  # type: ignore
 
     return _inner
 
@@ -54,8 +58,8 @@ class Get:
     attr: Optional[str] = None
 
     def __call__(
-            self,
-            registry: Registry,
+        self,
+        registry: Registry,
     ) -> object:
         """Use registry to find lookup key and optionally pluck attr."""
         # Can't lookup a string, ever, so bail on this with an error.
@@ -83,8 +87,8 @@ class Context:
     attr: Optional[str] = None
 
     def __call__(
-            self,
-            registry: Registry,
+        self,
+        registry: Registry,
     ) -> object:
         """Use registry to grab the context and optionally pluck an attr."""
         value = registry.context

@@ -3,10 +3,14 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
-
 from hopscotch.fixtures.dataklasses import AnotherGreeting
-from hopscotch.fixtures.dataklasses import Greeting, Customer, FrenchCustomer, GreeterFirstName, GreeterFrenchCustomer
-from hopscotch.registry import Registry, Registration
+from hopscotch.fixtures.dataklasses import Customer
+from hopscotch.fixtures.dataklasses import FrenchCustomer
+from hopscotch.fixtures.dataklasses import GreeterFirstName
+from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
+from hopscotch.fixtures.dataklasses import Greeting
+from hopscotch.registry import Registration
+from hopscotch.registry import Registry
 
 
 class DummyScan:
@@ -113,8 +117,8 @@ def test_singleton_registry_context_french_customer() -> None:
 def test_field_operator_get_attr() -> None:
     """Use a field operator version of ``Get`` for the attribute."""
     r = Registry()
-    r.register(Customer(first_name="Field"))
     r.register(GreeterFirstName)
+    r.register(Customer(first_name="Field"))
     assert r.get(GreeterFirstName).customer_name == "Field"
 
 
@@ -269,9 +273,7 @@ def test_register_class() -> None:
 def test_register_class_with_context() -> None:
     """Register a class for a context then ensure it is present."""
     registry = Registry()
-    registry.register(
-        AnotherGreeting, servicetype=Greeting, context=FrenchCustomer
-    )
+    registry.register(AnotherGreeting, servicetype=Greeting, context=FrenchCustomer)
     classes = registry.registrations[Greeting]["classes"]
     registrations = classes[FrenchCustomer]
     registration = registrations[0]
@@ -398,6 +400,7 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
+
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

@@ -2,30 +2,24 @@
 import typing
 
 import pytest
-
 from hopscotch import VDOMNode
-from hopscotch.field_infos import (
-    FieldInfo,
-    get_dataclass_field_infos,
-    get_field_origin,
-    get_non_dataclass_field_infos,
-    get_operator,
-)
-from hopscotch.fixtures import (
-    dataklasses,
-    DummyOperator,
-    functions,
-    named_tuples,
-    plain_classes,
-)
-from hopscotch.fixtures.dataklasses import (
-    Greeting,
-    GreetingOperator,
-    GreetingTuple,
-    GreeterFirstName,
-    Customer,
-)
-from hopscotch.operators import Get, Operator
+from hopscotch.field_infos import FieldInfo
+from hopscotch.field_infos import get_dataclass_field_infos
+from hopscotch.field_infos import get_field_origin
+from hopscotch.field_infos import get_non_dataclass_field_infos
+from hopscotch.field_infos import get_operator
+from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyOperator
+from hopscotch.fixtures import functions
+from hopscotch.fixtures import named_tuples
+from hopscotch.fixtures import plain_classes
+from hopscotch.fixtures.dataklasses import Customer
+from hopscotch.fixtures.dataklasses import GreeterFirstName
+from hopscotch.fixtures.dataklasses import Greeting
+from hopscotch.fixtures.dataklasses import GreetingOperator
+from hopscotch.fixtures.dataklasses import GreetingTuple
+from hopscotch.operators import Get
+from hopscotch.operators import Operator
 from hopscotch.registry import Registry
 
 
@@ -129,7 +123,7 @@ def test_get_operator_no_annotated() -> None:
     ],
 )
 def test_target_field_info_str(
-        target: type, extractor: typing.Callable[..., list[FieldInfo]]
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Variations of field_info extraction."""
     field_infos = extractor(target)
@@ -150,7 +144,7 @@ def test_target_field_info_str(
     ],
 )
 def test_field_info_children(
-        target: type, extractor: typing.Callable[..., list[FieldInfo]]
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Look for the magic-named ``children`` argument."""
     field_infos = extractor(target)

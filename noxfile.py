@@ -23,7 +23,7 @@ python_versions = ["3.9"]
 nox.options.sessions = (
     "pre-commit",
     "safety",
-    "mypy",
+    # "mypy",
     "tests",
     "xdoctest",
     "docs-build",
