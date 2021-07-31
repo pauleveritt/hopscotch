@@ -11,12 +11,12 @@ from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Type
-from typing import TypedDict
 from typing import TypeVar
+from typing import TypedDict
 from typing import Union
 
-from venusian import attach
 from venusian import Scanner
+from venusian import attach
 
 from .callers import caller_package
 from .field_infos import FieldInfos
@@ -64,14 +64,7 @@ def inject_callable(
         result: T = factory(registry)
         return result
 
-    # Does the registry already have field info for this target?
-    if registry is not None:
-        these_field_infos = registration.field_infos
-    else:
-        # No registry, so we calculate field info every time (boo)
-        these_field_infos = get_field_infos(target)
-
-    for field_info in these_field_infos:
+    for field_info in registration.field_infos:
         fn = field_info.field_name
         ft = field_info.field_type
         is_builtin = field_info.is_builtin
@@ -87,7 +80,7 @@ def inject_callable(
         elif registry and ft is Registry:
             # Special rule: if you ask for the registry, you'll get it
             field_value = registry
-        elif not is_builtin:
+        elif not (ft is None or is_builtin):
             # Avoid trying to inject str, meaning, only inject
             # user-defined classes
             # TODO If ``ft`` is a function or NamedTuple, it kind of breaks

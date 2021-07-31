@@ -10,6 +10,11 @@ def Greeting(salutation: str = "Hello") -> str:
     return salutation
 
 
+def GreetingDefaultNoHint(salutation="Hello") -> str:
+    """A function to with a parameter having no hint."""
+    return salutation
+
+
 def GreetingNoDefault(salutation: str) -> str:
     """A function to give a greeting without a default."""
     return salutation

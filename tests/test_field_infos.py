@@ -2,14 +2,15 @@
 import typing
 
 import pytest
+
 from hopscotch import VDOMNode
 from hopscotch.field_infos import FieldInfo
 from hopscotch.field_infos import get_dataclass_field_infos
 from hopscotch.field_infos import get_field_origin
 from hopscotch.field_infos import get_non_dataclass_field_infos
 from hopscotch.field_infos import get_operator
-from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures import DummyOperator
+from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
 from hopscotch.fixtures import plain_classes
@@ -91,6 +92,14 @@ def test_get_field_origin_primitive_type(target: type) -> None:
     assert str is result
 
 
+def test_parameter_no_hint() -> None:
+    """A function parameter with no type hint should be None."""
+    target = functions.GreetingDefaultNoHint
+    field_infos = get_non_dataclass_field_infos(target)
+    field_type = field_infos[0].field_type
+    assert None is field_type
+
+
 def test_dummy_get_operator() -> None:
     """See if we can get the annotation to get the operator."""
     aa = getattr(typing, "_AnnotatedAlias")
@@ -123,7 +132,7 @@ def test_get_operator_no_annotated() -> None:
     ],
 )
 def test_target_field_info_str(
-    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+        target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Variations of field_info extraction."""
     field_infos = extractor(target)
@@ -144,7 +153,7 @@ def test_target_field_info_str(
     ],
 )
 def test_field_info_children(
-    target: type, extractor: typing.Callable[..., list[FieldInfo]]
+        target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Look for the magic-named ``children`` argument."""
     field_infos = extractor(target)

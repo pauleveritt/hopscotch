@@ -3,22 +3,22 @@ from __future__ import annotations
 
 import inspect
 from dataclasses import Field
+from dataclasses import MISSING
 from dataclasses import fields
 from dataclasses import is_dataclass
-from dataclasses import MISSING
 from inspect import Parameter
 from inspect import signature
 from typing import Any
 from typing import Callable
+from typing import NamedTuple
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import Tuple
+from typing import Type
+from typing import Union
 from typing import get_args
 from typing import get_origin
 from typing import get_type_hints
-from typing import NamedTuple
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import TYPE_CHECKING
-from typing import Union
 
 from hopscotch import VDOMNode
 
@@ -101,24 +101,31 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
 
 def function_field_info_factory(field_type: type, parameter: Parameter) -> FieldInfo:
     """Extract field info from a plain function."""
+    operator = None
+    is_builtin = None
+    has_annotated = None
+
     if parameter.name == "children":
         # Special case: a parameter named 'children'
         field_type = tuple[VDOMNode]
+    elif field_type == EMPTY:
+        # If no type hint was provided, ``inspect._empty`` will be assigned.
+        # Change this to None.
+        field_type = None
     else:
         # Is this a generic, such as Optional[ServiceContainer]?
         field_type = get_field_origin(field_type)
 
-    # Using Annotation[] ??
-    has_annotated = hasattr(field_type, "__metadata__")
-    field_type, operator = get_operator(field_type)
+        # Using Annotation[] ??
+        has_annotated = hasattr(field_type, "__metadata__")
+        field_type, operator = get_operator(field_type)
+        is_builtin = field_type.__module__ == "builtins"
 
     # Default values
     if parameter.default == EMPTY:
         default_value = None
     else:
         default_value = parameter.default
-
-    is_builtin = field_type.__module__ == "builtins"
 
     return FieldInfo(
         field_name=parameter.name,

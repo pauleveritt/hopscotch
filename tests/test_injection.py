@@ -5,15 +5,18 @@ components. Thus it needs to support use both with and without a
 registry.
 """
 import pytest
-from hopscotch.fixtures.dataklasses import AnotherGreeting
-from hopscotch.fixtures.dataklasses import Customer
-from hopscotch.fixtures.dataklasses import Greeter
-from hopscotch.fixtures.dataklasses import GreeterCustomer
-from hopscotch.fixtures.dataklasses import GreeterRegistry
-from hopscotch.fixtures.dataklasses import GreeterService
-from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.fixtures.dataklasses import GreetingFactory
-from hopscotch.fixtures.dataklasses import GreetingNoDefault
+from hopscotch.fixtures.dataklasses import (
+    AnotherGreeting,
+    Customer,
+    Greeter,
+    GreeterCustomer,
+    GreeterRegistry,
+    GreeterService,
+    Greeting,
+    GreetingFactory,
+    GreetingNoDefault,
+)
+from hopscotch.fixtures import functions, named_tuples
 from hopscotch.registry import inject_callable
 from hopscotch.registry import Registration
 from hopscotch.registry import Registry
@@ -46,11 +49,17 @@ def test_dependency_namedtuple() -> None:
     They can still be used by the injector, just by grabbing the symbol
     directly rather than going to find it.
     """
-    from hopscotch.fixtures.named_tuples import Greeter as NTGreeter
 
-    registration = Registration(NTGreeter)
+    registration = Registration(named_tuples.Greeter)
     result = inject_callable(registration)
     assert "Hello" == result.greeting.salutation
+
+
+def test_inject_function_no_type_hint() -> None:
+    """A function parameter with no type hint can use default value."""
+    registration = Registration(functions.GreetingDefaultNoHint)
+    result = inject_callable(registration)
+    assert "Hello" == result
 
 
 def test_injection_no_registry() -> None:
