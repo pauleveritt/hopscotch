@@ -47,9 +47,9 @@ T = TypeVar("T")
 
 
 def inject_callable(
-    registration: Registration,
-    props: Optional[Props] = None,
-    registry: Optional[Registry] = None,
+        registration: Registration,
+        props: Optional[Props] = None,
+        registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
     target = registration.implementation
@@ -139,9 +139,9 @@ class Registry:
     registrations: Registrations
 
     def __init__(
-        self,
-        parent: Optional[Registry] = None,
-        context: Optional[Any] = None,
+            self,
+            parent: Optional[Registry] = None,
+            context: Optional[Any] = None,
     ) -> None:
         """Construct a registry that might have a context and be nested."""
         self.registrations = defaultdict(make_singletons_classes)
@@ -150,8 +150,8 @@ class Registry:
         self.scanner = Scanner(registry=self)
 
     def scan(
-        self,
-        pkg: PACKAGE = None,
+            self,
+            pkg: PACKAGE = None,
     ) -> None:
         """Look for decorators that need to be registered."""
         if pkg is None:
@@ -166,17 +166,73 @@ class Registry:
         """Use injection to construct and return an instance."""
         return inject_callable(registration, props=props, registry=self)
 
+    def get_best_match(
+            self,
+            servicetype: Type[T],
+            context_class: Optional[Any] = None,
+            allow_singletons: bool = True,
+    ) -> Optional[Registration]:
+        """Find the best-match registration, if any.
+
+        Using the registry is a two-step process: lookup an implementation, 
+        then if needed, construct and return. This is the first part.
+        """
+
+        tr = self.registrations[servicetype]
+        if allow_singletons:
+            registrations = tr["singletons"] | tr["classes"]
+        else:
+            registrations = tr["classes"]
+
+        # We will put possible matches into three piles: high/medium/low
+        # precedence. Each pile is an ordered list based on registration
+        # time (later registrations override earlier.)
+        precedences: dict[str, list[Registration]] = dict(
+            high=list(),
+            medium=list(),
+            low=list(),
+        )
+        for this_context, these_registrations in registrations.items():
+            if this_context is None and context_class is None:
+                # This is the most basic case, test it first to bail out quickly.
+                precedences["low"] = these_registrations
+            elif this_context is context_class:
+                precedences["high"] = these_registrations
+            elif this_context is None:
+                precedences["low"] = these_registrations
+            elif context_class is not None and issubclass(context_class, this_context):
+                precedences["medium"] = these_registrations
+            # Otherwise, filter it out and do nothing
+
+        # Get the first match and return (is_singleton=True) or construct
+        # and return (is_singleton = False)
+        matches = precedences["high"] + precedences["medium"] + precedences["low"]
+
+        # If we found a match, return it
+        if matches:
+            return matches[0]
+        else:
+            if self.parent:
+                # Otherwise, go to parent
+                return self.parent.get_best_match(
+                    servicetype,
+                    context_class=context_class,
+                    allow_singletons=allow_singletons,
+                )
+            return None
+
     def get(  # noqa: C901
-        self,
-        servicetype: Type[T],
-        context: Optional[Any] = None,
-        **kwargs: Props,
+            self,
+            servicetype: Type[T],
+            context: Optional[Any] = None,
+            **kwargs: Props,
     ) -> T:
         """Find an appropriate service class and construct an implementation.
 
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
+
         # Use the passed-in context class if provided, otherwise, the
         # the registry's context (if provided.)
         context_class: Optional[Any] = None
@@ -185,61 +241,35 @@ class Registry:
         elif self.context:
             context_class = self.context.__class__
 
-        st_registrations = self.registrations[servicetype]
-        if kwargs:
-            # If props are passed in, we can't use singletons. So if
-            # kwargs are None, add in singletons.
-            registrations = st_registrations["classes"]
-        else:
-            registrations = st_registrations["singletons"] | st_registrations["classes"]
-
-        # We will put possible matches into three piles: high/medium/low
-        # precedence. Each pile is an ordered list based on registration
-        # time (later registrations override earlier.)
-        precedences2: dict[str, list[Registration]] = dict(
-            high=list(),
-            medium=list(),
-            low=list(),
+        # Use precedence etc. to get the best matching implementation.
+        best_match = self.get_best_match(
+            servicetype,
+            context_class=context_class,
+            # If props are passed in, we can't use singletons. So
+            # allow_singletons when bool(kwargs) is false.
+            allow_singletons=not bool(kwargs)
         )
-        for this_context, these_registrations in registrations.items():
-            if this_context is None and context_class is None:
-                # This is the most basic case, test it first to bail out quickly.
-                precedences2["low"] = these_registrations
-            elif this_context is context_class:
-                precedences2["high"] = these_registrations
-            elif this_context is None:
-                precedences2["low"] = these_registrations
-            elif context_class is not None and issubclass(context_class, this_context):
-                precedences2["medium"] = these_registrations
-            # Otherwise, filter it out and do nothing
-
-        # Now filter by predicates
-        matches = precedences2["high"] + precedences2["medium"] + precedences2["low"]
-        for match in matches:
-            if match.is_singleton:
+        if best_match:
+            if best_match.is_singleton:
                 # TODO Now that ``.get()`` makes promises about typing, it makes
                 #    registering a singleton for a "kind" a good bit harder.
                 #    We'll just shut this up for now.
-                return match.implementation  # type: ignore
+                return best_match.implementation  # type: ignore
             else:
                 # Need to construct it
-                instance: T = self.inject(match, props=kwargs)
+                instance: T = self.inject(best_match, props=kwargs)
                 return instance
-
-        # # Try with the parents
-        if self.parent is not None:
-            return self.parent.get(servicetype, context, **kwargs)
 
         # If we get to here, we didn't find anything, raise an error
         msg = f"No service '{servicetype.__name__}' in registry"
         raise LookupError(msg)
 
     def register(
-        self,
-        implementation: Union[T, Type[T]],
-        *,
-        servicetype: Optional[Type[T]] = None,
-        context: Optional[Any] = None,
+            self,
+            implementation: Union[T, Type[T]],
+            *,
+            servicetype: Optional[Type[T]] = None,
+            context: Optional[Any] = None,
     ) -> None:
         """Use a LIFO list for all the possible implementations.
 
@@ -272,10 +302,10 @@ class injectable:  # noqa
     servicetype = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
-        self,
-        servicetype: Optional[Type[T]] = None,
-        *,
-        context: Optional[Optional[Any]] = None,
+            self,
+            servicetype: Optional[Type[T]] = None,
+            *,
+            context: Optional[Optional[Any]] = None,
     ):
         """Construct decorator that can register later with registry."""
         if servicetype is not None:

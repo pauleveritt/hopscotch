@@ -9,6 +9,7 @@ from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeting
+from hopscotch.operators import Context
 from hopscotch.registry import Registration
 from hopscotch.registry import Registry
 
@@ -23,6 +24,41 @@ class DummyScan:
     def __call__(self, pkg: Optional[object]) -> None:
         """Set the called_with to simulate the caller."""
         self.called_with = pkg
+
+
+def test_get_match_singleton_context_none() -> None:
+    """Get best match when context is ``None``."""
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+
+    # GIVEN A registry with two registrations
+    r = Registry()  # No context
+    r.register(greeting)
+    r.register(customer_greeting, context=Customer)
+
+    # WHEN Get the best match
+    match = r.get_best_match(Greeting, allow_singletons=True)
+
+    # THEN Match should be context=None registration
+    assert match.implementation == greeting
+
+
+def test_nested_get_match_singleton_context_none() -> None:
+    """Get best match from parent registry."""
+    greeting = Greeting(salutation="no context")
+    customer_greeting = Greeting(salutation="customer")
+
+    # GIVEN A parent registry with two registrations, then a child.
+    parent_registry = Registry()  # No context
+    parent_registry.register(greeting)
+    parent_registry.register(customer_greeting, context=Customer)
+    child_registry = Registry(parent=parent_registry)
+
+    # WHEN Get the best match
+    match = child_registry.get_best_match(Greeting, allow_singletons=True)
+
+    # THEN Match should be context=None registration
+    assert match.implementation == greeting
 
 
 def test_singleton_registry_context_none() -> None:
@@ -341,6 +377,36 @@ def test_child_registry() -> None:
     assert "G2" == result.salutation
 
 
+def test_child_registry() -> None:
+    """Match a registry in the child registry."""
+
+    @dataclass()
+    class GreetingImplementer2(Greeting):
+        salutation: str = "G2"
+
+    parent_registry = Registry()
+    parent_registry.register(AnotherGreeting, servicetype=Greeting)
+    parent_registry.register(GreetingImplementer2, servicetype=Greeting)
+    child_registry = Registry(parent=parent_registry)
+    result = child_registry.get(Greeting)
+    assert "G2" == result.salutation
+
+
+def test_nested_registry_match() -> None:
+    """Registration in parent uses dependency from child."""
+
+    @dataclass()
+    class View:
+        customer: Customer = Context()
+
+    parent_registry = Registry()
+    parent_registry.register(View)
+    context_customer = Customer(first_name="Nested")
+    child_registry = Registry(parent=parent_registry, context=context_customer)
+    result = child_registry.get(View)
+    assert "G2" == result.customer.first_name
+
+
 def test_injector_registry_scan_caller() -> None:
     """Pretend to scan and see if called_with is set correctly."""
     registry = Registry()
@@ -400,7 +466,6 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
-
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():
