@@ -9,7 +9,7 @@ from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.operators import Context
+from hopscotch.operators import Context, context
 from hopscotch.registry import Registration
 from hopscotch.registry import Registry
 
@@ -392,19 +392,34 @@ def test_child_registry() -> None:
     assert "G2" == result.salutation
 
 
-def test_nested_registry_match() -> None:
+def test_nested_registry_match_parent() -> None:
+    """Registration in parent uses dependency from parent."""
+
+    @dataclass()
+    class View:
+        customer: Customer = context()
+
+    context_customer = Customer(first_name="Parent")
+    parent_registry = Registry(context=context_customer)
+    parent_registry.register(View)
+    child_registry = Registry(parent=parent_registry)
+    result = child_registry.get(View)
+    assert "Parent" == result.customer.first_name
+
+
+def test_nested_registry_match_child() -> None:
     """Registration in parent uses dependency from child."""
 
     @dataclass()
     class View:
-        customer: Customer = Context()
+        customer: Customer = context()
 
+    context_customer = Customer(first_name="Child")
     parent_registry = Registry()
     parent_registry.register(View)
-    context_customer = Customer(first_name="Nested")
     child_registry = Registry(parent=parent_registry, context=context_customer)
     result = child_registry.get(View)
-    assert "G2" == result.customer.first_name
+    assert "Child" == result.customer.first_name
 
 
 def test_injector_registry_scan_caller() -> None:

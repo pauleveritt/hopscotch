@@ -19,7 +19,7 @@ from venusian import Scanner
 from venusian import attach
 
 from .callers import caller_package
-from .field_infos import FieldInfos
+from .field_infos import FieldInfos, FieldInfo
 from .field_infos import get_field_infos
 
 PACKAGE = Optional[Union[ModuleType, str]]
@@ -46,6 +46,60 @@ class Registration:
 T = TypeVar("T")
 
 
+def inject_field_no_registry(
+        field_info: FieldInfo,
+        props: Props,
+) -> Optional[object]:
+    """Get a value for a field without a registry."""
+
+    ft = field_info.field_type
+    is_builtin = field_info.is_builtin
+    if not (ft is None or is_builtin):
+        # Avoid trying to inject str, meaning, only inject
+        # user-defined classes
+        # Treat this as a symbol that can be injected without
+        # a lookup, such as a function, NamedTuple, etc.
+        # TODO Would be great to avoid computing this each time
+        registration = Registration(
+            context=None,  # TODO Bring this back w/ context injection
+            implementation=ft,
+            is_singleton=False,  # TODO They might be in registry
+        )
+        return inject_callable(registration, props=props)
+
+    return
+
+
+def inject_field_registry(
+        field_info: FieldInfo,
+        registry: Registry,
+) -> Optional[object]:
+    """Get a value for a field using a registry."""
+    ft = field_info.field_type
+    is_builtin = field_info.is_builtin
+    operator = field_info.operator
+    if operator is not None:
+        # This field uses Annotated[SomeType, SomeOperator]
+        return operator(registry)
+    elif ft is Registry:
+        # Special rule: if you ask for the registry, you'll get it
+        return registry
+    elif not (ft is None or is_builtin):
+        # Avoid trying to inject str, meaning, only inject
+        # user-defined classes
+        # TODO If ``ft`` is a function or NamedTuple, it kind of breaks
+        #   the type-oriented contract for ``get``. But the following
+        #   might still work.  Not sure the right solution.
+        try:
+            return registry.get(ft)
+        except LookupError as exc:
+            # See if this dependency is in parent registries
+            if registry.parent:
+                return registry.parent.get(ft)
+            # No parent registry, just re-raise the exception
+            raise exc
+
+
 def inject_callable(
         registration: Registration,
         props: Optional[Props] = None,
@@ -66,44 +120,25 @@ def inject_callable(
 
     for field_info in registration.field_infos:
         fn = field_info.field_name
-        ft = field_info.field_type
-        is_builtin = field_info.is_builtin
-        operator = field_info.operator
         if props and fn in props:
             # Props have highest precedence
             field_value = props[fn]
-        elif operator is not None and registry is not None:
-            # FIXME Put a single registry is not None wrapper around
-            #   the next 3 statements.
-            # This field uses Annotated[SomeType, SomeOperator]
-            field_value = operator(registry)
-        elif registry and ft is Registry:
-            # Special rule: if you ask for the registry, you'll get it
-            field_value = registry
-        elif not (ft is None or is_builtin):
-            # Avoid trying to inject str, meaning, only inject
-            # user-defined classes
-            # TODO If ``ft`` is a function or NamedTuple, it kind of breaks
-            #   the type-oriented contract for ``get``. But the following
-            #   might still work.  Not sure the right solution.
-            if registry:
-                field_value = registry.get(ft)
-            else:
-                # Treat this as a symbol that can be injected without
-                # a lookup, such as a function, NamedTuple, etc.
-                # TODO Would be great to avoid computing this each time
-                registration = Registration(
-                    context=None,  # TODO Bring this back w/ context injection
-                    implementation=ft,
-                    is_singleton=False,  # TODO They might be in registry
-                )
-                field_value = inject_callable(registration, props=props)
-        elif field_info.default_value is not None:
-            field_value = field_info.default_value
+        elif registry:
+            field_value = inject_field_registry(field_info, registry)
         else:
-            ql = target.__qualname__  # type: ignore
-            msg = f"Cannot inject '{ft.__name__}' on '{ql}.{fn}'"
-            raise ValueError(msg)
+            field_value = inject_field_no_registry(field_info, props)
+
+        # If we didn't get a value...
+        if field_value is None:
+            if field_info.default_value is not None:
+                # ...try to get from default
+                field_value = field_info.default_value
+            else:
+                # ...otherwise, we failed injection.
+                ql = target.__qualname__  # type: ignore
+                ft = field_info.field_type
+                msg = f"Cannot inject '{ft.__name__}' on '{ql}.{fn}'"
+                raise ValueError(msg)
 
         kwargs[fn] = field_value
 
