@@ -9,17 +9,19 @@ from inspect import isclass
 from types import ModuleType
 from typing import Any
 from typing import Callable
+from typing import cast
 from typing import Optional
 from typing import Type
-from typing import TypeVar
 from typing import TypedDict
+from typing import TypeVar
 from typing import Union
 
-from venusian import Scanner
 from venusian import attach
+from venusian import Scanner
 
 from .callers import caller_package
-from .field_infos import FieldInfos, FieldInfo
+from .field_infos import FieldInfo
+from .field_infos import FieldInfos
 from .field_infos import get_field_infos
 
 PACKAGE = Optional[Union[ModuleType, str]]
@@ -28,6 +30,7 @@ Props = dict[str, Any]
 
 class IsNoneType:
     """Mimic Python 3.10 ``NoneType`` as just a marker."""
+
     pass
 
 
@@ -52,8 +55,8 @@ T = TypeVar("T")
 
 
 def inject_field_no_registry(
-        field_info: FieldInfo,
-        props: Optional[Props],
+    field_info: FieldInfo,
+    props: Optional[Props],
 ) -> Optional[object]:
     """Get a value for a field without a registry."""
     ft = field_info.field_type
@@ -75,8 +78,8 @@ def inject_field_no_registry(
 
 
 def inject_field_registry(
-        field_info: FieldInfo,
-        registry: Registry,
+    field_info: FieldInfo,
+    registry: Registry,
 ) -> Optional[Any]:
     """Get a value for a field using a registry."""
     ft = field_info.field_type
@@ -107,9 +110,9 @@ def inject_field_registry(
 
 
 def inject_callable(
-        registration: Registration,
-        props: Optional[Props] = None,
-        registry: Optional[Registry] = None,
+    registration: Registration,
+    props: Optional[Props] = None,
+    registry: Optional[Registry] = None,
 ) -> T:
     """Construct target with or without a registry."""
     target = registration.implementation
@@ -149,7 +152,7 @@ def inject_callable(
                 # ...otherwise, we failed injection.
                 ql = target.__qualname__  # type: ignore
                 ft = field_info.field_type
-                ft_name = 'None' if ft is None else ft.__name__
+                ft_name = "None" if ft is None else ft.__name__
                 msg = f"Cannot inject '{ft_name}' on '{ql}.{fn}'"
                 raise ValueError(msg)
 
@@ -187,9 +190,9 @@ class Registry:
     registrations: Registrations
 
     def __init__(
-            self,
-            parent: Optional[Registry] = None,
-            context: Optional[Any] = None,
+        self,
+        parent: Optional[Registry] = None,
+        context: Optional[Any] = None,
     ) -> None:
         """Construct a registry that might have a context and be nested."""
         self.registrations = defaultdict(make_singletons_classes)
@@ -198,8 +201,8 @@ class Registry:
         self.scanner = Scanner(registry=self)
 
     def scan(
-            self,
-            pkg: PACKAGE = None,
+        self,
+        pkg: PACKAGE = None,
     ) -> None:
         """Look for decorators that need to be registered."""
         if pkg is None:
@@ -215,17 +218,16 @@ class Registry:
         return inject_callable(registration, props=props, registry=self)
 
     def get_best_match(
-            self,
-            servicetype: Type[T],
-            context_class: Optional[Any] = None,
-            allow_singletons: bool = True,
+        self,
+        servicetype: Type[T],
+        context_class: Optional[Any] = None,
+        allow_singletons: bool = True,
     ) -> Optional[Registration]:
         """Find the best-match registration, if any.
 
-        Using the registry is a two-step process: lookup an implementation, 
+        Using the registry is a two-step process: lookup an implementation,
         then if needed, construct and return. This is the first part.
         """
-
         tr = self.registrations[servicetype]
         if allow_singletons:
             registrations = tr["singletons"] | tr["classes"]
@@ -248,8 +250,12 @@ class Registry:
                 precedences["high"] = these_registrations
             elif this_context is IsNoneType:
                 precedences["low"] = these_registrations
-            elif context_class is not None and issubclass(context_class, this_context):
-                precedences["medium"] = these_registrations
+            if this_context is not IsNoneType:
+                # TODO mypy didn't like issubclass(context_class, this_context)
+                if context_class and issubclass(
+                    context_class, cast(type, this_context)
+                ):
+                    precedences["medium"] = these_registrations
             # Otherwise, filter it out and do nothing
 
         # Get the first match and return (is_singleton=True) or construct
@@ -270,17 +276,16 @@ class Registry:
             return None
 
     def get(  # noqa: C901
-            self,
-            servicetype: Type[T],
-            context: Optional[Any] = None,
-            **kwargs: Props,
+        self,
+        servicetype: Type[T],
+        context: Optional[Any] = None,
+        **kwargs: Props,
     ) -> T:
         """Find an appropriate service class and construct an implementation.
 
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
         """
-
         # Use the passed-in context class if provided, otherwise, the
         # the registry's context (if provided.)
         context_class: Optional[Any] = None
@@ -295,7 +300,7 @@ class Registry:
             context_class=context_class,
             # If props are passed in, we can't use singletons. So
             # allow_singletons when bool(kwargs) is false.
-            allow_singletons=not bool(kwargs)
+            allow_singletons=not bool(kwargs),
         )
         if best_match:
             if best_match.is_singleton:
@@ -313,11 +318,11 @@ class Registry:
         raise LookupError(msg)
 
     def register(
-            self,
-            implementation: T,
-            *,
-            servicetype: Optional[Type[T]] = None,
-            context: Optional[Any] = None,
+        self,
+        implementation: T,
+        *,
+        servicetype: Optional[Type[T]] = None,
+        context: Optional[Any] = None,
     ) -> None:
         """Use a LIFO list for all the possible implementations.
 
@@ -357,10 +362,10 @@ class injectable:  # noqa
     servicetype = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
-            self,
-            servicetype: Optional[Type[T]] = None,
-            *,
-            context: Optional[Optional[Any]] = None,
+        self,
+        servicetype: Optional[Type[T]] = None,
+        *,
+        context: Optional[Optional[Any]] = None,
     ):
         """Construct decorator that can register later with registry."""
         if servicetype is not None:

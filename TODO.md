@@ -4,8 +4,8 @@
 
 ## Next
 
-- Get rid of the ``servicetype`` name, switch to: implements, or kind,
-  or for_, something else.
+- Get rid of the `servicetype` name, switch to: implements, or kind,
+  or for\_, something else.
 
 ## Soon
 

@@ -3,15 +3,17 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
-
-from hopscotch.fixtures.dataklasses import AnotherGreeting, Greeter, GreeterCustomer
+from hopscotch.fixtures.dataklasses import AnotherGreeting
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
+from hopscotch.fixtures.dataklasses import Greeter
+from hopscotch.fixtures.dataklasses import GreeterCustomer
 from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import context
-from hopscotch.registry import Registration, IsNoneType
+from hopscotch.registry import IsNoneType
+from hopscotch.registry import Registration
 from hopscotch.registry import Registry
 
 
@@ -41,7 +43,8 @@ def test_get_match_singleton_context_none() -> None:
     match = r.get_best_match(Greeting, allow_singletons=True)
 
     # THEN Match should be context=None registration
-    assert match.implementation == greeting
+    if match:
+        assert match.implementation == greeting
 
 
 def test_nested_get_match_singleton_context_none() -> None:
@@ -59,7 +62,8 @@ def test_nested_get_match_singleton_context_none() -> None:
     match = child_registry.get_best_match(Greeting, allow_singletons=True)
 
     # THEN Match should be context=None registration
-    assert match.implementation == greeting
+    if match:
+        assert match.implementation == greeting
 
 
 def test_singleton_registry_context_none() -> None:
@@ -315,7 +319,7 @@ def test_register_class_with_context() -> None:
     registration = registrations[0]
     assert AnotherGreeting == registration.implementation
     gs = registry.registrations[Greeting]
-    assert gs["classes"][None] == []
+    assert gs["classes"][IsNoneType] == []
     first = gs["classes"][FrenchCustomer][0]
     assert first.implementation is AnotherGreeting
     assert first.servicetype is Greeting
@@ -409,8 +413,8 @@ def test_nested_registry_match_child() -> None:
 
 def test_dependency_not_in_registry() -> None:
     """Injection can call the symbol if it isn't registered."""
-
     from hopscotch.fixtures import plain_classes
+
     @dataclass()
     class GreeterPlainClassDependency:
         """A dataclass to engage a customer."""
@@ -425,7 +429,6 @@ def test_dependency_not_in_registry() -> None:
 
 def test_multiple_context_registrations() -> None:
     """Multiple registrations on different contexts."""
-
     customer = Customer(first_name="Fred")
     french_customer = FrenchCustomer(first_name="Marie")
     parent_registry = Registry()
@@ -434,15 +437,9 @@ def test_multiple_context_registrations() -> None:
     greeting = Greeting()
     parent_registry.register(greeting)
     parent_registry.register(Greeter)
+    parent_registry.register(GreeterCustomer, servicetype=Greeter, context=Customer)
     parent_registry.register(
-        GreeterCustomer,
-        servicetype=Greeter,
-        context=Customer
-    )
-    parent_registry.register(
-        GreeterFrenchCustomer,
-        servicetype=Greeter,
-        context=FrenchCustomer
+        GreeterFrenchCustomer, servicetype=Greeter, context=FrenchCustomer
     )
 
     # ## Now make per-request registries.
@@ -521,6 +518,7 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
+
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

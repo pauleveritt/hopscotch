@@ -1,6 +1,6 @@
 """Make sure the test/example/docs examples work."""
-from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import init_caller_package
 from hopscotch.fixtures import named_tuples
@@ -70,7 +70,7 @@ def test_plain_classes_fixtures() -> None:
     assert plain_classes.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert plain_classes.Greeter(greeting=greeting).greeting.salutation == "Hello"
     assert (
-            plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
+        plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
     )
     greeter_annotated = plain_classes.GreeterAnnotated(greeting=greeting)
     assert greeter_annotated.greeting.salutation == "Hello"

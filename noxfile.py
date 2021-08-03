@@ -22,7 +22,7 @@ package = "hopscotch"
 python_versions = ["3.9"]
 nox.options.sessions = (
     "pre-commit",
-    "safety",
+    # "safety",
     "mypy",
     "tests",
     "xdoctest",
