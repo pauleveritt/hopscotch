@@ -197,7 +197,10 @@ class Registry:
         """Construct a registry that might have a context and be nested."""
         self.registrations = defaultdict(make_singletons_classes)
         self.parent: Optional[Registry] = parent
-        self.context = context
+        if context is None and parent is not None:
+            self.context = parent.context
+        else:
+            self.context = context
         self.scanner = Scanner(registry=self)
 
     def scan(

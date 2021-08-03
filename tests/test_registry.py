@@ -273,6 +273,18 @@ def test_get_services_match_in_parent() -> None:
     assert greeting == result
 
 
+def test_nested_contexts() -> None:
+    """Child registries get assigned the nearest context."""
+    # We don't want to recurse up parents, looking for the
+    # nearest non-None context.
+    context = Customer(first_name="Grandparent")
+    great_grandparent_registry = Registry()
+    grandparent_registry = Registry(parent=great_grandparent_registry, context=context)
+    parent_registry = Registry(parent=grandparent_registry)
+    registry = Registry(parent=parent_registry)
+    assert registry.context == context
+
+
 def test_register_service_with_class() -> None:
     """Register a singleton with the longer format."""
     registry = Registry()

@@ -92,15 +92,6 @@ class Context:
     ) -> object:
         """Use registry to grab the context and optionally pluck an attr."""
         value = registry.context
-
-        # If no context, keep walking up parents until you find one
-        # TODO Have a cache on the child registries, perhaps at creation
-        #   time, to assign the "nearest context".
-        if value is None:
-            this_registry = registry.parent
-            while this_registry and value is None:
-                value = this_registry.context
-                this_registry = this_registry.parent
         if value is None:
             raise ValueError("No context on registry")
 
