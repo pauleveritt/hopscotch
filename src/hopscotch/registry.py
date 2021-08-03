@@ -48,10 +48,9 @@ T = TypeVar("T")
 
 def inject_field_no_registry(
         field_info: FieldInfo,
-        props: Props,
+        props: Optional[Props],
 ) -> Optional[object]:
     """Get a value for a field without a registry."""
-
     ft = field_info.field_type
     is_builtin = field_info.is_builtin
     if not (ft is None or is_builtin):
@@ -67,13 +66,13 @@ def inject_field_no_registry(
         )
         return inject_callable(registration, props=props)
 
-    return
+    return None
 
 
 def inject_field_registry(
         field_info: FieldInfo,
         registry: Registry,
-) -> Optional[object]:
+) -> Optional[Any]:
     """Get a value for a field using a registry."""
     ft = field_info.field_type
     is_builtin = field_info.is_builtin
@@ -98,6 +97,8 @@ def inject_field_registry(
                 return registry.parent.get(ft)
             # No parent registry, just re-raise the exception
             raise exc
+
+    return None
 
 
 def inject_callable(
@@ -143,7 +144,8 @@ def inject_callable(
                 # ...otherwise, we failed injection.
                 ql = target.__qualname__  # type: ignore
                 ft = field_info.field_type
-                msg = f"Cannot inject '{ft.__name__}' on '{ql}.{fn}'"
+                ft_name = 'None' if ft is None else ft.__name__
+                msg = f"Cannot inject '{ft_name}' on '{ql}.{fn}'"
                 raise ValueError(msg)
 
         kwargs[fn] = field_value
@@ -307,7 +309,7 @@ class Registry:
 
     def register(
             self,
-            implementation: Union[T, Type[T]],
+            implementation: Union[Type[T], T],
             *,
             servicetype: Optional[Type[T]] = None,
             context: Optional[Any] = None,

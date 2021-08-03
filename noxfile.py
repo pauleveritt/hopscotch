@@ -23,7 +23,7 @@ python_versions = ["3.9"]
 nox.options.sessions = (
     "pre-commit",
     "safety",
-    # "mypy",
+    "mypy",
     "tests",
     "xdoctest",
     "docs-build",
@@ -114,7 +114,7 @@ def safety(session: Session) -> None:
 @session(python=python_versions)
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
-    args = session.posargs or ["hopscotch", "tests", "docs/conf.py"]
+    args = session.posargs or ["src/hopscotch", "tests", "docs/conf.py"]
     session.install(".")
     session.install("mypy", "pytest")
     session.run("mypy", *args)

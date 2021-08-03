@@ -32,7 +32,8 @@ class FieldInfo(NamedTuple):
     """Extract needed info from dataclass fields, functions, etc."""
 
     field_name: str
-    field_type: Type[Any]
+    # TODO Can Type[Any] just be type?
+    field_type: Optional[Type[Any]]
     default_value: Optional[Any] = None
     init: bool = True  # Dataclasses can flag init=False
     operator: Optional[Operator] = None
@@ -102,24 +103,26 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
 def function_field_info_factory(field_type: type, parameter: Parameter) -> FieldInfo:
     """Extract field info from a plain function."""
     operator = None
-    is_builtin = None
-    has_annotated = None
+    is_builtin = False
+    has_annotated = False
 
+    this_field_type: Optional[type]
     if parameter.name == "children":
         # Special case: a parameter named 'children'
-        field_type = tuple[VDOMNode]
+        this_field_type = tuple[VDOMNode]
     elif field_type == EMPTY:
         # If no type hint was provided, ``inspect._empty`` will be assigned.
         # Change this to None.
-        field_type = None
+        this_field_type = None
     else:
         # Is this a generic, such as Optional[ServiceContainer]?
-        field_type = get_field_origin(field_type)
+        this_field_type = get_field_origin(field_type)
 
         # Using Annotation[] ??
-        has_annotated = hasattr(field_type, "__metadata__")
-        field_type, operator = get_operator(field_type)
-        is_builtin = field_type.__module__ == "builtins"
+        if this_field_type:
+            has_annotated = hasattr(this_field_type, "__metadata__")
+            this_field_type, operator = get_operator(this_field_type)
+            is_builtin = this_field_type.__module__ == "builtins"
 
     # Default values
     if parameter.default == EMPTY:
@@ -129,7 +132,7 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
 
     return FieldInfo(
         field_name=parameter.name,
-        field_type=field_type,
+        field_type=this_field_type,
         default_value=default_value,
         init=True,
         operator=operator,

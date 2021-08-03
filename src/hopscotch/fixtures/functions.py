@@ -10,9 +10,9 @@ def Greeting(salutation: str = "Hello") -> str:
     return salutation
 
 
-def GreetingDefaultNoHint(salutation="Hello") -> str:
+def GreetingDefaultNoHint(salutation="Hello") -> str:  # type: ignore
     """A function to with a parameter having no hint."""
-    return salutation
+    return salutation  # type: ignore
 
 
 def GreetingNoDefault(salutation: str) -> str:

@@ -378,21 +378,6 @@ def test_child_registry() -> None:
     assert "G2" == result.salutation
 
 
-def test_child_registry() -> None:
-    """Match a registry in the child registry."""
-
-    @dataclass()
-    class GreetingImplementer2(Greeting):
-        salutation: str = "G2"
-
-    parent_registry = Registry()
-    parent_registry.register(AnotherGreeting, servicetype=Greeting)
-    parent_registry.register(GreetingImplementer2, servicetype=Greeting)
-    child_registry = Registry(parent=parent_registry)
-    result = child_registry.get(Greeting)
-    assert "G2" == result.salutation
-
-
 def test_nested_registry_match_parent() -> None:
     """Registration in parent uses dependency from parent."""
 
@@ -423,20 +408,20 @@ def test_nested_registry_match_child() -> None:
     assert "Child" == result.customer.first_name
 
 
-def test_function_dependency_not_in_registry() -> None:
+def test_dependency_not_in_registry() -> None:
     """Injection can call the symbol if it isn't registered."""
 
-    from hopscotch.fixtures import functions
+    from hopscotch.fixtures import plain_classes
     @dataclass()
-    class GreeterFunctionDependency:
+    class GreeterPlainClassDependency:
         """A dataclass to engage a customer."""
 
-        greeting: functions.Greeting
+        greeting: plain_classes.Greeting
 
     registry = Registry()
-    registry.register(GreeterFunctionDependency, servicetype=Greeter)
+    registry.register(GreeterPlainClassDependency, servicetype=Greeter)
     greeter = registry.get(Greeter)
-    assert greeter.greeting == "Hello"
+    assert greeter.greeting.salutation == "Hello"
 
 
 def test_multiple_context_registrations() -> None:
@@ -445,7 +430,6 @@ def test_multiple_context_registrations() -> None:
     customer = Customer(first_name="Fred")
     french_customer = FrenchCustomer(first_name="Marie")
     parent_registry = Registry()
-    parent_registry.name = 'parent'
 
     # Register for FrenchCustomer, Customer, and no context
     greeting = Greeting()
@@ -470,7 +454,6 @@ def test_multiple_context_registrations() -> None:
 
     # Next, context=Customer.
     request_registry = Registry(parent=parent_registry, context=customer)
-    request_registry.name = 'request'
     greeter = request_registry.get(Greeter)
     assert isinstance(greeter, GreeterCustomer)
 

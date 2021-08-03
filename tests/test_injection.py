@@ -25,7 +25,7 @@ from hopscotch.registry import Registry
 def test_field_default() -> None:
     """The target a field with a default."""
     registration = Registration(Greeting)
-    result = inject_callable(registration)
+    result: Greeting = inject_callable(registration)
     assert result.salutation == "Hello"
 
 
@@ -35,7 +35,7 @@ def test_dependency_class() -> None:
     registry.register(Greeting)
 
     registration = Registration(GreeterService)
-    result = registry.inject(registration)
+    result: GreeterService = registry.inject(registration)
     assert "Hello" == result.greeting.salutation
 
 
@@ -51,14 +51,14 @@ def test_dependency_namedtuple() -> None:
     """
 
     registration = Registration(named_tuples.Greeter)
-    result = inject_callable(registration)
+    result: Greeter = inject_callable(registration)
     assert "Hello" == result.greeting.salutation
 
 
 def test_inject_function_no_type_hint() -> None:
     """A function parameter with no type hint can use default value."""
     registration = Registration(functions.GreetingDefaultNoHint)
-    result = inject_callable(registration)
+    result: str = inject_callable(registration)
     assert "Hello" == result
 
 
@@ -66,7 +66,7 @@ def test_injection_no_registry() -> None:
     """Simulate usage of injection rules without needing a registry."""
     props = dict(salutation="No registry")
     registration = Registration(Greeting)
-    result = inject_callable(registration, props=props)
+    result: Greeting = inject_callable(registration, props=props)
     assert "No registry" == result.salutation
 
 
@@ -83,7 +83,7 @@ def test_dependency_no_default() -> None:
 def test_dependency_default() -> None:
     """The target has an str field with a default."""
     registration = Registration(AnotherGreeting)
-    result = inject_callable(registration)
+    result: AnotherGreeting = inject_callable(registration)
     assert "Another Hello" == result.salutation
 
 
@@ -93,7 +93,7 @@ def test_non_dependency() -> None:
     registry = Registry()
     registry.register(gs)
     registration = Registration(Greeter)
-    result = inject_callable(registration, registry=registry)
+    result: Greeter = inject_callable(registration, registry=registry)
     assert "use singleton" == result.greeting.salutation
 
 
@@ -112,7 +112,7 @@ def test_dependency_nested_registry() -> None:
 
     # Get something registered with parent, dependency local
     registration = Registration(GreeterService)
-    result = child_registry.inject(registration)
+    result: GreeterService = child_registry.inject(registration)
     assert "use child" == result.greeting.salutation
 
 
@@ -120,7 +120,7 @@ def test_pass_in_props_create_dependency() -> None:
     """Instead of injecting a field, get it from passed-in 'props'."""
     props = dict(salutation="use prop")
     registration = Registration(Greeting)
-    result = inject_callable(registration, props=props)
+    result: Greeting = inject_callable(registration, props=props)
     assert result.salutation == "use prop"
 
 
@@ -128,7 +128,7 @@ def test_inject_registry() -> None:
     """Target wants the registry and will later get what it needs."""
     registry = Registry()
     registration = Registration(GreeterRegistry)
-    result = inject_callable(registration, registry=registry)
+    result: GreeterRegistry = inject_callable(registration, registry=registry)
     assert registry == result.registry
 
 
@@ -138,14 +138,14 @@ def test_inject_context() -> None:
     registry = Registry(context=customer)
     registration = Registration(GreeterCustomer)
     registry.register(GreeterCustomer)
-    result = inject_callable(registration, registry=registry)
+    result: GreeterCustomer = inject_callable(registration, registry=registry)
     assert customer == result.customer
 
 
 def test_hopscotch_factory() -> None:
     """The dependency has its own factory as a class attribute."""
-    registraton = Registration(GreetingFactory)
+    r = Registration(GreetingFactory)
     registry = Registry()
     registry.register(GreetingFactory)
-    result = inject_callable(registraton, registry=registry)
+    result: GreetingFactory = inject_callable(r, registry=registry)
     assert result.salutation == "Hi From Factory"
