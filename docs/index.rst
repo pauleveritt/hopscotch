@@ -14,6 +14,7 @@ TO DOCUMENT
 - Parent registries
   * get_best_match and injection recurse up
   * context lookup recurses up
+- You can do a ``get`` with a ``context`` that overrides ``registry.context``
 
 .. _Contributor Guide: contributing.html
 

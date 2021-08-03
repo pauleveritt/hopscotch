@@ -318,6 +318,12 @@ class Registry:
             is_singleton=is_singleton,
         )
 
+        # TODO We currently make you do `@implements(Heading)` by providing
+        #   servicetype=Heading. Wouldn't it be nicer to MyHeading(Heading)?
+        #   We'd only pay the cost up-front by parsing it into Registration.
+        #   the challenge, though, is: which things in MRO can be considered
+        #   "interfaces"?
+
         # Let's decide what key to use to register this as.
         if servicetype is None:
             st = type(implementation) if is_singleton else implementation

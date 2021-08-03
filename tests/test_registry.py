@@ -3,13 +3,14 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
-from hopscotch.fixtures.dataklasses import AnotherGreeting
+
+from hopscotch.fixtures.dataklasses import AnotherGreeting, Greeter, GreeterCustomer
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.operators import Context, context
+from hopscotch.operators import context
 from hopscotch.registry import Registration
 from hopscotch.registry import Registry
 
@@ -420,6 +421,47 @@ def test_nested_registry_match_child() -> None:
     child_registry = Registry(parent=parent_registry, context=context_customer)
     result = child_registry.get(View)
     assert "Child" == result.customer.first_name
+
+
+def test_multiple_context_registrations() -> None:
+    """Multiple registrations on different contexts."""
+
+    customer = Customer(first_name="Fred")
+    french_customer = FrenchCustomer(first_name="Marie")
+    parent_registry = Registry()
+    parent_registry.name = 'parent'
+
+    # Register for FrenchCustomer, Customer, and no context
+    greeting = Greeting()
+    parent_registry.register(greeting)
+    parent_registry.register(Greeter)
+    parent_registry.register(
+        GreeterCustomer,
+        servicetype=Greeter,
+        context=Customer
+    )
+    parent_registry.register(
+        GreeterFrenchCustomer,
+        servicetype=Greeter,
+        context=FrenchCustomer
+    )
+
+    # ## Now make per-request registries.
+    # First, no context.
+    request_registry = Registry(parent=parent_registry, context=None)
+    greeter = request_registry.get(Greeter)
+    assert isinstance(greeter, Greeter)
+
+    # Next, context=Customer.
+    request_registry = Registry(parent=parent_registry, context=customer)
+    request_registry.name = 'request'
+    greeter = request_registry.get(Greeter)
+    assert isinstance(greeter, GreeterCustomer)
+
+    # Next, context=FrenchCustomer.
+    request_registry = Registry(parent=parent_registry, context=french_customer)
+    greeter = request_registry.get(Greeter)
+    assert isinstance(greeter, GreeterFrenchCustomer)
 
 
 def test_injector_registry_scan_caller() -> None:
