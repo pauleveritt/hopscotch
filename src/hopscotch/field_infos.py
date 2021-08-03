@@ -33,8 +33,8 @@ class FieldInfo(NamedTuple):
 
     field_name: str
     # TODO Can Type[Any] just be type?
-    field_type: Optional[Type[Any]]
-    default_value: Optional[Any] = None
+    field_type: Optional[type]
+    default_value: Optional[object] = None
     init: bool = True  # Dataclasses can flag init=False
     operator: Optional[Operator] = None
     has_annotated: bool = False
