@@ -7,7 +7,7 @@ from dataclasses import field
 from importlib import import_module
 from inspect import isclass
 from types import ModuleType
-from typing import Any
+from typing import Any, overload
 from typing import Callable
 from typing import Optional
 from typing import Type
@@ -306,6 +306,26 @@ class Registry:
         # If we get to here, we didn't find anything, raise an error
         msg = f"No service '{servicetype.__name__}' in registry"
         raise LookupError(msg)
+
+    @overload
+    def register(
+            self,
+            implementation: Type[T],
+            *,
+            servicetype: Optional[Type[T]] = None,
+            context: Optional[Any] = None,
+    ) -> None:
+        ...
+
+    @overload
+    def register(
+            self,
+            implementation: T,
+            *,
+            servicetype: Optional[Type[T]] = None,
+            context: Optional[Any] = None,
+    ) -> None:
+        ...
 
     def register(
             self,
