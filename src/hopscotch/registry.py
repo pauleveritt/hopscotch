@@ -68,7 +68,7 @@ def inject_field_no_registry(
         # a lookup, such as a function, NamedTuple, etc.
         # TODO Would be great to avoid computing this each time
         registration = Registration(
-            context=None,  # TODO Bring this back w/ context injection
+            context=None,
             implementation=ft,
             is_singleton=False,  # TODO They might be in registry
         )
@@ -123,7 +123,6 @@ def inject_callable(
     factory = getattr(target, "__hopscotch_factory__", None)
 
     if factory is not None and registry is not None:
-        # TODO Allow usage without a registry
         result: T = factory(registry)
         return result
 

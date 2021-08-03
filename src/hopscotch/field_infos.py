@@ -30,12 +30,9 @@ EMPTY = getattr(inspect, "_empty")
 
 class FieldInfo(NamedTuple):
     """Extract needed info from dataclass fields, functions, etc."""
-
     field_name: str
-    # TODO Can Type[Any] just be type?
     field_type: Optional[type]
     default_value: Optional[object] = None
-    init: bool = True  # Dataclasses can flag init=False
     operator: Optional[Operator] = None
     has_annotated: bool = False
     is_builtin: bool = False
@@ -93,7 +90,6 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
         field_name=field.name,
         field_type=field_type,
         default_value=default_value,
-        init=field.init,
         operator=operator,
         has_annotated=has_annotated,
         is_builtin=is_builtin,
@@ -134,7 +130,6 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
         field_name=parameter.name,
         field_type=this_field_type,
         default_value=default_value,
-        init=True,
         operator=operator,
         has_annotated=has_annotated,
         is_builtin=is_builtin,

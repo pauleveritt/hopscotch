@@ -2,16 +2,17 @@
 
 ## Now
 
+- Eliminate need for `servicetype=` by just sniffing MRO
+
 ## Next
 
 - Get rid of the `servicetype` name, switch to: implements, or kind,
-  or for\_, something else.
+  or for_, something else.
 
 ## Soon
 
 - Write a bunch of examples and hook into docs
   - Sybil for docs
-- File a ticket with poetry plugin about `src`
 
 ## Eventually
 

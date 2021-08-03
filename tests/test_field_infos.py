@@ -138,7 +138,6 @@ def test_target_field_info_str(
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
-    assert field_infos[0].init is True
     assert field_infos[0].has_annotated is False
 
 
@@ -159,7 +158,6 @@ def test_field_info_children(
     assert field_infos[0].field_name == "children"
     assert field_infos[0].field_type == tuple[VDOMNode]
     assert field_infos[0].default_value is None
-    assert field_infos[0].init is True
 
 
 def test_dataclass_field_info_init_false() -> None:
@@ -168,7 +166,6 @@ def test_dataclass_field_info_init_false() -> None:
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
-    assert field_infos[0].init is False
     assert field_infos[0].has_annotated is False
     assert field_infos[0].is_builtin is True
 
@@ -179,7 +176,6 @@ def test_field_info_more_generic() -> None:
     assert field_infos[0].field_name == "salutation"
     assert "GenericAlias" in str(type(field_infos[0].field_type))
     assert field_infos[0].default_value is None
-    assert field_infos[0].init is True
     assert field_infos[0].is_builtin is True
 
 
