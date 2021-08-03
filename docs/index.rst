@@ -15,6 +15,10 @@ TO DOCUMENT
   * get_best_match and injection recurse up
   * context lookup recurses up
 - You can do a ``get`` with a ``context`` that overrides ``registry.context``
+- ``registry.get`` gives ``LookupError`` if not registered, but during
+  injection, if the target isn't in registry, we treat it like a non-registry
+  injection and just construct it. This lets you use an unregistered
+  function or dataclass component, from a registered one
 
 .. _Contributor Guide: contributing.html
 

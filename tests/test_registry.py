@@ -423,6 +423,22 @@ def test_nested_registry_match_child() -> None:
     assert "Child" == result.customer.first_name
 
 
+def test_function_dependency_not_in_registry() -> None:
+    """Injection can call the symbol if it isn't registered."""
+
+    from hopscotch.fixtures import functions
+    @dataclass()
+    class GreeterFunctionDependency:
+        """A dataclass to engage a customer."""
+
+        greeting: functions.Greeting
+
+    registry = Registry()
+    registry.register(GreeterFunctionDependency, servicetype=Greeter)
+    greeter = registry.get(Greeter)
+    assert greeter.greeting == "Hello"
+
+
 def test_multiple_context_registrations() -> None:
     """Multiple registrations on different contexts."""
 

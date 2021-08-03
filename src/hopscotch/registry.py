@@ -124,7 +124,13 @@ def inject_callable(
             # Props have highest precedence
             field_value = props[fn]
         elif registry:
-            field_value = inject_field_registry(field_info, registry)
+            try:
+                field_value = inject_field_registry(field_info, registry)
+            except LookupError:
+                # During *injection* (not during ``registry.get``) we
+                # allow injectable dependencies that aren't registered.
+                # Maybe a function, dataclass, whatever. Just inject it.
+                field_value = inject_field_no_registry(field_info, props)
         else:
             field_value = inject_field_no_registry(field_info, props)
 
