@@ -234,7 +234,7 @@ def test_get_singleton() -> None:
 def test_get_singleton_service() -> None:
     """Return a singleton that is registered against a service."""
     registry = Registry()
-    greeting = AnotherGreeting()
+    greeting = Greeting()
     registry.register(greeting, servicetype=Greeting)
     result = registry.get(Greeting)
     assert greeting.salutation == result.salutation
@@ -252,10 +252,9 @@ def test_get_singleton_service_subclass() -> None:
 def test_get_services_found_class() -> None:
     """Construct an instance from a matching class."""
     registry = Registry()
-    greeting = AnotherGreeting()
     registry.register(AnotherGreeting, servicetype=Greeting)
     result = registry.get(Greeting)
-    assert greeting == result
+    assert result.salutation == "Another Hello"
 
 
 def test_get_services_match_in_parent() -> None:

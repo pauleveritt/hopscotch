@@ -7,7 +7,7 @@ from dataclasses import field
 from importlib import import_module
 from inspect import isclass
 from types import ModuleType
-from typing import Any, overload
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Type
@@ -307,29 +307,9 @@ class Registry:
         msg = f"No service '{servicetype.__name__}' in registry"
         raise LookupError(msg)
 
-    @overload
-    def register(
-            self,
-            implementation: Type[T],
-            *,
-            servicetype: Optional[Type[T]] = None,
-            context: Optional[Any] = None,
-    ) -> None:
-        ...
-
-    @overload
     def register(
             self,
             implementation: T,
-            *,
-            servicetype: Optional[Type[T]] = None,
-            context: Optional[Any] = None,
-    ) -> None:
-        ...
-
-    def register(
-            self,
-            implementation: Union[Type[T], T],
             *,
             servicetype: Optional[Type[T]] = None,
             context: Optional[Any] = None,
@@ -381,7 +361,7 @@ class injectable:  # noqa
             self.servicetype = servicetype
         self.context = context
 
-    def __call__(self, wrapped: type) -> type:
+    def __call__(self, wrapped: T) -> T:
         """Execute the decorator during venusian scan phase."""
 
         def callback(scanner: Scanner, name: str, cls: object) -> None:
