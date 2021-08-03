@@ -359,7 +359,7 @@ class injectable:  # noqa
             self.servicetype = servicetype
         self.context = context
 
-    def __call__(self, wrapped: object) -> object:
+    def __call__(self, wrapped: type) -> type:
         """Execute the decorator during venusian scan phase."""
 
         def callback(scanner: Scanner, name: str, cls: object) -> None:
