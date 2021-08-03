@@ -26,6 +26,11 @@ PACKAGE = Optional[Union[ModuleType, str]]
 Props = dict[str, Any]
 
 
+class IsNoneType:
+    """Mimic Python 3.10 ``NoneType`` as just a marker."""
+    pass
+
+
 @dataclass()
 class Registration:
     """Collect registration and introspection info of a target."""
@@ -157,8 +162,8 @@ def inject_callable(
 class KindGroups(TypedDict):
     """Constrain the keys to just singleton and classes."""
 
-    singletons: dict[Union[type, Type[None]], list[Registration]]
-    classes: dict[Union[type, Type[None]], list[Registration]]
+    singletons: dict[Union[type, IsNoneType], list[Registration]]
+    classes: dict[Union[type, IsNoneType], list[Registration]]
 
 
 def make_singletons_classes() -> KindGroups:
@@ -236,12 +241,12 @@ class Registry:
             low=list(),
         )
         for this_context, these_registrations in registrations.items():
-            if this_context is None and context_class is None:
+            if this_context is IsNoneType and context_class is None:
                 # This is the most basic case, test it first to bail out quickly.
                 precedences["low"] = these_registrations
             elif this_context is context_class:
                 precedences["high"] = these_registrations
-            elif this_context is None:
+            elif this_context is IsNoneType:
                 precedences["low"] = these_registrations
             elif context_class is not None and issubclass(context_class, this_context):
                 precedences["medium"] = these_registrations
@@ -342,7 +347,8 @@ class Registry:
         # creating tree nodes as needed.
         s_or_c = "singletons" if is_singleton else "classes"
         registrations = self.registrations[st][s_or_c]  # type: ignore
-        registrations[context].insert(0, registration)
+        this_context = IsNoneType if context is None else context
+        registrations[this_context].insert(0, registration)
 
 
 class injectable:  # noqa

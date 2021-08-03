@@ -11,7 +11,7 @@ from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import context
-from hopscotch.registry import Registration
+from hopscotch.registry import Registration, IsNoneType
 from hopscotch.registry import Registry
 
 
@@ -275,7 +275,7 @@ def test_register_service_with_class() -> None:
     greeting = Greeting()
     registry.register(greeting)
     greetings = registry.registrations[Greeting]
-    registration = greetings["singletons"][None][0]
+    registration = greetings["singletons"][IsNoneType][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
     assert registration.servicetype is None
@@ -287,7 +287,7 @@ def test_register_service_without_class() -> None:
     greeting = AnotherGreeting()
     registry.register(greeting)
     gi = registry.registrations[AnotherGreeting]
-    first = gi["singletons"][None][0]
+    first = gi["singletons"][IsNoneType][0]
     assert first.implementation == greeting
     assert first.is_singleton
 
@@ -296,11 +296,11 @@ def test_register_class() -> None:
     """Register a class then ensure it is present."""
     registry = Registry()
     registry.register(AnotherGreeting, servicetype=Greeting)
-    registrations = registry.registrations[Greeting]["classes"][None]
+    registrations = registry.registrations[Greeting]["classes"][IsNoneType]
     registration = registrations[0]
     assert AnotherGreeting is registration.implementation
     gs = registry.registrations[Greeting]
-    first = gs["classes"][None][0]
+    first = gs["classes"][IsNoneType][0]
     assert first.implementation is AnotherGreeting
     assert first.servicetype is Greeting
     assert not first.is_singleton
