@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
+
+from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import AnotherGreeting
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
@@ -14,7 +16,6 @@ from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import context
 from hopscotch.registry import IsNoneType
 from hopscotch.registry import Registration
-from hopscotch.registry import Registry
 
 
 class DummyScan:
@@ -539,7 +540,6 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
-
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

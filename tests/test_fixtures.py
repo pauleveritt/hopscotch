@@ -1,11 +1,11 @@
 """Make sure the test/example/docs examples work."""
-from hopscotch.fixtures import dataklasses
+from hopscotch import Registry
 from hopscotch.fixtures import DummyOperator
+from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import init_caller_package
 from hopscotch.fixtures import named_tuples
 from hopscotch.fixtures import plain_classes
-from hopscotch.registry import Registry
 
 
 def test_init_caller_package() -> None:
