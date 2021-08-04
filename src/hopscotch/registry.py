@@ -345,7 +345,7 @@ class Registry:
             # Let's try to infer it from the subclass.
             if isclass(implementation):
                 base_classes = getmro(implementation)[:-1]
-                if len(base_classes) == 2:
+                if len(base_classes) > 1:
                     # This registration is a class with a single base class
                     st = base_classes[1]
                 else:
