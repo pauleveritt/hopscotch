@@ -2,12 +2,7 @@
 
 ## Now
 
-- Eliminate need for `servicetype=` by just sniffing MRO
-
 ## Next
-
-- Get rid of the `servicetype` name, switch to: implements, or kind,
-  or for\_, something else.
 
 ## Soon
 
@@ -16,6 +11,7 @@
 
 ## Eventually
 
+- Better concept of "kind" that is hierarchical in the registration
 - Service types have a `select` which helps narrow
 - Return this repo to a `src` layout and get coverage working again in GHA
 - Bring over predicates

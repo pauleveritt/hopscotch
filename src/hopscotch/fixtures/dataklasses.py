@@ -6,12 +6,12 @@ from dataclasses import field
 from typing import Annotated
 from typing import Optional
 
-from ..operators import Context
-from ..operators import context
-from ..operators import Get
-from ..operators import get
-from ..registry import injectable
-from ..registry import Registry
+from hopscotch import Registry
+from hopscotch import injectable
+from hopscotch.operators import Context
+from hopscotch.operators import Get
+from hopscotch.operators import context
+from hopscotch.operators import get
 
 
 @injectable()
