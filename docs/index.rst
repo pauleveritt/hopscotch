@@ -19,6 +19,7 @@ TO DOCUMENT
   injection, if the target isn't in registry, we treat it like a non-registry
   injection and just construct it. This lets you use an unregistered
   function or dataclass component, from a registered one
+- Sniffing base class for "servicetype" on the way to richer system of "kind"
 
 .. _Contributor Guide: contributing.html
 

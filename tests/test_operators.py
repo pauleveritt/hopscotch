@@ -67,12 +67,12 @@ def test_operators_get_failed_string() -> None:
 
 
 def test_operators_get_value_none() -> None:
-    """Registry did not have the lookup key registered as a service."""
+    """Registry did not have the lookup key registered as a kind."""
     registry = Registry()
     get = Get(Greeting)
     with pytest.raises(LookupError) as exc:
         get(registry)
-    expected = "No service 'Greeting' in registry"
+    expected = "No kind 'Greeting' in registry"
     assert exc.value.args[0] == expected
 
 

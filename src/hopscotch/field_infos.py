@@ -30,6 +30,7 @@ EMPTY = getattr(inspect, "_empty")
 
 class FieldInfo(NamedTuple):
     """Extract needed info from dataclass fields, functions, etc."""
+
     field_name: str
     field_type: Optional[type]
     default_value: Optional[object] = None
@@ -66,7 +67,7 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
         # Special case: a parameter named 'children'
         field_type = tuple[VDOMNode]
     else:
-        # Is this a generic, such as Optional[ServiceContainer]?
+        # Is this a generic, such as Optional[KindContainer]?
         field_type = get_field_origin(field_type)
 
     # Using Annotation[] ??
@@ -111,7 +112,7 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
         # Change this to None.
         this_field_type = None
     else:
-        # Is this a generic, such as Optional[ServiceContainer]?
+        # Is this a generic, such as Optional[KindContainer]?
         this_field_type = get_field_origin(field_type)
 
         # Using Annotation[] ??

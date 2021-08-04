@@ -1,4 +1,4 @@
-"""Example objects and services implemented as functions."""
+"""Example objects and kinds implemented as functions."""
 from typing import Annotated
 from typing import Optional
 

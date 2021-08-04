@@ -227,7 +227,7 @@ def test_singleton_registry_context_french_multiple() -> None:
 
 
 def test_get_singleton() -> None:
-    """Return a singleton that has no service it is registered against."""
+    """Return a singleton that has no kind it is registered against."""
     registry = Registry()
     greeting = Greeting()
     registry.register(greeting)
@@ -235,37 +235,37 @@ def test_get_singleton() -> None:
     assert greeting is result
 
 
-def test_get_singleton_service() -> None:
-    """Return a singleton that is registered against a service."""
+def test_get_singleton_kind() -> None:
+    """Return a singleton that is registered against a kind."""
     registry = Registry()
     greeting = Greeting()
-    registry.register(greeting, servicetype=Greeting)
+    registry.register(greeting, kind=Greeting)
     result = registry.get(Greeting)
     assert greeting.salutation == result.salutation
 
 
-def test_get_singleton_service_subclass() -> None:
-    """Return a singleton that subclasses a service."""
+def test_get_singleton_kind_subclass() -> None:
+    """Return a singleton that subclasses a kind."""
     registry = Registry()
     greeting = AnotherGreeting()
-    registry.register(greeting, servicetype=Greeting)
+    registry.register(greeting, kind=Greeting)
     result = registry.get(Greeting)
     assert greeting is result
 
 
-def test_get_services_found_class() -> None:
+def test_get_kinds_found_class() -> None:
     """Construct an instance from a matching class."""
     registry = Registry()
-    registry.register(AnotherGreeting, servicetype=Greeting)
+    registry.register(AnotherGreeting)
     result = registry.get(Greeting)
     assert result.salutation == "Another Hello"
 
 
-def test_get_services_match_in_parent() -> None:
+def test_get_kinds_match_in_parent() -> None:
     """No local match but is found in parent."""
     parent_registry = Registry()
     greeting = AnotherGreeting()
-    parent_registry.register(AnotherGreeting, servicetype=Greeting)
+    parent_registry.register(AnotherGreeting)
 
     # Make a child registry which has nothing registered
     child_registry = Registry(parent=parent_registry)
@@ -285,7 +285,7 @@ def test_nested_contexts() -> None:
     assert registry.context == context
 
 
-def test_register_service_with_class() -> None:
+def test_register_kind_with_class() -> None:
     """Register a singleton with the longer format."""
     registry = Registry()
     greeting = Greeting()
@@ -294,10 +294,10 @@ def test_register_service_with_class() -> None:
     registration = greetings["singletons"][IsNoneType][0]
     assert registration.is_singleton
     assert registration.implementation == greeting
-    assert registration.servicetype is None
+    assert registration.kind is None
 
 
-def test_register_service_without_class() -> None:
+def test_register_kind_without_class() -> None:
     """Register a singleton with the shorter format."""
     registry = Registry()
     greeting = AnotherGreeting()
@@ -311,21 +311,30 @@ def test_register_service_without_class() -> None:
 def test_register_class() -> None:
     """Register a class then ensure it is present."""
     registry = Registry()
-    registry.register(AnotherGreeting, servicetype=Greeting)
+    registry.register(AnotherGreeting)
     registrations = registry.registrations[Greeting]["classes"][IsNoneType]
     registration = registrations[0]
     assert AnotherGreeting is registration.implementation
     gs = registry.registrations[Greeting]
     first = gs["classes"][IsNoneType][0]
     assert first.implementation is AnotherGreeting
-    assert first.servicetype is Greeting
+    assert first.kind is None
     assert not first.is_singleton
+
+
+def test_register_kind_with_multiple_class() -> None:
+    """Register a class as kind with implementations, get right one."""
+    registry = Registry()
+    registry.register(Greeting)
+    registry.register(AnotherGreeting)
+    result = registry.get(Greeting)
+    assert result.__class__ is AnotherGreeting
 
 
 def test_register_class_with_context() -> None:
     """Register a class for a context then ensure it is present."""
     registry = Registry()
-    registry.register(AnotherGreeting, servicetype=Greeting, context=FrenchCustomer)
+    registry.register(AnotherGreeting, context=FrenchCustomer)
     classes = registry.registrations[Greeting]["classes"]
     registrations = classes[FrenchCustomer]
     registration = registrations[0]
@@ -334,7 +343,7 @@ def test_register_class_with_context() -> None:
     assert gs["classes"][IsNoneType] == []
     first = gs["classes"][FrenchCustomer][0]
     assert first.implementation is AnotherGreeting
-    assert first.servicetype is Greeting
+    assert first.kind is None
     assert not first.is_singleton
 
 
@@ -357,8 +366,8 @@ def test_get_last_class_registration() -> None:
         salutation: str = "G2"
 
     registry = Registry()
-    registry.register(AnotherGreeting, servicetype=Greeting)
-    registry.register(GreetingImplementer2, servicetype=Greeting)
+    registry.register(AnotherGreeting)
+    registry.register(GreetingImplementer2)
     result = registry.get(Greeting)
     assert "G2" == result.salutation
 
@@ -371,9 +380,9 @@ def test_parent_registry() -> None:
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register(AnotherGreeting, servicetype=Greeting)
+    parent_registry.register(AnotherGreeting)
     child_registry = Registry(parent=parent_registry)
-    child_registry.register(GreetingImplementer2, servicetype=Greeting)
+    child_registry.register(GreetingImplementer2, kind=Greeting)
     result = child_registry.get(Greeting)
     assert result.salutation == "G2"
 
@@ -386,8 +395,8 @@ def test_child_registry() -> None:
         salutation: str = "G2"
 
     parent_registry = Registry()
-    parent_registry.register(AnotherGreeting, servicetype=Greeting)
-    parent_registry.register(GreetingImplementer2, servicetype=Greeting)
+    parent_registry.register(AnotherGreeting)
+    parent_registry.register(GreetingImplementer2, kind=Greeting)
     child_registry = Registry(parent=parent_registry)
     result = child_registry.get(Greeting)
     assert "G2" == result.salutation
@@ -434,7 +443,7 @@ def test_dependency_not_in_registry() -> None:
         greeting: plain_classes.Greeting
 
     registry = Registry()
-    registry.register(GreeterPlainClassDependency, servicetype=Greeter)
+    registry.register(GreeterPlainClassDependency, kind=Greeter)
     greeter = registry.get(Greeter)
     assert greeter.greeting.salutation == "Hello"
 
@@ -449,9 +458,9 @@ def test_multiple_context_registrations() -> None:
     greeting = Greeting()
     parent_registry.register(greeting)
     parent_registry.register(Greeter)
-    parent_registry.register(GreeterCustomer, servicetype=Greeter, context=Customer)
+    parent_registry.register(GreeterCustomer, kind=Greeter, context=Customer)
     parent_registry.register(
-        GreeterFrenchCustomer, servicetype=Greeter, context=FrenchCustomer
+        GreeterFrenchCustomer, kind=Greeter, context=FrenchCustomer
     )
 
     # ## Now make per-request registries.
@@ -487,21 +496,21 @@ def test_registration_with_context() -> None:
         context=Greeting,
     )
     assert registration.implementation is Greeting
-    assert registration.servicetype is None
+    assert registration.kind is None
     assert registration.context is Greeting
     assert len(registration.field_infos) == 1
     assert not registration.is_singleton
 
 
-def test_registration_with_servicetype() -> None:
-    """Ensure a registration can be created with a servicetype."""
+def test_registration_with_kind() -> None:
+    """Ensure a registration can be created with a kind."""
     registration = Registration(
         implementation=AnotherGreeting,
-        servicetype=Greeting,
+        kind=Greeting,
         context=Greeting,
     )
     assert registration.implementation is AnotherGreeting
-    assert registration.servicetype is Greeting
+    assert registration.kind is Greeting
     assert registration.context is Greeting
     assert len(registration.field_infos) == 1
 
@@ -519,7 +528,7 @@ def test_registration_with_no_context() -> None:
     """Ensure a registration can be created without a context."""
     registration = Registration(implementation=Greeting)
     assert registration.implementation is Greeting
-    assert registration.servicetype is None
+    assert registration.kind is None
     assert registration.context is None
     assert len(registration.field_infos) == 1
 

@@ -11,8 +11,8 @@ from hopscotch.fixtures.dataklasses import AnotherGreeting
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import Greeter
 from hopscotch.fixtures.dataklasses import GreeterCustomer
+from hopscotch.fixtures.dataklasses import GreeterKind
 from hopscotch.fixtures.dataklasses import GreeterRegistry
-from hopscotch.fixtures.dataklasses import GreeterService
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.fixtures.dataklasses import GreetingFactory
 from hopscotch.fixtures.dataklasses import GreetingNoDefault
@@ -33,8 +33,8 @@ def test_dependency_class() -> None:
     registry = Registry()
     registry.register(Greeting)
 
-    registration = Registration(GreeterService)
-    result: GreeterService = registry.inject(registration)
+    registration = Registration(GreeterKind)
+    result: GreeterKind = registry.inject(registration)
     assert "Hello" == result.greeting.salutation
 
 
@@ -109,8 +109,8 @@ def test_dependency_nested_registry() -> None:
     child_registry.register(gs_child)
 
     # Get something registered with parent, dependency local
-    registration = Registration(GreeterService)
-    result: GreeterService = child_registry.inject(registration)
+    registration = Registration(GreeterKind)
+    result: GreeterKind = child_registry.inject(registration)
     assert "use child" == result.greeting.salutation
 
 

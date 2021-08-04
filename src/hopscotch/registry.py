@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from importlib import import_module
+from inspect import getmro
 from inspect import isclass
 from types import ModuleType
 from typing import Any
@@ -38,9 +39,9 @@ class IsNoneType:
 class Registration:
     """Collect registration and introspection info of a target."""
 
-    slots = ("implementation", "servicetype", "context", "field_infos", "is_singleton")
+    slots = ("implementation", "kind", "context", "field_infos", "is_singleton")
     implementation: Union[Callable[..., object], object]
-    servicetype: Optional[Callable[..., object]] = None
+    kind: Optional[Callable[..., object]] = None
     context: Optional[Callable[..., object]] = None
     field_infos: FieldInfos = field(default_factory=list)
     is_singleton: bool = False
@@ -221,7 +222,7 @@ class Registry:
 
     def get_best_match(
         self,
-        servicetype: Type[T],
+        kind: Type[T],
         context_class: Optional[Any] = None,
         allow_singletons: bool = True,
     ) -> Optional[Registration]:
@@ -230,7 +231,7 @@ class Registry:
         Using the registry is a two-step process: lookup an implementation,
         then if needed, construct and return. This is the first part.
         """
-        tr = self.registrations[servicetype]
+        tr = self.registrations[kind]
         if allow_singletons:
             registrations = tr["singletons"] | tr["classes"]
         else:
@@ -271,7 +272,7 @@ class Registry:
             if self.parent:
                 # Otherwise, go to parent
                 return self.parent.get_best_match(
-                    servicetype,
+                    kind,
                     context_class=context_class,
                     allow_singletons=allow_singletons,
                 )
@@ -279,11 +280,11 @@ class Registry:
 
     def get(  # noqa: C901
         self,
-        servicetype: Type[T],
+        kind: Type[T],
         context: Optional[Any] = None,
         **kwargs: Props,
     ) -> T:
-        """Find an appropriate service class and construct an implementation.
+        """Find an appropriate kind class and construct an implementation.
 
         The passed-in keyword args act as "props" which have highest-precedence
         as arguments used in construction.
@@ -298,7 +299,7 @@ class Registry:
 
         # Use precedence etc. to get the best matching implementation.
         best_match = self.get_best_match(
-            servicetype,
+            kind,
             context_class=context_class,
             # If props are passed in, we can't use singletons. So
             # allow_singletons when bool(kwargs) is false.
@@ -316,42 +317,48 @@ class Registry:
                 return instance
 
         # If we get to here, we didn't find anything, raise an error
-        msg = f"No service '{servicetype.__name__}' in registry"
+        msg = f"No kind '{kind.__name__}' in registry"
         raise LookupError(msg)
 
     def register(
         self,
         implementation: T,
         *,
-        servicetype: Optional[Type[T]] = None,
+        kind: Optional[Type[T]] = None,
         context: Optional[Any] = None,
     ) -> None:
         """Use a LIFO list for all the possible implementations.
 
-        Note that the implementation must be a subclass of the servicetype.
+        Note that the implementation must be a subclass of the kind.
         """
         is_singleton = not isclass(implementation)
+
         registration = Registration(
             implementation=implementation,
             context=context,
-            servicetype=servicetype,
+            kind=kind,
             is_singleton=is_singleton,
         )
 
-        # TODO We currently make you do `@implements(Heading)` by providing
-        #   servicetype=Heading. Wouldn't it be nicer to MyHeading(Heading)?
-        #   We'd only pay the cost up-front by parsing it into Registration.
-        #   the challenge, though, is: which things in MRO can be considered
-        #   "interfaces"?
-
         # Let's decide what key to use to register this as.
-        if servicetype is None:
-            st = type(implementation) if is_singleton else implementation
+        if kind is None:
+            # Let's try to infer it from the subclass.
+            if isclass(implementation):
+                base_classes = getmro(implementation)[:-1]
+                if len(base_classes) == 2:
+                    # This registration is a class with a single base class
+                    st = base_classes[1]
+                else:
+                    # Mimic the part below to finish this branch
+                    st = implementation
+            else:
+                st = type(implementation) if is_singleton else implementation
         else:
-            st = servicetype
+            st = kind
 
         # Put this in the correct place of the registrations tree,
         # creating tree nodes as needed.
+
         s_or_c = "singletons" if is_singleton else "classes"
         registrations = self.registrations[st][s_or_c]  # type: ignore
         this_context = IsNoneType if context is None else context
@@ -361,17 +368,16 @@ class Registry:
 class injectable:  # noqa
     """``venusian`` decorator to register an injectable factory ."""
 
-    servicetype = None  # Give subclasses a chance to give default, e.g. view
+    kind = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
         self,
-        servicetype: Optional[Type[T]] = None,
+        kind: Optional[Type[T]] = None,
         *,
         context: Optional[Optional[Any]] = None,
     ):
         """Construct decorator that can register later with registry."""
-        if servicetype is not None:
-            self.servicetype = servicetype
+        self.kind = kind
         self.context = context
 
     def __call__(self, wrapped: T) -> T:
@@ -379,11 +385,10 @@ class injectable:  # noqa
 
         def callback(scanner: Scanner, name: str, cls: object) -> None:
             """Perform the work of actually putting in registry."""
-            servicetype = self.servicetype if self.servicetype else cls
             registry = getattr(scanner, "registry")
             registry.register(
                 implementation=cls,
-                servicetype=servicetype,
+                kind=self.kind,
                 context=self.context,
             )
 

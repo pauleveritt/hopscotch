@@ -25,7 +25,7 @@ def test_dataklass_fixtures() -> None:
     gs = dataklasses.Greeting()
     assert gs.salutation == "Hello"
     assert dataklasses.Greeter(greeting=greeting).greeting.salutation == "Hello"
-    assert dataklasses.GreeterService(greeting=gs).greeting.salutation == "Hello"
+    assert dataklasses.GreeterKind(greeting=gs).greeting.salutation == "Hello"
     gs2 = dataklasses.GreeterAnnotated(greeting=greeting).greeting.salutation
     assert gs2 == "Hello"
     children = ("a",)
@@ -69,9 +69,7 @@ def test_plain_classes_fixtures() -> None:
     assert greeting.salutation == "Hello"
     assert plain_classes.GreetingNoDefault(salutation="Hi").salutation == "Hi"
     assert plain_classes.Greeter(greeting=greeting).greeting.salutation == "Hello"
-    assert (
-        plain_classes.GreeterService(greeting=greeting).greeting.salutation == "Hello"
-    )
+    assert plain_classes.GreeterKind(greeting=greeting).greeting.salutation == "Hello"
     greeter_annotated = plain_classes.GreeterAnnotated(greeting=greeting)
     assert greeter_annotated.greeting.salutation == "Hello"
     children = ("a",)

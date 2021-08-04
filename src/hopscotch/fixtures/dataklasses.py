@@ -1,4 +1,4 @@
-"""Example objects and services implemented as dataclasses."""
+"""Example objects and kinds implemented as dataclasses."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -81,8 +81,8 @@ class Greeter:
 
 
 @dataclass()
-class GreeterService:
-    """A dataclass ``Service`` to engage a customer."""
+class GreeterKind:
+    """A dataclass ``Kind`` to engage a customer."""
 
     greeting: Greeting
 

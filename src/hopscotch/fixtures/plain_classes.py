@@ -1,4 +1,4 @@
-"""Example objects and services implemented as plain classes."""
+"""Example objects and kinds implemented as plain classes."""
 from typing import Annotated
 from typing import Optional
 
@@ -29,13 +29,13 @@ class Greeter:
         self.greeting = greeting
 
 
-class GreeterService:
-    """A plain-old-class ``Service`` to engage a customer."""
+class GreeterKind:
+    """A plain-old-class ``Kind`` to engage a customer."""
 
     greeting: Greeting
 
     def __init__(self, greeting: Greeting):
-        """Construct a greeter that is a service."""
+        """Construct a greeter that is a kind."""
         self.greeting = greeting
 
 
