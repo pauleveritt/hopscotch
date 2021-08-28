@@ -26,11 +26,9 @@ When filing an issue, make sure to answer these questions:
 The best way to get your bug fixed is to provide a test case,
 and/or steps to reproduce the issue.
 
-
 ## How to request a feature
 
 Request features on the [Issue Tracker](https://github.com/pauleveritt/hopscotch/issues).
-
 
 ## How to set up your development environment
 
@@ -75,10 +73,8 @@ For example, invoke the unit test suite like this:
 $ nox --session=tests
 ```
 
-
-Unit tests are located in the ``tests`` directory,
+Unit tests are located in the `tests` directory,
 and are written using the [pytest](https://pytest.readthedocs.io/) testing framework.
-
 
 ## How to submit changes
 

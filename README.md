@@ -34,10 +34,11 @@ Looking for a modern registry that scales from simple use, up to rich dependency
 
 ## Features
 
-- *Simple to complex*. The easy stuff for a simple registry is easy, but rich, replaceable systems are in scope also.
-- *Better DX*. Improve developer experience through deep embrace of static analysis and usage of symbols instead of magic names.
-- *Hierarchical*. A cascade of parent registries helps model request lifecycles.
-- *Tested and documented*. High test coverage and quality docs with lots of (tested) examples.- *Extensible*. 
+- _Simple to complex_. The easy stuff for a simple registry is easy, but rich, replaceable systems are in scope also.
+- _Better DX_. Improve developer experience through deep embrace of static analysis and usage of symbols instead of magic names.
+- _Hierarchical_. A cascade of parent registries helps model request lifecycles.
+- _Tested and documented_. High test coverage and quality docs with lots of (tested) examples.- _Extensible_.
+- _Great with components_. When used with [`viewdom`](https://viewdom.readthedocs.io), everything is wired up and you can just work in templates.
 
 ## Requirements
 
@@ -46,11 +47,109 @@ Looking for a modern registry that scales from simple use, up to rich dependency
 
 ## Installation
 
-You can install *Hopscotch* via [pip](https://pip.pypa.io/) from [PyPI](https://pypi.org/):
+You can install _Hopscotch_ via [pip](https://pip.pypa.io/) from [PyPI](https://pypi.org/):
 
 ```shell
 $ pip install hopscotch
 ```
+
+## Quick Examples
+
+Let's look at: a hello world, same but with a decorator, replacement, and multiple choice.
+
+Here's a registry with one "kind of thing" in it:
+
+```python
+# One kind of thing
+@dataclass
+class Greeter:
+    """A simple greeter."""
+
+    greeting: str = "Hello!"
+
+
+registry = Registry()
+registry.register(Greeter)
+# Later
+greeter = registry.get(Greeter)
+# greeter.greeting == "Hello!"
+```
+
+That's manual registration -- let's try with a decorator:
+
+```python
+@injectable()
+@dataclass
+class Greeter:
+    """A simple greeter."""
+
+    greeting: str = "Hello!"
+
+
+registry = Registry()
+registry.scan()
+# Later
+greeter = registry.get(Greeter)
+# greeter.greeting == "Hello!"
+```
+
+You're building a pluggable app where people can replace builtins:
+
+```python
+# Some site might want to change a built-in.
+@injectable(kind=Greeter)
+@dataclass
+class CustomGreeter:
+    """Provide a different ``Greeter`` in this site."""
+
+    greeting: str = "Howdy!"
+```
+
+Sometimes you want a `Greeter` but sometimes you want a `FrenchGreeter` -- for example, based on the row of data a request is processing:
+
+```python
+@injectable(kind=Greeter, context=FrenchCustomer)
+@dataclass
+class FrenchGreeter:
+    """Provide a different ``Greeter`` in this site."""
+
+    greeting: str = "Bonjour!"
+
+# Much later
+child_registry = Registry(
+    parent=parent_registry,
+    context=french_customer
+)
+greeter2 = child_registry.get(Greeter)
+# greeter2.greeting == "Bonjour!"
+```
+
+Finally, have your data constructed for you in rich ways, including custom field "operators":
+
+```python
+@injectable()
+@dataclass
+class SiteConfig:
+    punctuation: str = "!"
+
+
+@injectable()
+@dataclass
+class Greeter:
+    """A simple greeter."""
+
+    punctuation: str = get(SiteConfig, attr="punctuation")
+    greeting: str = "Hello"
+
+    def greet(self) -> str:
+        """Provide a greeting."""
+        return f"{self.greeting}{self.punctuation}"
+```
+
+The full code for these examples are in the docs, with more explanation (and many more examples.)
+
+And don't worry, dataclasses aren't required.
+Some support is available for plain-old classes, `NamedTuple`, and even functions.
 
 # Contributing
 
@@ -59,13 +158,12 @@ To learn more, see the [contributor's guide](contributing).
 
 # License
 
-Distributed under the terms of the [MIT license](https://opensource.org/licenses/MIT), *Hopscotch* is free and open source software.
+Distributed under the terms of the [MIT license](https://opensource.org/licenses/MIT), _Hopscotch_ is free and open source software.
 
 # Issues
 
 If you encounter any problems,
 please [file an issue](https://github.com/pauleveritt/hopscotch/issues) along with a detailed description.
-
 
 # Credits
 
