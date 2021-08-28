@@ -1,13 +1,16 @@
 """Rich dependency injection with operators."""
 from dataclasses import dataclass
 
-from hopscotch import Registry, injectable
+from hopscotch import injectable
+from hopscotch import Registry
 from hopscotch.operators import get
 
 
 @injectable()
 @dataclass
 class SiteConfig:
+    """Hold configuration data for a pluggable app site."""
+
     punctuation: str = "!"
 
 

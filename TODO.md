@@ -27,7 +27,6 @@
   just uses the current registry. Context might be higher up.
 - Registries have props that can be more easily injected than singletons
 
-
 ## TO DOCUMENT
 
 - Handling generics such as Optional

@@ -1,7 +1,8 @@
 """Register with a decorator."""
 from dataclasses import dataclass
 
-from hopscotch import Registry, injectable
+from hopscotch import injectable
+from hopscotch import Registry
 
 
 @injectable()

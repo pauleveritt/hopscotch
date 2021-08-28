@@ -1,18 +1,21 @@
 """Replace a built-in class."""
 from dataclasses import dataclass
 
-from hopscotch import Registry, injectable
+from hopscotch import injectable
+from hopscotch import Registry
 
 
 @dataclass
 class Customer:
     """A basic customer."""
+
     name: str = "Mary"
 
 
 @dataclass
 class FrenchCustomer:
     """A different customer."""
+
     name: str = "Marie"
 
 
@@ -42,10 +45,6 @@ greeter1 = parent_registry.get(Greeter)
 # greeter1.greeting == "Hello!"
 
 # Much later
-child_registry = Registry(
-    parent=parent_registry,
-    context=french_customer
-)
+child_registry = Registry(parent=parent_registry, context=french_customer)
 greeter2 = child_registry.get(Greeter)
 # greeter2.greeting == "Bonjour!"
-

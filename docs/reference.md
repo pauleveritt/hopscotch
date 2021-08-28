@@ -48,6 +48,7 @@ This is the object to use.
 Hopscotch provides some fixtures for use in tests and examples.
 
 ### DummyOperator
+
 ```{eval-rst}
 .. automodule:: hopscotch.fixtures
    :members:

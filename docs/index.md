@@ -1,4 +1,5 @@
 ```{include} ../README.md
+
 ```
 
 ```{toctree}
@@ -6,6 +7,7 @@
 maxdepth: 1
 ---
 why
+registry
 reference
 contributing
 Code of Conduct <codeofconduct>
