@@ -5,6 +5,7 @@
 ---
 maxdepth: 1
 ---
+why
 reference
 contributing
 Code of Conduct <codeofconduct>
