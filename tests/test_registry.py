@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
-
 from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import AnotherGreeting
 from hopscotch.fixtures.dataklasses import Customer
@@ -403,6 +402,24 @@ def test_child_registry() -> None:
     assert "G2" == result.salutation
 
 
+def test_callable_instance() -> None:
+    """Match a registry in the child registry."""
+
+    @dataclass()
+    class ThisComponent:
+        salutation: str = "This Greeting"
+
+        def __call__(self) -> str:
+            return f"Hello {self.salutation}"
+
+    parent_registry = Registry()
+    parent_registry.register(AnotherGreeting)
+    parent_registry.register(ThisComponent, kind=Greeting)
+    child_registry = Registry(parent=parent_registry)
+    result = child_registry.get(Greeting)
+    assert "This Greeting" == result.salutation
+
+
 def test_nested_registry_match_parent() -> None:
     """Registration in parent uses dependency from parent."""
 
@@ -540,6 +557,7 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
+
 
 # FIXME Bring this back when examples are back
 # def test_injector_registry_scan_pkg():

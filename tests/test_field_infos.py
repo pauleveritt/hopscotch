@@ -2,15 +2,14 @@
 import typing
 
 import pytest
-
 from hopscotch import Registry
 from hopscotch.field_infos import FieldInfo
 from hopscotch.field_infos import get_dataclass_field_infos
 from hopscotch.field_infos import get_field_origin
 from hopscotch.field_infos import get_non_dataclass_field_infos
 from hopscotch.field_infos import get_operator
-from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import dataklasses
+from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
 from hopscotch.fixtures import plain_classes
@@ -131,7 +130,7 @@ def test_get_operator_no_annotated() -> None:
     ],
 )
 def test_target_field_info_str(
-        target: type, extractor: typing.Callable[..., list[FieldInfo]]
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Variations of field_info extraction."""
     field_infos = extractor(target)
@@ -151,7 +150,7 @@ def test_target_field_info_str(
     ],
 )
 def test_field_info_children(
-        target: type, extractor: typing.Callable[..., list[FieldInfo]]
+    target: type, extractor: typing.Callable[..., list[FieldInfo]]
 ) -> None:
     """Look for the magic-named ``children`` argument."""
     field_infos = extractor(target)
