@@ -1,7 +1,6 @@
 """Sphinx configuration."""
 from datetime import datetime
 
-
 project = "Hopscotch"
 author = "Paul Everitt"
 copyright = f"{datetime.now().year}, {author}"
@@ -12,3 +11,4 @@ extensions = [
 ]
 autodoc_typehints = "description"
 html_theme = "furo"
+myst_enable_extensions = ["colon_fence"]

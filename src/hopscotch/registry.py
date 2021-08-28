@@ -183,7 +183,6 @@ Registrations = dict[type, KindGroups]
 
 class Registry:
     """Type-oriented registry with special features."""
-
     context: Optional[Any]
     parent: Optional[Registry]
     scanner: Scanner

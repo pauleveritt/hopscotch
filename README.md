@@ -32,6 +32,12 @@ Writing a decoupled application -- a "pluggable app" -- in Python is a common pr
 Looking for a modern registry that scales from simple use, up to rich dependency injection (DI)?
 `hopscotch` is a registry and DI package for Python 3.9+, written to support research into component-driven development for Python's web story.
 
+```{admonition} Let's Be Real
+I expect a lot of skepticism.
+In fact, I don't expect a lot of adoption.
+Instead, I'm using this to learn and write articles.
+```
+
 ## Features
 
 - _Simple to complex_. The easy stuff for a simple registry is easy, but rich, replaceable systems are in scope also.
@@ -40,6 +46,8 @@ Looking for a modern registry that scales from simple use, up to rich dependency
 - _Tested and documented_. High test coverage and quality docs with lots of (tested) examples.- _Extensible_.
 - _Great with components_. When used with [`viewdom`](https://viewdom.readthedocs.io), everything is wired up and you can just work in templates.
 
+Hopscotch takes its history from `wired`, which came from `Pyramid`, which came from `Zope`.
+
 ## Requirements
 
 - Python 3.9+.
@@ -47,7 +55,7 @@ Looking for a modern registry that scales from simple use, up to rich dependency
 
 ## Installation
 
-You can install _Hopscotch_ via [pip](https://pip.pypa.io/) from [PyPI](https://pypi.org/):
+You can install `Hopscotch` via [pip](https://pip.pypa.io/) from [PyPI](https://pypi.org/):
 
 ```shell
 $ pip install hopscotch
