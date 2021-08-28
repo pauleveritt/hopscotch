@@ -1,9 +1,7 @@
-.. include:: ../README.rst
-   :end-before: github-only
+```{include} ../README.md
+```
 
-
-TO DOCUMENT
-===========
+# TO DOCUMENT
 
 - Handling generics such as Optional
 - Plain classes, namedtuples (though service typing might be weird, dataclass)
@@ -23,12 +21,13 @@ TO DOCUMENT
 
 .. _Contributor Guide: contributing.html
 
-.. toctree::
-   :hidden:
-   :maxdepth: 1
-
-   reference
-   contributing
-   Code of Conduct <codeofconduct>
-   License <license>
-   Changelog <https://github.com/pauleveritt/hopscotch/releases>
+```{toctree}
+---
+maxdepth: 1
+---
+reference
+contributing
+Code of Conduct <codeofconduct>
+License <license>
+Changelog <https://github.com/pauleveritt/hopscotch/releases>
+```

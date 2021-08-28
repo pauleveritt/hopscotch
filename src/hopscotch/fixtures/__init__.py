@@ -11,5 +11,12 @@ class DummyOperator:
     arg: str
 
     def __call__(self, registry: Registry) -> str:
-        """Return the stored argument."""
+        """Return the stored argument.
+
+        Args:
+            registry: A real or fake hopscotch registry for this operator.
+
+        Returns:
+            The result of this DummyOperator.
+        """
         return self.arg

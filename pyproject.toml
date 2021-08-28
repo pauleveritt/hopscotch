@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Type-oriented registry with dependency injection."
 authors = ["Paul Everitt <pauleveritt@me.com>"]
 license = "MIT"
-readme = "README.rst"
+readme = "README.md"
 homepage = "https://github.com/pauleveritt/hopscotch"
 repository = "https://github.com/pauleveritt/hopscotch"
 documentation = "https://hopscotch.readthedocs.io"
@@ -20,8 +20,8 @@ python = "^3.9.1"
 venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
 nox = "^2021.6.12"
-pytest = "^6.2.3"
 coverage = {extras = ["toml"], version = "^5.4"}
 safety = "^1.10.3"
 mypy = "^0.910"
@@ -42,6 +42,7 @@ pre-commit-hooks = "^4.0.1"
 Pygments = "^2.8.1"
 nox-poetry = "^0.8.6"
 furo = "^2021.6.24b37"
+myst-parser = "^0.15.2"
 
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"

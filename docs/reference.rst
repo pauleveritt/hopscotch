@@ -1,10 +1,7 @@
 Reference
 =========
 
-.. contents::
-    :local:
-    :backlinks: none
-
+API reference documentation.
 
 hopscotch.fixtures
 ------------------
