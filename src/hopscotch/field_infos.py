@@ -3,22 +3,22 @@ from __future__ import annotations
 
 import inspect
 from dataclasses import Field
-from dataclasses import MISSING
 from dataclasses import fields
 from dataclasses import is_dataclass
+from dataclasses import MISSING
 from inspect import Parameter
 from inspect import signature
 from typing import Any
 from typing import Callable
-from typing import NamedTuple
-from typing import Optional
-from typing import TYPE_CHECKING
-from typing import Tuple
-from typing import Type
-from typing import Union
 from typing import get_args
 from typing import get_origin
 from typing import get_type_hints
+from typing import NamedTuple
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import TYPE_CHECKING
+from typing import Union
 
 if TYPE_CHECKING:
     from hopscotch.operators import Operator

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Annotated
 
 import pytest
-
 from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import Context

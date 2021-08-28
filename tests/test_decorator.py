@@ -4,7 +4,6 @@ More cumbersome (due to scanner) to copy around so placed into a
 single test.
 """
 import pytest
-
 from hopscotch import Registry
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
