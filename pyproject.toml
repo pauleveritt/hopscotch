@@ -43,6 +43,7 @@ Pygments = "^2.8.1"
 nox-poetry = "^0.8.6"
 furo = "^2021.6.24b37"
 myst-parser = "^0.15.2"
+sybil = "^2.0.1"
 
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"
@@ -54,6 +55,10 @@ source_pkgs = ["hopscotch"]
 [tool.coverage.report]
 show_missing = true
 fail_under = 90
+
+[tool.pytest.ini_options]
+addopts = "-p no:doctest"
+testpaths = ["tests", "examples", "docs"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -44,7 +44,7 @@ def test_functions_fixtures() -> None:
     assert functions.GreetingDefaultNoHint() == "Hello"
     assert functions.GreetingNoDefault(salutation="Hi") == "Hi"
     assert functions.Greeter(greeting=greeting) == "Hello"
-    assert functions.GreeterAnnotated(greeting=greeting) == "Hello"
+    assert functions.GreeterAnnotated(customer_name="Hello") == "Hello"
     children = ("a",)
     assert functions.GreeterChildren(children=children) == children
     assert functions.GreeterOptional(greeting=None) is None

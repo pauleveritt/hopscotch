@@ -15,7 +15,7 @@ It's primarily for me to learn and articulate some ideas from the world of front
 I'll start here.
 Things like registries are an indirection.
 All frameworks are by definition an indirection -- some mysterious force is calling your code and passing in arguments.
-Have you ever written a Flask view or a pytest test?
+Have you ever written a pytest test?
 If so, a registry is calling your code and even doing dependency injection!
 
 Still, registries have a bad rap in Python.

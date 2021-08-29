@@ -19,6 +19,7 @@ class GreetingNoDefault:
         self.salutation = salutation
 
 
+# Start Greeter
 class Greeter:
     """A plain-old-class to engage a customer."""
 

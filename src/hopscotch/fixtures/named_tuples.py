@@ -20,6 +20,7 @@ class GreetingNoDefault(NamedTuple):
     salutation: str
 
 
+# Start Greeter
 class Greeter(NamedTuple):
     """A ``NamedTuple`` to engage a customer."""
 

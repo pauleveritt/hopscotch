@@ -2,7 +2,8 @@
 from typing import Annotated
 from typing import Optional
 
-from hopscotch.fixtures import DummyOperator
+from hopscotch.fixtures.dataklasses import Customer
+from hopscotch.operators import Get
 
 
 def Greeting(salutation: str = "Hello") -> str:
@@ -20,19 +21,24 @@ def GreetingNoDefault(salutation: str) -> str:
     return salutation
 
 
+# Start Greeter
 def Greeter(greeting: str) -> str:
     """A function to engage a customer."""
     return greeting
 
 
+# Start GreeterOptional
 def GreeterOptional(greeting: Optional[str]) -> Optional[str]:
     """A function to engage a customer with optional greeting."""
     return greeting
 
 
-def GreeterAnnotated(greeting: Annotated[str, DummyOperator("YOLO")]) -> str:
+# Start GreeterAnnotated
+def GreeterAnnotated(
+    customer_name: Annotated[str, Get(Customer, attr="first_name")]
+) -> str:
     """A function to engage a customer with an ``Annotated``."""
-    return greeting
+    return customer_name
 
 
 def GreeterChildren(children: tuple[str]) -> tuple[str]:

@@ -60,7 +60,6 @@ def test_get_field_origin_generic(target: object, expected: object) -> None:
     "target, expected",
     [
         (dataklasses.GreeterAnnotated, dataklasses.Greeting),
-        (functions.GreeterAnnotated, str),
         (named_tuples.GreeterAnnotated, named_tuples.Greeting),
         (plain_classes.GreeterAnnotated, plain_classes.Greeting),
     ],
@@ -69,6 +68,20 @@ def test_get_field_origin_annotated(target: object, expected: object) -> None:
     """Find correct type with an ``Annotated`` involved."""
     th = typing.get_type_hints(target, globalns=None, localns=None)
     param1_annotation = th["greeting"]
+    result = get_field_origin(param1_annotation)
+    assert expected is result
+
+
+@pytest.mark.parametrize(
+    "target, expected",
+    [
+        (functions.GreeterAnnotated, str),
+    ],
+)
+def test_get_field_origin_annotated_function(target: object, expected: object) -> None:
+    """Find correct type with an ``Annotated`` involved."""
+    th = typing.get_type_hints(target, globalns=None, localns=None)
+    param1_annotation = th["customer_name"]
     result = get_field_origin(param1_annotation)
     assert expected is result
 

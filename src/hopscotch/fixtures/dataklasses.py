@@ -14,14 +14,16 @@ from hopscotch.operators import Get
 from hopscotch.operators import get
 
 
+# Decorate Greeting
 @injectable()
-@dataclass()
+@dataclass()  # Start Greeting
 class Greeting:
     """A dataclass to give a greeting."""
 
     salutation: str = "Hello"
 
 
+# Start AnotherGreeting
 @dataclass()
 class AnotherGreeting(Greeting):
     """A replacement alternative for the default ``Greeting``."""
@@ -60,6 +62,7 @@ class GreetingTuple:
     salutation: tuple[str, ...]
 
 
+# Start GreetingFactory
 @dataclass()
 class GreetingFactory:
     """Use the ``__hopscotch_factory__`` protocol to control creation."""
@@ -72,6 +75,7 @@ class GreetingFactory:
         return cls(salutation="Hi From Factory")
 
 
+# Start Greeter
 @injectable()
 @dataclass()
 class Greeter:
@@ -80,6 +84,7 @@ class Greeter:
     greeting: Greeting
 
 
+# Start GreeterKind
 @dataclass()
 class GreeterKind:
     """A dataclass ``Kind`` to engage a customer."""
@@ -87,11 +92,12 @@ class GreeterKind:
     greeting: Greeting
 
 
+# Start GreeterOptional
 @dataclass()
 class GreeterOptional:
     """A dataclass to engage a customer with optional greeting."""
 
-    greeting: Optional[Greeting]
+    greeting: Optional[Greeting]  # no default
 
 
 @dataclass()
@@ -115,6 +121,7 @@ class GreeterRegistry:
     registry: Registry
 
 
+# Start Customer
 @dataclass()
 class Customer:
     """The person to greet, stored as the registry context."""
@@ -137,6 +144,7 @@ class GreeterCustomer:
     customer: Annotated[Customer, Context()]
 
 
+# Start GreeterFrenchCustomer
 @injectable(context=FrenchCustomer)
 @dataclass()
 class GreeterFrenchCustomer:
@@ -145,6 +153,16 @@ class GreeterFrenchCustomer:
     customer: FrenchCustomer = context()
 
 
+# Start GreeterGetAnother
+@injectable()
+@dataclass()
+class GreeterGetAnother:
+    """Use an operator to change the type hint of what's retrieved."""
+
+    customer_name: AnotherGreeting = get(Greeting)
+
+
+# Start GreeterFirstName
 @dataclass()
 class GreeterFirstName:
     """A dataclass that gets an attribute off a dependency."""

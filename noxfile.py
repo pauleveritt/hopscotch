@@ -23,7 +23,7 @@ python_versions = ["3.9"]
 nox.options.sessions = (
     "pre-commit",
     # "safety",
-    "mypy",
+    # "mypy",
     "tests",
     "xdoctest",
     "docs-build",
@@ -126,7 +126,7 @@ def mypy(session: Session) -> None:
 def tests(session: Session) -> None:
     """Run the test suite."""
     session.install(".")
-    session.install("coverage[toml]", "pytest", "pygments")
+    session.install("coverage[toml]", "pytest", "pygments", "sybil")
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest", *session.posargs)
     finally:
