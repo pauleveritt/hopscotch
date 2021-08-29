@@ -45,9 +45,6 @@ furo = "^2021.6.24b37"
 myst-parser = "^0.15.2"
 sybil = "^2.0.1"
 
-[tool.poetry.scripts]
-hopscotch = "hopscotch.__main__:main"
-
 [tool.coverage.run]
 branch = true
 source_pkgs = ["hopscotch"]
