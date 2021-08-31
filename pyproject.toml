@@ -41,7 +41,7 @@ reorder-python-imports = "^2.4.0"
 pre-commit-hooks = "^4.0.1"
 Pygments = "^2.8.1"
 nox-poetry = "^0.8.6"
-furo = "^2021.6.24b37"
+furo = "^2021.8.31"
 
 [tool.poetry.scripts]
 hopscotch = "hopscotch.__main__:main"
