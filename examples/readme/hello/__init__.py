@@ -1,6 +1,5 @@
 """Simplest possible example."""
 from dataclasses import dataclass
-
 from hopscotch import Registry
 
 
