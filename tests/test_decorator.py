@@ -3,6 +3,7 @@
 More cumbersome (due to scanner) to copy around so placed into a
 single test.
 """
+import pytest
 from hopscotch import Registry
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
@@ -10,8 +11,6 @@ from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeter
 from hopscotch.fixtures.dataklasses import GreeterCustomer
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
-
-import pytest
 
 
 def test_injectable_no_context() -> None:
