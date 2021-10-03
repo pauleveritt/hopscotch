@@ -3,8 +3,9 @@
 Used for testing caller_package and the branching that looks
 if the package has a __init__.py in it.
 """
-from hopscotch.callers import caller_package
 from typing import Any
+
+from hopscotch.callers import caller_package
 
 
 def make_call() -> Any:
