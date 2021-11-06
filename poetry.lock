@@ -1009,15 +1009,15 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "sybil"
-version = "2.0.1"
-description = "Automated testing for the examples in your documentation."
+version = "3.0.0"
+description = "Automated testing for the examples in your code and documentation."
 category = "dev"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.extras]
-build = ["sphinx", "setuptools-git", "twine", "wheel"]
-test = ["pytest (>=3.5.0)", "pytest-cov"]
+build = ["furo", "sphinx", "setuptools-git", "twine", "wheel"]
+test = ["pytest (>=6.2.0)", "pytest-cov"]
 
 [[package]]
 name = "toml"
@@ -1126,7 +1126,7 @@ tests = ["cmake", "codecov", "ninja", "pybind11", "scikit-build", "pytest", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9.1"
-content-hash = "8324149690f141057cfcff5be2ee1e396f702c8c4c64e6ce73ac7f3d52e802b6"
+content-hash = "c30adfe19a1817fc854d91682039c54bd0b4574768b1b0f78c8800297191fbdc"
 
 [metadata.files]
 alabaster = [
@@ -1684,8 +1684,8 @@ stevedore = [
     {file = "stevedore-3.4.0.tar.gz", hash = "sha256:59b58edb7f57b11897f150475e7bc0c39c5381f0b8e3fa9f5c20ce6c89ec4aa1"},
 ]
 sybil = [
-    {file = "sybil-2.0.1-py2.py3-none-any.whl", hash = "sha256:8b1492888b65b4a2c0e39d90b976b2a1ee00187f6210e57fb6fbc13768b9992b"},
-    {file = "sybil-2.0.1.tar.gz", hash = "sha256:597d71e246690b9223c132f0ed7dcac470dcbe9ad022004a801e108a00dc3524"},
+    {file = "sybil-3.0.0-py3-none-any.whl", hash = "sha256:98caf3d4cf0212636f9b6eac819c45ff0c5790ace121068f4a4c21b2c941ffb4"},
+    {file = "sybil-3.0.0.tar.gz", hash = "sha256:7692ed66e793e5e79ae6a70cf2cf861917ed48eaff0d8adf825e64d85820f251"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
