@@ -41,7 +41,7 @@ reorder-python-imports = "^2.4.0"
 pre-commit-hooks = "^4.0.1"
 Pygments = "^2.8.1"
 nox-poetry = "^0.8.6"
-furo = "^2021.9.22"
+furo = "^2021.10.9"
 myst-parser = "^0.15.2"
 sybil = "^2.0.1"
 
