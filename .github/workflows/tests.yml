@@ -116,17 +116,17 @@ jobs:
           pip install --constraint=.github/workflows/constraints.txt nox nox-poetry
           nox --version
 
-      - name: Download coverage data
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: coverage-data
+#      - name: Download coverage data
+#        uses: actions/download-artifact@v2.0.10
+#        with:
+#          name: coverage-data
 
-      - name: Combine coverage data and display human readable report
-        run: |
-          nox --force-color --session=coverage
-
-      - name: Create coverage report
-        run: |
-          nox --force-color --session=coverage -- xml
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v2.1.0
+#      - name: Combine coverage data and display human readable report
+#        run: |
+#          nox --force-color --session=coverage
+#
+#      - name: Create coverage report
+#        run: |
+#          nox --force-color --session=coverage -- xml
+#      - name: Upload coverage report
+#        uses: codecov/codecov-action@v2.1.0
