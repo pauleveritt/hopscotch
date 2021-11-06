@@ -1,6 +1,5 @@
 """Replace a built-in class."""
 from dataclasses import dataclass
-
 from hopscotch import injectable
 from hopscotch import Registry
 
