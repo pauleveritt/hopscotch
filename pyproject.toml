@@ -42,7 +42,7 @@ pre-commit-hooks = "^4.0.1"
 Pygments = "^2.11.2"
 nox-poetry = "^0.8.6"
 furo = "^2021.10.9"
-myst-parser = "^0.15.2"
+myst-parser = "^0.16.1"
 sybil = "^3.0.0"
 
 [tool.coverage.run]
