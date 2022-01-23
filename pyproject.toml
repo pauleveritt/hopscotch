@@ -9,6 +9,7 @@ homepage = "https://github.com/pauleveritt/hopscotch"
 repository = "https://github.com/pauleveritt/hopscotch"
 documentation = "https://hopscotch.readthedocs.io"
 classifiers = [
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.9",
 ]
 
