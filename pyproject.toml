@@ -21,7 +21,7 @@ venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
-nox = "^2021.6.12"
+nox = "^2022.1.7"
 coverage = {extras = ["toml"], version = "^6.1", allow-prereleases = true}
 safety = "^1.10.3"
 mypy = "^0.910"
