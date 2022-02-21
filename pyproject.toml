@@ -21,7 +21,7 @@ python = "^3.9.1"
 venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
+pytest = "^7.0.1"
 nox = "^2022.1.7"
 coverage = {extras = ["toml"], version = "^6.3", allow-prereleases = true}
 safety = "^1.10.3"
@@ -42,8 +42,8 @@ reorder-python-imports = "^2.7.1"
 pre-commit-hooks = "^4.0.1"
 Pygments = "^2.11.2"
 nox-poetry = "^0.9.0"
-furo = "^2022.1.2"
-myst-parser = "^0.16.1"
+furo = "^2022.2.14"
+myst-parser = "^0.17.0"
 sybil = "^3.0.0"
 
 [tool.coverage.run]
