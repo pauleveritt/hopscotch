@@ -3,14 +3,34 @@
 More cumbersome (due to scanner) to copy around so placed into a
 single test.
 """
+from dataclasses import dataclass
+from typing import cast
+
 import pytest
+
 from hopscotch import Registry
+from hopscotch import injectable
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeter
 from hopscotch.fixtures.dataklasses import GreeterCustomer
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
+
+
+class View:
+    title: str
+
+
+# noinspection PyPep8Naming
+class view(injectable):
+    kind = View
+
+
+@view()
+@dataclass
+class MyView(View):
+    title: str = "My View"
 
 
 def test_injectable_no_context() -> None:
@@ -45,3 +65,10 @@ def test_injectable_explicit_context() -> None:
     registry2.scan(dataklasses)
     with pytest.raises(LookupError):
         registry2.get(GreeterFrenchCustomer)
+
+
+def test_custom_decorator():
+    registry = Registry()
+    registry.scan()
+    result = cast(MyView, registry.get(View))
+    assert 'My View' == result.title
