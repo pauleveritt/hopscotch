@@ -368,7 +368,7 @@ class Registry:
 class injectable:  # noqa
     """``venusian`` decorator to register an injectable factory ."""
 
-    kind = None  # Give subclasses a chance to give default, e.g. view
+    kind: Optional[Type[T]] = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
         self,
@@ -377,7 +377,8 @@ class injectable:  # noqa
         context: Optional[Optional[Any]] = None,
     ):
         """Construct decorator that can register later with registry."""
-        self.kind = kind
+        if kind:
+            self.kind = kind
         self.context = context
 
     def __call__(self, wrapped: T) -> T:
