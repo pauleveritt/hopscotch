@@ -1,13 +1,14 @@
 """Test the bundled operators."""
 from dataclasses import dataclass
-from hopscotch import Registry
-from hopscotch.fixtures.dataklasses import Greeting
-from hopscotch.operators import Context
-from hopscotch.operators import Get
-from hopscotch.operators import make_field_operator
 from typing import Annotated
 
 import pytest
+from hopscotch import Registry
+from hopscotch.fixtures.dataklasses import Greeting
+from hopscotch.operators import Context
+from hopscotch.operators import context
+from hopscotch.operators import Get
+from hopscotch.operators import make_field_operator
 
 
 def test_get_setup() -> None:
@@ -109,10 +110,7 @@ def test_operators_context_attr() -> None:
 
     @dataclass
     class DummyHeading:
-        context_title: Annotated[
-            str,
-            Context(attr="title"),  # noqa: F821
-        ]
+        context_title: str = context(attr="title")
 
     context1 = Context1()
     registry = Registry(context=context1)

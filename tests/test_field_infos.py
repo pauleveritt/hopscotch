@@ -1,5 +1,7 @@
 """Test the field discovery functions for various targets."""
 import typing
+
+import pytest
 from hopscotch import Registry
 from hopscotch.field_infos import FieldInfo
 from hopscotch.field_infos import get_dataclass_field_infos
@@ -18,8 +20,6 @@ from hopscotch.fixtures.dataklasses import GreetingOperator
 from hopscotch.fixtures.dataklasses import GreetingTuple
 from hopscotch.operators import Get
 from hopscotch.operators import Operator
-
-import pytest
 
 
 @pytest.mark.parametrize(
@@ -150,6 +150,7 @@ def test_target_field_info_str(
     assert field_infos[0].field_name == "salutation"
     assert field_infos[0].field_type == str
     assert field_infos[0].default_value is None
+    assert field_infos[0].default_factory is None
     assert field_infos[0].has_annotated is False
 
 
@@ -170,6 +171,18 @@ def test_field_info_children(
     assert field_infos[0].field_name == "children"
     assert field_infos[0].field_type is None
     assert field_infos[0].default_value is None
+
+
+def test_field_info_default_value() -> None:
+    """Confirm a default value."""
+    field_infos = get_dataclass_field_infos(dataklasses.GreetingFieldDefault)
+    assert field_infos[0].default_value == "Default Argument"
+
+
+def test_field_info_default_factory() -> None:
+    """Confirm a default factory."""
+    field_infos = get_dataclass_field_infos(dataklasses.GreetingFieldDefaultFactory)
+    assert field_infos[0].default_factory is list
 
 
 def test_dataclass_field_info_init_false() -> None:

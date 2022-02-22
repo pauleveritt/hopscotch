@@ -1,8 +1,9 @@
 """Example objects and kinds implemented as functions."""
-from hopscotch.fixtures.dataklasses import Customer
-from hopscotch.operators import Get
 from typing import Annotated
 from typing import Optional
+
+from hopscotch.fixtures.dataklasses import Customer
+from hopscotch.operators import Get
 
 
 def Greeting(salutation: str = "Hello") -> str:

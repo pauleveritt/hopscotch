@@ -1,5 +1,8 @@
 """Test the registry implementation and helpers."""
 from dataclasses import dataclass
+from typing import Optional
+
+import pytest
 from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import AnotherGreeting
 from hopscotch.fixtures.dataklasses import Customer
@@ -12,9 +15,6 @@ from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import context
 from hopscotch.registry import IsNoneType
 from hopscotch.registry import Registration
-from typing import Optional
-
-import pytest
 
 
 class DummyScan:
