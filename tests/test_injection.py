@@ -4,6 +4,7 @@ The ``inject_callable`` callable is used in both the registry and
 components. Thus it needs to support use both with and without a
 registry.
 """
+import pytest
 from hopscotch import Registry
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
@@ -15,18 +16,32 @@ from hopscotch.fixtures.dataklasses import GreeterKind
 from hopscotch.fixtures.dataklasses import GreeterRegistry
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.fixtures.dataklasses import GreetingFactory
+from hopscotch.fixtures.dataklasses import GreetingFieldDefault
+from hopscotch.fixtures.dataklasses import GreetingFieldDefaultFactory
 from hopscotch.fixtures.dataklasses import GreetingNoDefault
 from hopscotch.registry import inject_callable
 from hopscotch.registry import Registration
 
-import pytest
-
 
 def test_field_default() -> None:
-    """The target a field with a default."""
+    """The target is a field with a default."""
     registration = Registration(Greeting)
     result: Greeting = inject_callable(registration)
     assert result.salutation == "Hello"
+
+
+def test_field_default_argument() -> None:
+    """The target is a field using a default argument."""
+    registration = Registration(GreetingFieldDefault)
+    result: Greeting = inject_callable(registration)
+    assert result.salutation == "Default Argument"
+
+
+def test_field_default_factory() -> None:
+    """The target is a field using a default factory."""
+    registration = Registration(GreetingFieldDefaultFactory)
+    result: Greeting = inject_callable(registration)
+    assert result.salutation == []
 
 
 def test_dependency_class() -> None:

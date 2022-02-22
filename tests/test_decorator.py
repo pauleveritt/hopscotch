@@ -7,9 +7,8 @@ from dataclasses import dataclass
 from typing import cast
 
 import pytest
-
-from hopscotch import Registry
 from hopscotch import injectable
+from hopscotch import Registry
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
@@ -19,17 +18,23 @@ from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 
 
 class View:
+    """A marker for an example custom injectable."""
+
     title: str
 
 
 # noinspection PyPep8Naming
-class view(injectable):
+class view(injectable):  # noqa: N801
+    """Custom decorator for custom injectable."""
+
     kind = View
 
 
 @view()
 @dataclass
 class MyView(View):
+    """An example view."""
+
     title: str = "My View"
 
 
@@ -67,8 +72,9 @@ def test_injectable_explicit_context() -> None:
         registry2.get(GreeterFrenchCustomer)
 
 
-def test_custom_decorator():
+def test_custom_decorator() -> None:
+    """Test the custom decorator."""
     registry = Registry()
     registry.scan()
     result = cast(MyView, registry.get(View))
-    assert 'My View' == result.title
+    assert "My View" == result.title

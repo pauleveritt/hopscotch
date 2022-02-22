@@ -3,14 +3,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Annotated
+from typing import Optional
+
 from hopscotch import injectable
 from hopscotch import Registry
 from hopscotch.operators import Context
 from hopscotch.operators import context
 from hopscotch.operators import Get
 from hopscotch.operators import get
-from typing import Annotated
-from typing import Optional
 
 
 # Decorate Greeting
@@ -42,6 +43,20 @@ class GreetingInitFalse:
     """A dataclass with a field that inits to false."""
 
     salutation: str = field(init=False)
+
+
+@dataclass()
+class GreetingFieldDefault:
+    """A dataclass with a field using a default argument."""
+
+    salutation: str = field(default="Default Argument")
+
+
+@dataclass()
+class GreetingFieldDefaultFactory:
+    """A dataclass with a field using a default factory."""
+
+    salutation: list = field(default_factory=list)
 
 
 @dataclass()

@@ -148,6 +148,8 @@ def inject_callable(
             if field_info.default_value is not None:
                 # ...try to get from default
                 field_value = field_info.default_value
+            elif field_info.default_factory is not None:
+                field_value = field_info.default_factory()
             else:
                 # ...otherwise, we failed injection.
                 ql = target.__qualname__  # type: ignore
@@ -368,7 +370,9 @@ class Registry:
 class injectable:  # noqa
     """``venusian`` decorator to register an injectable factory ."""
 
-    kind: Optional[Type[T]] = None  # Give subclasses a chance to give default, e.g. view
+    kind: Optional[
+        Type[T]
+    ] = None  # Give subclasses a chance to give default, e.g. view
 
     def __init__(
         self,

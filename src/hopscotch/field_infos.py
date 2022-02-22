@@ -32,6 +32,7 @@ class FieldInfo(NamedTuple):
     field_name: str
     field_type: Optional[type]
     default_value: Optional[object] = None
+    default_factory: Optional[Callable[[], object]] = None
     operator: Optional[Operator] = None
     has_annotated: bool = False
     is_builtin: bool = False
@@ -82,6 +83,9 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
 
     # Default values
     default_value = None if field.default is MISSING else field.default
+    default_factory = (
+        None if field.default_factory is MISSING else field.default_factory
+    )
 
     is_builtin = field_type.__module__ == "builtins" if field_type else False
 
@@ -89,6 +93,7 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
         field_name=field.name,
         field_type=field_type,
         default_value=default_value,
+        default_factory=default_factory,
         operator=operator,
         has_annotated=has_annotated,
         is_builtin=is_builtin,
