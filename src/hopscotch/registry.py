@@ -226,7 +226,7 @@ class Registry:
         self,
         kind: Type[T],
         context_class: Optional[Any] = None,
-        allow_singletons: bool = True,
+        allow_singletons: bool = True,  # If props are passed in, we can't use singletons
     ) -> Optional[Registration]:
         """Find the best-match registration, if any.
 
@@ -373,6 +373,7 @@ class injectable:  # noqa
     kind: Optional[
         Type[T]
     ] = None  # Give subclasses a chance to give default, e.g. view
+    is_singleton: bool = False  # Decorator registers singletons.
 
     def __init__(
         self,
@@ -388,11 +389,14 @@ class injectable:  # noqa
     def __call__(self, wrapped: T) -> T:
         """Execute the decorator during venusian scan phase."""
 
-        def callback(scanner: Scanner, name: str, cls: object) -> None:
+        def callback(scanner: Scanner, name: str, cls: type) -> None:
             """Perform the work of actually putting in registry."""
+            # Does this custom decorator want to register singletons? If
+            # so, make an instance to use instead of decorated class target.
+            target = cls() if self.is_singleton else cls
             registry = getattr(scanner, "registry")
             registry.register(
-                implementation=cls,
+                implementation=target,
                 kind=self.kind,
                 context=self.context,
             )
