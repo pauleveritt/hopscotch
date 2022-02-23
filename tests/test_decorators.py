@@ -7,8 +7,9 @@ from dataclasses import dataclass
 from typing import cast
 
 import pytest
+
+from hopscotch import Registry, Registration
 from hopscotch import injectable
-from hopscotch import Registry
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
@@ -18,7 +19,7 @@ from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
 
 
 class View:
-    """A marker for an example custom injectable."""
+    """A marker for an example View custom injectable."""
 
     title: str
 
@@ -30,12 +31,34 @@ class view(injectable):  # noqa: N801
     kind = View
 
 
+class Config:
+    """A marker for an example singleton custom injectable."""
+
+    title: str
+
+
+# noinspection PyPep8Naming
+class config(injectable):  # noqa: N801
+    """Custom decorator for custom singleton injectable."""
+
+    kind = Config
+    is_singleton = True
+
+
 @view()
 @dataclass
 class MyView(View):
     """An example view."""
 
     title: str = "My View"
+
+
+@config()
+@dataclass
+class MyConfig(View):
+    """An example configuration."""
+
+    title: str = "My Config"
 
 
 def test_injectable_no_context() -> None:
@@ -73,8 +96,21 @@ def test_injectable_explicit_context() -> None:
 
 
 def test_custom_decorator() -> None:
-    """Test the custom decorator."""
+    """Test the custom view decorator."""
     registry = Registry()
     registry.scan()
     result = cast(MyView, registry.get(View))
     assert "My View" == result.title
+
+
+def test_custom_singleton_decorator() -> None:
+    """Test the custom singleton decorator."""
+    registry = Registry()
+    registry.scan()
+    config_singletons = registry.registrations[Config]["singletons"]
+    items = cast(list, list(config_singletons.values())[0])
+    first: Registration = items[0]
+    impl = cast(MyConfig, first.implementation)
+    assert "My Config" == impl.title
+    result = cast(MyConfig, registry.get(Config))
+    assert "My Config" == result.title
