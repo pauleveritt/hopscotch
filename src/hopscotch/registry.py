@@ -391,7 +391,6 @@ class injectable:  # noqa
 
         def callback(scanner: Scanner, name: str, cls: type) -> None:
             """Perform the work of actually putting in registry."""
-
             # Does this custom decorator want to register singletons? If
             # so, make an instance to use instead of decorated class target.
             target = cls() if self.is_singleton else cls

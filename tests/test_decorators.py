@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import cast
 
 import pytest
-
-from hopscotch import Registry, Registration
 from hopscotch import injectable
+from hopscotch import Registration
+from hopscotch import Registry
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import FrenchCustomer
