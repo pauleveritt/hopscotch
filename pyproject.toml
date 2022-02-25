@@ -44,7 +44,7 @@ Pygments = "^2.11.2"
 nox-poetry = "^0.9.0"
 furo = "^2022.2.14"
 myst-parser = "^0.17.0"
-sybil = "^3.0.0"
+sybil = "^3.0.1"
 
 [tool.coverage.run]
 branch = true
