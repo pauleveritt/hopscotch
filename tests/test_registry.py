@@ -557,23 +557,3 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
-
-
-# FIXME Bring this back when examples are back
-# def test_injector_registry_scan_pkg():
-#     from examples import d_decorators
-#
-#     registry = Registry()
-#     ds = DummyScan()
-#     registry.scanner.scan = ds
-#     registry.scan(d_decorators)
-#     if ds.called_with:
-#         assert "examples.d_decorators" == ds.called_with.__name__
-
-
-# def test_injector_registry_scan_string():
-#     registry = Registry()
-#     ds = DummyScan()
-#     registry.scanner.scan = ds
-#     registry.scan("examples.d_decorators")
-#     assert "examples.d_decorators" == ds.called_with.__name__  # type: ignore
