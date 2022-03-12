@@ -557,3 +557,14 @@ def test_context_registration_no_context() -> None:
     registry.register(Greeting, context=Customer)
     with pytest.raises(LookupError):
         registry.get(Greeting)
+
+
+def test_registry_hopscotch_setup() -> None:
+    """Module has ``hopscotch_setup`` called by ``registry.setup``."""
+    from hopscotch.fixtures import hopscotch_setup
+    from hopscotch.fixtures.hopscotch_setup import MyConfig
+
+    registry = Registry()
+    registry.setup(hopscotch_setup)
+    my_config = registry.get(MyConfig)
+    assert my_config.site_title == "My Configuration"

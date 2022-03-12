@@ -205,6 +205,15 @@ class Registry:
             self.context = context
         self.scanner = Scanner(registry=self)
 
+    def setup(
+        self,
+        pkg: PACKAGE = None,
+    ) -> None:
+        """Pass the registry to a package which has a setup function."""
+        setup_function = getattr(pkg, "hopscotch_setup", None)
+        if setup_function:
+            setup_function(self)
+
     def scan(
         self,
         pkg: PACKAGE = None,
