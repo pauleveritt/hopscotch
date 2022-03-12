@@ -559,21 +559,12 @@ def test_context_registration_no_context() -> None:
         registry.get(Greeting)
 
 
-# FIXME Bring this back when examples are back
-# def test_injector_registry_scan_pkg():
-#     from examples import d_decorators
-#
-#     registry = Registry()
-#     ds = DummyScan()
-#     registry.scanner.scan = ds
-#     registry.scan(d_decorators)
-#     if ds.called_with:
-#         assert "examples.d_decorators" == ds.called_with.__name__
+def test_registry_hopscotch_setup() -> None:
+    """Module has ``hopscotch_setup`` called by ``registry.setup``."""
+    from hopscotch.fixtures import hopscotch_setup
+    from hopscotch.fixtures.hopscotch_setup import MyConfig
 
-
-# def test_injector_registry_scan_string():
-#     registry = Registry()
-#     ds = DummyScan()
-#     registry.scanner.scan = ds
-#     registry.scan("examples.d_decorators")
-#     assert "examples.d_decorators" == ds.called_with.__name__  # type: ignore
+    registry = Registry()
+    registry.setup(hopscotch_setup)
+    my_config = registry.get(MyConfig)
+    assert my_config.site_title == "My Configuration"
