@@ -1,4 +1,4 @@
-"""Register with a decorator."""
+"""Register an injectable using a decorator."""
 from dataclasses import dataclass
 
 from hopscotch import injectable
@@ -13,8 +13,10 @@ class Greeter:
     greeting: str = "Hello!"
 
 
-registry = Registry()
-registry.scan()
-# Later
-greeter = registry.get(Greeter)
-# greeter.greeting == "Hello!"
+def main() -> str:
+    """Render a template to a string."""
+    registry = Registry()
+    registry.scan()
+    # Later
+    greeter = registry.get(Greeter)
+    return greeter.greeting

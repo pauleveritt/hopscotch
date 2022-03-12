@@ -1,8 +1,7 @@
-"""Test the example."""
+"""Test an example."""
+from . import main
 
 
-def test_readme_operators() -> None:
-    """Construct a greeting from config."""
-    from . import greeting
-
-    assert greeting == "Hello!"
+def test_main() -> None:
+    """Ensure the result matches what is expected."""
+    assert main() == "Hello!"

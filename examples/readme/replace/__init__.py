@@ -21,11 +21,13 @@ class CustomGreeter:
     greeting: str = "Howdy!"
 
 
-# Make app and register built-ins
-registry = Registry()
-registry.register(Greeter)
-# Still during startup, but later during site registration
-registry.scan()
-# Later, when processing a request
-greeter = registry.get(Greeter)
-# greeter.greeting == "Howdy!"
+def main() -> str:
+    """Render a template to a string."""
+    # Make app and register built-ins
+    registry = Registry()
+    registry.register(Greeter)
+    # Still during startup, but later during site registration
+    registry.scan()
+    # Later, when processing a request
+    greeter = registry.get(Greeter)
+    return greeter.greeting

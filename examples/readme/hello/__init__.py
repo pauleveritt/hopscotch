@@ -11,8 +11,10 @@ class Greeter:
     greeting: str = "Hello!"
 
 
-registry = Registry()
-registry.register(Greeter)
-# Later
-greeter = registry.get(Greeter)
-# greeter.greeting == "Hello!"
+def main() -> str:
+    """Render a template to a string."""
+    registry = Registry()
+    registry.register(Greeter)
+    # Later
+    greeter = registry.get(Greeter)
+    return greeter.greeting

@@ -36,15 +36,17 @@ class FrenchGreeter:
     greeting: str = "Bonjour!"
 
 
-customer = Customer()
-french_customer = FrenchCustomer()
-parent_registry = Registry(context=customer)
-parent_registry.scan()
-# Later
-greeter1 = parent_registry.get(Greeter)
-# greeter1.greeting == "Hello!"
+def main() -> tuple[str, str]:
+    """Render a template to a string."""
+    customer = Customer()
+    french_customer = FrenchCustomer()
+    parent_registry = Registry(context=customer)
+    parent_registry.scan()
+    # Later
+    greeter1 = parent_registry.get(Greeter)
 
-# Much later
-child_registry = Registry(parent=parent_registry, context=french_customer)
-greeter2 = child_registry.get(Greeter)
-# greeter2.greeting == "Bonjour!"
+    # Much later
+    child_registry = Registry(parent=parent_registry, context=french_customer)
+    greeter2 = child_registry.get(Greeter)
+
+    return greeter1.greeting, greeter2.greeting

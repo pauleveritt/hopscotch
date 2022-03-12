@@ -1,7 +1,7 @@
-"""Test the example."""
-from . import greeter
+"""Test an example."""
+from . import main
 
 
-def test_readme_hello() -> None:
-    """Make sure the greeter is retrieved from registry."""
-    assert greeter.greeting == "Hello!"
+def test_main() -> None:
+    """Ensure the result matches what is expected."""
+    assert main() == "Hello!"

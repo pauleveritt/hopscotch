@@ -27,9 +27,10 @@ class Greeter:
         return f"{self.greeting}{self.punctuation}"
 
 
-registry = Registry()
-registry.scan()
-# Later
-greeter = registry.get(Greeter)
-greeting = greeter.greet()
-# greeting == "Hello!"
+def main() -> str:
+    """Render a template to a string."""
+    registry = Registry()
+    registry.scan()
+    # Later
+    greeter = registry.get(Greeter)
+    return greeter.greet()
