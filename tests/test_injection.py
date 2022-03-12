@@ -4,7 +4,10 @@ The ``inject_callable`` callable is used in both the registry and
 components. Thus it needs to support use both with and without a
 registry.
 """
+from dataclasses import dataclass
+
 import pytest
+
 from hopscotch import Registry
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
@@ -19,8 +22,8 @@ from hopscotch.fixtures.dataklasses import GreetingFactory
 from hopscotch.fixtures.dataklasses import GreetingFieldDefault
 from hopscotch.fixtures.dataklasses import GreetingFieldDefaultFactory
 from hopscotch.fixtures.dataklasses import GreetingNoDefault
-from hopscotch.registry import inject_callable
 from hopscotch.registry import Registration
+from hopscotch.registry import inject_callable
 
 
 def test_field_default() -> None:
@@ -52,6 +55,25 @@ def test_dependency_class() -> None:
     registration = Registration(GreeterKind)
     result: GreeterKind = registry.inject(registration)
     assert "Hello" == result.greeting.salutation
+
+
+def test_dependency_default_class() -> None:
+    """The target has a field dependency NOT in registry."""
+
+    @dataclass
+    class SomeSalutation:
+        title: str = "Some Salutation"
+
+    @dataclass
+    class SomeGreeting:
+        some_salutation: SomeSalutation = SomeSalutation()
+    registry = Registry()
+
+    registry.register(SomeGreeting)
+    registry.register(SomeGreeting)
+    registration = Registration(SomeGreeting)
+    result: SomeGreeting = registry.inject(registration)
+    assert "Some Salutation" == result.some_salutation.title
 
 
 def test_dependency_namedtuple() -> None:
