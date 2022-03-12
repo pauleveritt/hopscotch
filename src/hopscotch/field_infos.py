@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import inspect
+import os
+import sysconfig
 from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
@@ -24,6 +26,19 @@ if TYPE_CHECKING:
     from hopscotch.operators import Operator
 
 EMPTY = getattr(inspect, "_empty")
+
+
+# At startup, make a set containing all the builtin module names
+def get_stdlib_module_names() -> set[str]:
+    """Called at startup to get a list of builtin modules."""
+    stdlib_dir = sysconfig.get_path(name="stdlib")
+    stdlib_modules = {f.replace(".py", "") for f in os.listdir(stdlib_dir)}
+    # Add builtin "module" for things like tuple.
+    stdlib_modules.add("builtins")
+    return stdlib_modules
+
+
+STDLIB_MODULE_NAMES = get_stdlib_module_names()
 
 
 class FieldInfo(NamedTuple):
@@ -87,7 +102,7 @@ def dataclass_field_info_factory(field_type: type, field: Field[Any]) -> FieldIn
         None if field.default_factory is MISSING else field.default_factory
     )
 
-    is_builtin = field_type.__module__ == "builtins" if field_type else False
+    is_builtin = field_type.__module__ in STDLIB_MODULE_NAMES if field_type else False
 
     return FieldInfo(
         field_name=field.name,
@@ -122,7 +137,7 @@ def function_field_info_factory(field_type: type, parameter: Parameter) -> Field
         if this_field_type:
             has_annotated = hasattr(this_field_type, "__metadata__")
             this_field_type, operator = get_operator(this_field_type)
-            is_builtin = this_field_type.__module__ == "builtins"
+            is_builtin = this_field_type.__module__ in STDLIB_MODULE_NAMES
 
     # Default values
     if parameter.default == EMPTY:

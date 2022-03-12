@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from typing import Annotated
 from typing import Optional
 
@@ -74,6 +75,13 @@ class GreetingTuple:
     """A dataclass to give a sequence of greetings."""
 
     salutation: tuple[str, ...]
+
+
+@dataclass()
+class GreetingPath:
+    """A dataclass to give a builtin Path."""
+
+    location: Path
 
 
 # Start GreetingFactory

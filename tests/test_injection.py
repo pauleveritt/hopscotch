@@ -7,7 +7,6 @@ registry.
 from dataclasses import dataclass
 
 import pytest
-
 from hopscotch import Registry
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
@@ -22,8 +21,8 @@ from hopscotch.fixtures.dataklasses import GreetingFactory
 from hopscotch.fixtures.dataklasses import GreetingFieldDefault
 from hopscotch.fixtures.dataklasses import GreetingFieldDefaultFactory
 from hopscotch.fixtures.dataklasses import GreetingNoDefault
-from hopscotch.registry import Registration
 from hopscotch.registry import inject_callable
+from hopscotch.registry import Registration
 
 
 def test_field_default() -> None:
@@ -67,6 +66,7 @@ def test_dependency_default_class() -> None:
     @dataclass
     class SomeGreeting:
         some_salutation: SomeSalutation = SomeSalutation()
+
     registry = Registry()
 
     registry.register(SomeGreeting)

@@ -1,5 +1,6 @@
 """Test the field discovery functions for various targets."""
 import typing
+from pathlib import Path
 
 import pytest
 from hopscotch import Registry
@@ -8,6 +9,7 @@ from hopscotch.field_infos import get_dataclass_field_infos
 from hopscotch.field_infos import get_field_origin
 from hopscotch.field_infos import get_non_dataclass_field_infos
 from hopscotch.field_infos import get_operator
+from hopscotch.field_infos import get_stdlib_module_names
 from hopscotch.fixtures import dataklasses
 from hopscotch.fixtures import DummyOperator
 from hopscotch.fixtures import functions
@@ -17,9 +19,17 @@ from hopscotch.fixtures.dataklasses import Customer
 from hopscotch.fixtures.dataklasses import GreeterFirstName
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.fixtures.dataklasses import GreetingOperator
+from hopscotch.fixtures.dataklasses import GreetingPath
 from hopscotch.fixtures.dataklasses import GreetingTuple
 from hopscotch.operators import Get
 from hopscotch.operators import Operator
+
+
+def test_get_stdlib_module_names() -> None:
+    """Test the helper function which runs at startup."""
+    module_names = get_stdlib_module_names()
+    assert "contextlib" in module_names
+    assert "builtins" in module_names
 
 
 @pytest.mark.parametrize(
@@ -200,6 +210,15 @@ def test_field_info_more_generic() -> None:
     field_infos = get_dataclass_field_infos(GreetingTuple)
     assert field_infos[0].field_name == "salutation"
     assert "GenericAlias" in str(type(field_infos[0].field_type))
+    assert field_infos[0].default_value is None
+    assert field_infos[0].is_builtin is True
+
+
+def test_field_info_builtin() -> None:
+    """Look up a field that is a a builtin ``Path``."""
+    field_infos = get_dataclass_field_infos(GreetingPath)
+    assert field_infos[0].field_name == "location"
+    assert field_infos[0].field_type is Path
     assert field_infos[0].default_value is None
     assert field_infos[0].is_builtin is True
 
