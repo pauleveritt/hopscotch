@@ -33,6 +33,12 @@ def GreeterOptional(greeting: Optional[str]) -> Optional[str]:
     return greeting
 
 
+# Start GreeterOptional
+def GreeterRegisteredType(customer: Customer) -> Customer:
+    """A function to engage a customer."""
+    return customer
+
+
 # Start GreeterAnnotated
 def GreeterAnnotated(
     customer_name: Annotated[str, Get(Customer, attr="first_name")]

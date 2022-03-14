@@ -98,6 +98,16 @@ def test_inject_function_no_type_hint() -> None:
     assert "Hello" == result
 
 
+def test_inject_function_injectable() -> None:
+    """A function parameter with type hint in registry."""
+    customer = Customer(first_name="Marie")
+    registry = Registry()
+    registry.register(customer)
+    registration = Registration(functions.GreeterRegisteredType)
+    result: Customer = inject_callable(registration, registry=registry)
+    assert "Marie" == result.first_name
+
+
 def test_injection_no_registry() -> None:
     """Simulate usage of injection rules without needing a registry."""
     props = dict(salutation="No registry")
