@@ -5,6 +5,7 @@ from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import Context
 from hopscotch.operators import context
 from hopscotch.operators import Get
+from hopscotch.operators import get
 from hopscotch.operators import make_field_operator
 from typing import Annotated
 
@@ -31,6 +32,22 @@ def test_operators_get_simple_type() -> None:
     @dataclass()
     class DummyGreeter:
         dummy_greeting: Annotated[Greeting, Get(Greeting)]
+
+    registry = Registry()
+    greeting = Greeting()
+    registry.register(greeting)
+    registry.register(DummyGreeter)
+    # Now ask the registry to construct this
+    dummy_greeter = registry.get(DummyGreeter)
+    assert isinstance(dummy_greeter.dummy_greeting, Greeting)
+
+
+def test_operators_field_get_simple_type() -> None:
+    """Use field to lookup one type while stating another."""
+
+    @dataclass()
+    class DummyGreeter:
+        dummy_greeting: str = get(Greeting, attr="salutation")
 
     registry = Registry()
     greeting = Greeting()
