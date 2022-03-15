@@ -1,6 +1,5 @@
 """Package wants to manually setup the registry."""
 from dataclasses import dataclass
-
 from hopscotch import Registry
 
 

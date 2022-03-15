@@ -1,14 +1,14 @@
 """Test the bundled operators."""
 from dataclasses import dataclass
-from typing import Annotated
-
-import pytest
 from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import Context
 from hopscotch.operators import context
 from hopscotch.operators import Get
 from hopscotch.operators import make_field_operator
+from typing import Annotated
+
+import pytest
 
 
 def test_get_setup() -> None:

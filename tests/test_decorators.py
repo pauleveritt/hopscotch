@@ -4,9 +4,6 @@ More cumbersome (due to scanner) to copy around so placed into a
 single test.
 """
 from dataclasses import dataclass
-from typing import cast
-
-import pytest
 from hopscotch import injectable
 from hopscotch import Registration
 from hopscotch import Registry
@@ -16,6 +13,9 @@ from hopscotch.fixtures.dataklasses import FrenchCustomer
 from hopscotch.fixtures.dataklasses import Greeter
 from hopscotch.fixtures.dataklasses import GreeterCustomer
 from hopscotch.fixtures.dataklasses import GreeterFrenchCustomer
+from typing import cast
+
+import pytest
 
 
 class View:

@@ -5,8 +5,6 @@ components. Thus it needs to support use both with and without a
 registry.
 """
 from dataclasses import dataclass
-
-import pytest
 from hopscotch import Registry
 from hopscotch.fixtures import functions
 from hopscotch.fixtures import named_tuples
@@ -23,6 +21,8 @@ from hopscotch.fixtures.dataklasses import GreetingFieldDefaultFactory
 from hopscotch.fixtures.dataklasses import GreetingNoDefault
 from hopscotch.registry import inject_callable
 from hopscotch.registry import Registration
+
+import pytest
 
 
 def test_field_default() -> None:
@@ -127,6 +127,13 @@ def test_dependency_no_default() -> None:
 
 
 def test_dependency_default() -> None:
+    """The target has an str field with a default."""
+    registration = Registration(AnotherGreeting)
+    result: AnotherGreeting = inject_callable(registration)
+    assert "Another Hello" == result.salutation
+
+
+def test_dependency_get_attr() -> None:
     """The target has an str field with a default."""
     registration = Registration(AnotherGreeting)
     result: AnotherGreeting = inject_callable(registration)

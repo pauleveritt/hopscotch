@@ -1,8 +1,5 @@
 """Test the field discovery functions for various targets."""
 import typing
-from pathlib import Path
-
-import pytest
 from hopscotch import Registry
 from hopscotch.field_infos import FieldInfo
 from hopscotch.field_infos import get_dataclass_field_infos
@@ -23,6 +20,9 @@ from hopscotch.fixtures.dataklasses import GreetingPath
 from hopscotch.fixtures.dataklasses import GreetingTuple
 from hopscotch.operators import Get
 from hopscotch.operators import Operator
+from pathlib import Path
+
+import pytest
 
 
 def test_get_stdlib_module_names() -> None:
