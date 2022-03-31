@@ -1,5 +1,6 @@
 """Example objects for tests, examples, and docs."""
 from dataclasses import dataclass
+
 from hopscotch.registry import Registry
 
 

@@ -1,5 +1,8 @@
 """Test the bundled operators."""
 from dataclasses import dataclass
+from typing import Annotated
+
+import pytest
 from hopscotch import Registry
 from hopscotch.fixtures.dataklasses import Greeting
 from hopscotch.operators import Context
@@ -7,9 +10,6 @@ from hopscotch.operators import context
 from hopscotch.operators import Get
 from hopscotch.operators import get
 from hopscotch.operators import make_field_operator
-from typing import Annotated
-
-import pytest
 
 
 def test_get_setup() -> None:
@@ -55,7 +55,7 @@ def test_operators_field_get_simple_type() -> None:
     registry.register(DummyGreeter)
     # Now ask the registry to construct this
     dummy_greeter = registry.get(DummyGreeter)
-    assert isinstance(dummy_greeter.dummy_greeting, Greeting)
+    assert dummy_greeter.dummy_greeting == "Hello"
 
 
 def test_operators_get_attr() -> None:

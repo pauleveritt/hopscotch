@@ -1,5 +1,6 @@
 """Rich dependency injection with operators."""
 from dataclasses import dataclass
+
 from hopscotch import injectable
 from hopscotch import Registry
 from hopscotch.operators import get
