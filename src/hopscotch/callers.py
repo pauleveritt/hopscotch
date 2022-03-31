@@ -1,4 +1,5 @@
 """Utility functions for scanning packages and modules."""
+import inspect
 import sys
 from types import ModuleType
 from typing import Callable
