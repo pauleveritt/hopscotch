@@ -9,15 +9,15 @@ homepage = "https://github.com/pauleveritt/hopscotch"
 repository = "https://github.com/pauleveritt/hopscotch"
 documentation = "https://hopscotch.readthedocs.io"
 classifiers = [
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
 ]
 
 [tool.poetry.urls]
 Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
 [tool.poetry.dependencies]
-python = "^3.9.1"
+python = "^3.11"
 venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
