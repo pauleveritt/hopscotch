@@ -18,10 +18,10 @@ Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-venusian = "^3.0.0"
+venusian = "^3.1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.0.1"
+pytest = "^7.4.3"
 nox = "^2022.1.7"
 coverage = {extras = ["toml"], version = "^6.3", allow-prereleases = true}
 safety = "^1.10.3"

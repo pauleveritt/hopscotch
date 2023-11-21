@@ -18,7 +18,7 @@
 - Bring over predicates
 - Hierarchical cache service
   - Including simple persistent based on shelve
-  - Get the context and predicate into into a hashable "arguments"
+  - Get the context and predicate into a hashable "arguments"
 - Write example of a `select` that uses predicates
   - Convert `context` to be part of predicates
 - Eliminate top-level `VDOMNode` type
