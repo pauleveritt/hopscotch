@@ -66,7 +66,7 @@ class Get:
         # Can't lookup a string, ever, so bail on this with an error.
         if isinstance(self.lookup_key, str):
             lk = self.lookup_key
-            msg = f"Cannot use a string '{lk}' as container lookup value"
+            msg = f"Cannot use a string {lk!r} as container lookup value"
             raise ValueError(msg)
 
         result_value = registry.get(self.lookup_key)

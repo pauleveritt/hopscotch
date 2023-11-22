@@ -5,6 +5,7 @@ components. Thus it needs to support use both with and without a
 registry.
 """
 from dataclasses import dataclass
+from dataclasses import field
 
 import pytest
 from hopscotch import Registry
@@ -65,7 +66,7 @@ def test_dependency_default_class() -> None:
 
     @dataclass
     class SomeGreeting:
-        some_salutation: SomeSalutation = SomeSalutation()
+        some_salutation: SomeSalutation = field(default_factory=SomeSalutation)
 
     registry = Registry()
 
