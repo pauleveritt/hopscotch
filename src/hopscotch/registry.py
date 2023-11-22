@@ -155,7 +155,7 @@ def inject_callable(
                 ql = target.__qualname__  # type: ignore
                 ft = field_info.field_type
                 ft_name = "None" if ft is None else ft.__name__
-                msg = f"Cannot inject '{ft_name}' on '{ql}.{fn}'"
+                msg = f"Cannot inject {ft_name!r} on '{ql}.{fn}'"
                 raise ValueError(msg)
 
         kwargs[fn] = field_value
@@ -328,7 +328,7 @@ class Registry:
                 return instance
 
         # If we get to here, we didn't find anything, raise an error
-        msg = f"No kind '{kind.__name__}' in registry"
+        msg = f"No kind {kind.__name__!r} in registry"
         raise LookupError(msg)
 
     def register(
