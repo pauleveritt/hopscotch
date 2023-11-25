@@ -26,7 +26,7 @@ nox = "^2023.4.22"
 coverage = {extras = ["toml"], version = "^6.3", allow-prereleases = true}
 safety = "^2.3.5"
 mypy = "^0.940"
-xdoctest = {extras = ["colors"], version = "^0.15.10"}
+xdoctest = {extras = ["colors"], version = "^1.1.2"}
 sphinx = "^4.4.0"
 sphinx-autobuild = "^2021.3.14"
 pre-commit = "^3.5.0"
