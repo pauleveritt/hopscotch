@@ -1571,18 +1571,18 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "sybil"
-version = "3.0.1"
+version = "6.0.2"
 description = "Automated testing for the examples in your code and documentation."
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "sybil-3.0.1-py3-none-any.whl", hash = "sha256:5fa9dfc5d0e27f8c0e0b966baab2b8edc66d19c4bac7069d75b2dca8a30b5cef"},
-    {file = "sybil-3.0.1.tar.gz", hash = "sha256:6f02dc2204af7e5a212037924d974f72781f6dc18fd3c44cc7ce463a120f530d"},
+    {file = "sybil-6.0.2-py3-none-any.whl", hash = "sha256:b5cd4fbd33cf38686094752def4395dbc8c60e48e0e08852effeefbd8a5a050c"},
+    {file = "sybil-6.0.2.tar.gz", hash = "sha256:8dd4d9675551482a25a0b3a0c0f602a7de4903718305253d56f9b7c3e663a81c"},
 ]
 
 [package.extras]
-build = ["furo", "setuptools-git", "sphinx", "twine", "wheel"]
-test = ["pytest (>=6.2.0)", "pytest-cov"]
+build = ["furo", "sphinx", "twine", "urllib3 (<2)", "wheel"]
+test = ["mypy", "myst-parser", "pytest (>=7.1.0)", "pytest-cov", "seedir", "testfixtures", "types-PyYAML"]
 
 [[package]]
 name = "tomli"
@@ -1714,4 +1714,4 @@ tests = ["IPython", "cmake", "codecov", "ipykernel", "jupyter-client", "nbconver
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "2b7a018c2c20584050b20730270f77ad3141fe2293839c55b70baf81e9f1837a"
+content-hash = "5203ebe411ec4d7468963247dd3e50c43500c5cf3755d7edcfc298c866787be8"
