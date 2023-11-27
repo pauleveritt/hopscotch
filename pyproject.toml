@@ -25,7 +25,7 @@ pytest = "^7.4.3"
 nox = "^2023.4.22"
 coverage = {extras = ["toml"], version = "^6.3", allow-prereleases = true}
 safety = "^2.3.5"
-mypy = "^0.940"
+mypy = "^1.7"
 xdoctest = {extras = ["colors"], version = "^1.1.2"}
 sphinx = "^4.4.0"
 sphinx-autobuild = "^2021.3.14"
