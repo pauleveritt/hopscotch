@@ -6,19 +6,19 @@ on:
 
 jobs:
   tests:
-    name: ${{ matrix.session }} ${{ matrix.python }} / ${{ matrix.os }}
+    name: ${{ matrix.script }} ${{ matrix.python }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { python: "3.12", os: "ubuntu-latest", session: "pre-commit" }
-          - { python: "3.12", os: "ubuntu-latest", session: "safety" }
-          - { python: "3.12", os: "ubuntu-latest", session: "tests" }
-          - { python: "3.12", os: "windows-latest", session: "tests" }
-          - { python: "3.12", os: "macos-latest", session: "tests" }
-          - { python: "3.12", os: "ubuntu-latest", session: "xdoctest" }
-          - { python: "3.12", os: "ubuntu-latest", session: "docs-build" }
+          - { python: "3.12", os: "ubuntu-latest", script: "pre-commit" }
+          - { python: "3.12", os: "ubuntu-latest", script: "safety" }
+          - { python: "3.12", os: "ubuntu-latest", script: "test" }
+          - { python: "3.12", os: "windows-latest", script: "test" }
+          - { python: "3.12", os: "macos-latest", script: "test" }
+          - { python: "3.12", os: "ubuntu-latest", script: "xdoctest" }
+          - { python: "3.12", os: "ubuntu-latest", script: "docs-build" }
 
     env:
       PRE_COMMIT_COLOR: "always"
@@ -52,7 +52,7 @@ jobs:
           hatch version
 
       - name: Compute pre-commit cache key
-        if: matrix.session == 'pre-commit'
+        if: matrix.script == 'pre-commit'
         id: pre-commit-cache
         shell: python
         run: |
@@ -68,7 +68,7 @@ jobs:
 
       - name: Restore pre-commit cache
         uses: actions/cache@v3.3.2
-        if: matrix.session == 'pre-commit'
+        if: matrix.script == 'pre-commit'
         with:
           path: ~/.cache/pre-commit
           key: ${{ steps.pre-commit-cache.outputs.result }}-${{ hashFiles('.pre-commit-config.yaml') }}
@@ -77,17 +77,17 @@ jobs:
 
       - name: Run `hatch run`
         run: |
-          hatch run +py=${{ matrix.python }} ${{ matrix.session }}:run
+          hatch run +py=${{ matrix.python }} ${{ matrix.script }}:run
 
       - name: Upload coverage data
-        if: always() && matrix.session == 'tests'
+        if: always() && matrix.script == 'test'
         uses: "actions/upload-artifact@v3"
         with:
           name: coverage-data
           path: ".coverage.*"
 
       - name: Upload documentation
-        if: matrix.session == 'docs-build'
+        if: matrix.script == 'docs-build'
         uses: actions/upload-artifact@v3
         with:
           name: docs
