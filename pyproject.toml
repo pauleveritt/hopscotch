@@ -1,8 +1,9 @@
-[tool.poetry]
-name = "hopscotch"
+[project]
 version = "0.3.1"
+build-targets = ["wheel"]
+name = "hopscotch"
 description = "Type-oriented registry with dependency injection."
-authors = ["Paul Everitt <pauleveritt@me.com>"]
+authors = [{ name = "Paul Everitt", email = "pauleveritt@me.com" }]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/pauleveritt/hopscotch"
@@ -13,38 +14,45 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 
-[tool.poetry.urls]
+[tool.hatch.urls]
 Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-venusian = "^3.1.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.4.3"
-nox = "^2023.4.22"
-coverage = {extras = ["toml"], version = "^7.3", allow-prereleases = true}
-safety = "^2.3.5"
-mypy = "^1.7"
-xdoctest = {extras = ["colors"], version = "^1.1.2"}
-sphinx = "^4.4.0"
-sphinx-autobuild = "^2021.3.14"
-pre-commit = "^3.5.0"
-flake8 = "^6.1.0"
-black = "^22.1"
-flake8-bandit = "^4.1.1"
-flake8-bugbear = "^23.9.16"
-flake8-docstrings = "^1.6.0"
-flake8-rst-docstrings = "^0.3.0"
-pep8-naming = "^0.13.3"
-darglint = "^1.8.1"
-reorder-python-imports = "^3.12.0"
-pre-commit-hooks = "^4.0.1"
-Pygments = "^2.11.2"
-nox-poetry = "^1.0.3"
-furo = "^2022.3.4"
-myst-parser = "^0.17.0"
-sybil = "^3.0.1"
+[tool.hatch.envs.default]
+python = "3.11"
+dependencies = [
+    "venusian~=3.1.0"
+]
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest~=7.4.3",
+    "nox~=2023.4.22",
+    "safety~=2.3.5",
+    "mypy~=1.7",
+    "sphinx~=4.4.0",
+    "sphinx-autobuild~=2021.3.14",
+    "pre-commit~=3.5.0",
+    "flake8~=6.1.0",
+    "black~=22.1",
+    "flake8-bandit~=4.1.1",
+    "flake8-bugbear~=23.9.16",
+    "flake8-docstrings~=1.6.0",
+    "flake8-rst-docstrings~=0.3.0",
+    "pep8-naming~=0.13.3",
+    "darglint~=1.8.1",
+    "reorder-python-imports~=3.12.0",
+    "pre-commit-hooks~=4.0.1",
+    "Pygments~=2.11.2",
+#    "nox-poetry~=1.0.3",
+    "furo~=2022.3.4",
+    "myst-parser~=0.17.0",
+    "sybil~=3.0.1"
+]
+[project.optional-dependencies]
+toml = [
+    "coverage~=7.3"
+] # allow-prereleases = true]
+colors = ["xdoctest~=1.1.2"]
 
 [tool.coverage.run]
 branch = true
@@ -59,5 +67,5 @@ addopts = "-p no:doctest"
 testpaths = ["tests", "examples", "docs"]
 
 [build-system]
-requires = ["poetry-core>=1.8.1"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
