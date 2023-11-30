@@ -54,6 +54,9 @@ toml = [
 ] # allow-prereleases = true]
 colors = ["xdoctest~=1.1.2"]
 
+[[tool.hatch.envs.test.matrix]]
+python = ["3.11", "3.12"]
+
 [tool.coverage.run]
 branch = true
 source_pkgs = ["hopscotch"]
