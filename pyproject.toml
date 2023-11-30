@@ -103,7 +103,7 @@ python = ["3.11", "3.12"]
 
 [tool.coverage.run]
 branch = true
-source_pkgs = ["hopscotcsh"]
+source_pkgs = ["hopscotch"]
 
 [tool.coverage.report]
 show_missing = true
