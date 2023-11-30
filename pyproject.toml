@@ -73,6 +73,16 @@ dependencies = [
     "safety"
 ]
 
+[tool.hatch.envs.xdoctest]
+dependencies = [
+    "xdoctest[colors]~=1.1.2"
+]
+
+[tool.hatch.envs.docs-build]
+dependencies = [
+    "sphinx", "furo", "myst_parser"
+]
+
 [[tool.hatch.envs.test.matrix]]
 python = ["3.11", "3.12"]
 
@@ -85,9 +95,15 @@ python = ["3.11", "3.12"]
 [[tool.hatch.envs.safety.matrix]]
 python = ["3.11", "3.12"]
 
+[[tool.hatch.envs.xdoctest.matrix]]
+python = ["3.11", "3.12"]
+
+[[tool.hatch.envs.docs-build.matrix]]
+python = ["3.11", "3.12"]
+
 [tool.coverage.run]
 branch = true
-source_pkgs = ["hopscotch"]
+source_pkgs = ["hopscotcsh"]
 
 [tool.coverage.report]
 show_missing = true
@@ -102,8 +118,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.envs.test.scripts]
-run-coverage = "pytest --cov-config=pyproject.toml --cov=pkg --cov=tests"
-run = "pytest --no-cov"
+run = "pytest --cov-config=pyproject.toml --cov=pkg --cov=tests"
 
 
 [tool.hatch.envs.pre-commit.scripts]
@@ -114,3 +129,9 @@ run = "mypy src/hopscotch tests docs/conf.py"
 
 [tool.hatch.envs.safety.scripts]
 run = "hatch -e safety.py3.12 dep show requirements | safety check --full-report --stdin"
+
+[tool.hatch.envs.xdoctest.scripts]
+run = "xdoctest --modname=hopscotch --command=all --colored=1"
+
+[tool.hatch.envs.docs-build.scripts]
+run = "sphinx-build docs docs/_build"
