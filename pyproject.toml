@@ -21,7 +21,25 @@ dependencies = [
 [tool.hatch.urls]
 Changelog = "https://github.com/pauleveritt/hopscotch/releases"
 
-
+[tool.hatch.envs.pre-commit]
+dependencies = [
+    "black",
+    "darglint",
+    "flake8",
+    "flake8-bandit",
+    "flake8-bugbear",
+    "flake8-docstrings",
+    "flake8-rst-docstrings",
+    "pep8-naming",
+    "pre-commit",
+    "pre-commit-hooks",
+    "reorder-python-imports"
+]
+[tool.hatch.envs.mypy]
+dependencies = [
+    "mypy",
+    "pytest"
+]
 [tool.hatch.envs.test]
 dependencies = [
     "pytest~=7.4.3",
@@ -50,7 +68,21 @@ dependencies = [
     "pytest-cov~=4.1.0",
 ]
 
+[tool.hatch.envs.safety]
+dependencies = [
+    "safety"
+]
+
 [[tool.hatch.envs.test.matrix]]
+python = ["3.11", "3.12"]
+
+[[tool.hatch.envs.pre-commit.matrix]]
+python = ["3.11", "3.12"]
+
+[[tool.hatch.envs.mypy.matrix]]
+python = ["3.11", "3.12"]
+
+[[tool.hatch.envs.safety.matrix]]
 python = ["3.11", "3.12"]
 
 [tool.coverage.run]
@@ -73,3 +105,12 @@ build-backend = "hatchling.build"
 run-coverage = "pytest --cov-config=pyproject.toml --cov=pkg --cov=tests"
 run = "pytest --no-cov"
 
+
+[tool.hatch.envs.pre-commit.scripts]
+run = "pre-commit run --all-files --show-diff-on-failure"
+
+[tool.hatch.envs.mypy.scripts]
+run = "mypy src/hopscotch tests docs/conf.py"
+
+[tool.hatch.envs.safety.scripts]
+run = "hatch -e safety.py3.12 dep show requirements | safety check --full-report --stdin"

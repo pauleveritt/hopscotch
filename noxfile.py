@@ -84,26 +84,26 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
         hook.write_text("\n".join(lines))
 
 
-@session(name="pre-commit", python=python_versions[0])
-def precommit(session: Session) -> None:
-    """Lint using pre-commit."""
-    args = session.posargs or ["run", "--all-files", "--show-diff-on-failure"]
-    session.install(
-        "black",
-        "darglint",
-        "flake8",
-        "flake8-bandit",
-        "flake8-bugbear",
-        "flake8-docstrings",
-        "flake8-rst-docstrings",
-        "pep8-naming",
-        "pre-commit",
-        "pre-commit-hooks",
-        "reorder-python-imports",
-    )
-    session.run("pre-commit", *args)
-    if args and args[0] == "install":
-        activate_virtualenv_in_precommit_hooks(session)
+# @session(name="pre-commit", python=python_versions[0])
+# def precommit(session: Session) -> None:
+#     """Lint using pre-commit."""
+#     args = session.posargs or ["run", "--all-files", "--show-diff-on-failure"]
+#     session.install(
+#         "black",
+#         "darglint",
+#         "flake8",
+#         "flake8-bandit",
+#         "flake8-bugbear",
+#         "flake8-docstrings",
+#         "flake8-rst-docstrings",
+#         "pep8-naming",
+#         "pre-commit",
+#         "pre-commit-hooks",
+#         "reorder-python-imports",
+#     )
+#     session.run("pre-commit", *args)
+#     if args and args[0] == "install":
+#         activate_virtualenv_in_precommit_hooks(session)
 
 
 # @session(python=python_versions[0])
@@ -114,16 +114,16 @@ def precommit(session: Session) -> None:
 #     session.run("safety", "check", "--full-report", f"--file={requirements}")
 
 
-@session(python=python_versions)
-def mypy(session: Session) -> None:
-    """Type-check using mypy."""
-    args = session.posargs or ["src/hopscotch", "tests", "docs/conf.py"]
-    session.install(".")
-    session.install("mypy", "pytest")
-    session.run("mypy", *args)
-    if not session.posargs:
-        session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
-
+# @session(python=python_versions)
+# def mypy(session: Session) -> None:
+#     """Type-check using mypy."""
+#     args = session.posargs or ["src/hopscotch", "tests", "docs/conf.py"]
+#     session.install(".")
+#     session.install("mypy", "pytest")
+#     session.run("mypy", *args)
+#     if not session.posargs:
+#         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
+#
 
 @session(python=python_versions)
 def tests(session: Session) -> None:

@@ -78,7 +78,7 @@ jobs:
 
       - name: Run `hatch run test`
         run: |
-          hatch run +py=${{ matrix.python }} test:run-coverage 
+          hatch run +py=${{ matrix.python }} test:run-coverage
 
       - name: Upload coverage data
         if: always() && matrix.session == 'tests'
@@ -93,7 +93,6 @@ jobs:
         with:
           name: docs
           path: docs/_build
-
 #  coverage:
 #    runs-on: ubuntu-latest
 #    needs: tests
