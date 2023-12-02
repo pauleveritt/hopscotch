@@ -26,12 +26,16 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
-
+      - name: Create .script-cache.txt for pip cache
+        run: |
+          echo ${{ matrix.script }} > .script-cache.txt
+        shell: bash
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-
+          cache: pip
+          cache-dependency-path: .script-cache.txt
       - name: Upgrade pip
         run: |
           pip install --constraint=.github/workflows/constraints.txt pip
