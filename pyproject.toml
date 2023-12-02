@@ -124,7 +124,7 @@ run = "sphinx-build docs docs/_build"
 line-length = 88
 extend-select = ['B','B9','C','D','E','F','N','S','W']
 flake8-quotes = {inline-quotes = 'double', multiline-quotes = 'double'}
-target-version = 'py37'
+target-version = 'py311'
 ignore = ['E203','E501','N802','B009','B010']
 
 [tool.ruff.lint.mccabe]
