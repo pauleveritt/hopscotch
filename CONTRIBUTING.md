@@ -34,22 +34,13 @@ Request features on the [Issue Tracker](https://github.com/pauleveritt/hopscotch
 
 You need Python 3.6+ and the following tools:
 
-- [Poetry](https://python-poetry.org/)
+- [Hatch](https://hatch.pypa.io/)
 - [Nox](https://nox.thea.codes/)
-- [nox-poetry](https://nox-poetry.readthedocs.io/)
 
 Install the package with development requirements:
 
 ```shell
-$ poetry install
-```
-
-You can now run an interactive Python session,
-or the command-line interface:
-
-```shell
-$ poetry run python
-$ poetry run hopscotch
+$ hatch shell
 ```
 
 ## How to test the project
