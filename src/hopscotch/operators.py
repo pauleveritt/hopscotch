@@ -44,7 +44,7 @@ def make_field_operator(operator_class: Any) -> Any:
 
         # Use dataclass field metadata support to smuggle our injector
         # information through to the other side.
-        kwargs["metadata"]["injected"] = dict(operator=operator)
+        kwargs["metadata"]["injected"] = {"operator": operator}
         return field(**kwargs)  # type: ignore
 
     return _inner

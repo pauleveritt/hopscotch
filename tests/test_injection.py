@@ -101,7 +101,7 @@ def test_inject_function_no_type_hint() -> None:
 
 def test_injection_no_registry() -> None:
     """Simulate usage of injection rules without needing a registry."""
-    props = dict(salutation="No registry")
+    props = {"salutation": "No registry"}
     registration = Registration(Greeting)
     result: Greeting = inject_callable(registration, props=props)
     assert "No registry" == result.salutation
@@ -155,7 +155,7 @@ def test_dependency_nested_registry() -> None:
 
 def test_pass_in_props_create_dependency() -> None:
     """Instead of injecting a field, get it from passed-in 'props'."""
-    props = dict(salutation="use prop")
+    props = {"salutation": "use prop"}
     registration = Registration(Greeting)
     result: Greeting = inject_callable(registration, props=props)
     assert result.salutation == "use prop"

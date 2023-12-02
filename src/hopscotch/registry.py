@@ -173,10 +173,10 @@ class KindGroups(TypedDict):
 
 def make_singletons_classes() -> KindGroups:
     """Factory for defaultdict to initialize second level of tree."""
-    kind_groups: KindGroups = dict(
-        singletons=defaultdict(list),
-        classes=defaultdict(list),
-    )
+    kind_groups: KindGroups = {
+        "singletons": defaultdict(list),
+        "classes": defaultdict(list),
+    }
     return kind_groups
 
 
@@ -251,11 +251,11 @@ class Registry:
         # We will put possible matches into three piles: high/medium/low
         # precedence. Each pile is an ordered list based on registration
         # time (later registrations override earlier.)
-        precedences: dict[str, list[Registration]] = dict(
-            high=list(),
-            medium=list(),
-            low=list(),
-        )
+        precedences: dict[str, list[Registration]] = {
+            "high": [],
+            "medium": [],
+            "low": [],
+        }
         for this_context, these_registrations in registrations.items():
             if this_context is IsNoneType and context_class is None:
                 # This is the most basic case, test it first to bail out quickly.
