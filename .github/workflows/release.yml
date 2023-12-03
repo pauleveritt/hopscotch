@@ -44,13 +44,6 @@ jobs:
           version-command: |
             bash -o pipefail -c "hatch version"
 
-      - name: Bump version for developmental release
-        if: "! steps.check-version.outputs.tag"
-        run: |
-          hatch version patch &&
-          version=$(hatch version) &&
-          hatch version $version.dev.$(date +%s)
-
       - name: Build package
         run: |
           hatch build
@@ -61,14 +54,6 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-
-      #      - name: Publish package on TestPyPI
-      #        if: "! steps.check-version.outputs.tag"
-      #        uses: pypa/gh-action-pypi-publish@v1.8.11
-      #        with:
-      #          user: __token__
-      #          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-      #          repository_url: https://test.pypi.org/legacy/
 
       - name: Publish the release notes
         uses: release-drafter/release-drafter@v5.25.0
