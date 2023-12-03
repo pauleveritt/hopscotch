@@ -1,5 +1,5 @@
 [project]
-version = "0.3.1"
+dynamic = ["version"]
 build-targets = ["wheel"]
 name = "hopscotch"
 description = "Type-oriented registry with dependency injection."
@@ -17,6 +17,9 @@ requires-python = ">=3.11"
 dependencies = [
     "venusian~=3.1.0"
 ]
+
+[tool.hatch.version]
+path = "src/hopscotch/version.py"
 
 [tool.hatch.urls]
 Changelog = "https://github.com/pauleveritt/hopscotch/releases"
