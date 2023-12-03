@@ -131,7 +131,7 @@ def test_operators_operators_value_none() -> None:
 def test_make_field_operator() -> None:
     """Turn an operator into a dataclass field."""
     get = make_field_operator(Get)
-    get_field = get(Greeting, attr="salutation", metadata=dict(flag=9))
+    get_field = get(Greeting, attr="salutation", metadata={"flag": 9})
     metadata = get_field.metadata
     assert metadata["flag"] == 9
     injected = metadata["injected"]
