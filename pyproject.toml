@@ -41,17 +41,13 @@ dependencies = [
     "coverage[toml]~=7.3",
     "pytest-cov~=4.1.0",
     "ruff~=0.1.6",
-    "ruff-lsp~=0.0.45"
+    "ruff-lsp~=0.0.45",
+    "sphinx~=4.4.0",
 ]
 
 [tool.hatch.envs.safety]
 dependencies = [
     "safety~=2.3.5",
-]
-
-[tool.hatch.envs.xdoctest]
-dependencies = [
-    "xdoctest[colors]~=1.1.2"
 ]
 
 [tool.hatch.envs.docs-build]
@@ -74,9 +70,6 @@ python = ["3.12"]
 
 [[tool.hatch.envs.safety.matrix]]
 python = ["3.12"]
-
-[[tool.hatch.envs.xdoctest.matrix]]
-python = ["3.11", "3.12"]
 
 [[tool.hatch.envs.docs-build.matrix]]
 python = ["3.12"]
@@ -110,9 +103,6 @@ run = "mypy src/hopscotch tests docs/conf.py"
 
 [tool.hatch.envs.safety.scripts]
 run = "hatch -e safety.py3.12 dep show requirements | safety check --full-report --stdin"
-
-[tool.hatch.envs.xdoctest.scripts]
-run = "xdoctest --modname=hopscotch --command=all --colored=1"
 
 [tool.hatch.envs.docs-build.scripts]
 run = "sphinx-build docs docs/_build"

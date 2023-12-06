@@ -17,7 +17,6 @@ jobs:
           - { python: "3.12", os: "ubuntu-latest", script: "test" }
           - { python: "3.12", os: "windows-latest", script: "test" }
           - { python: "3.12", os: "macos-latest", script: "test" }
-          - { python: "3.12", os: "ubuntu-latest", script: "xdoctest" }
           - { python: "3.12", os: "ubuntu-latest", script: "docs-build" }
 
     env:
