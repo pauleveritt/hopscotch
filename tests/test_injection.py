@@ -155,7 +155,7 @@ def test_dependency_nested_registry() -> None:
 
 def test_pass_in_props_create_dependency() -> None:
     """Instead of injecting a field, get it from passed-in 'props'."""
-    props = {"salutation": "use prop"}
+    props = dict(salutation="use prop")  # noqa: C408
     registration = Registration(Greeting)
     result: Greeting = inject_callable(registration, props=props)
     assert result.salutation == "use prop"
