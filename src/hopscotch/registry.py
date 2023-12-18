@@ -225,7 +225,8 @@ class Registry:
         elif isinstance(pkg, str):
             # importlib.resource package specification
             pkg = import_module(pkg)
-        self.scanner.scan(pkg)
+        if pkg is not None:
+            self.scanner.scan(pkg)
 
     def inject(self, registration: Registration, props: Optional[Props] = None) -> T:
         """Use injection to construct and return an instance."""
